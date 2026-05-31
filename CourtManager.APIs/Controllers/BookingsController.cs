@@ -222,7 +222,7 @@ public class BookingsController : BaseApiController
     {
         _logger.LogInformation("Locking time slot {SlotId} for booking {BookingId}", slotId, bookingId);
 
-        var command = new LockTimeSlotCommand(slotId, bookingId);
+        var command = new LockTimeSlotCommand(slotId, bookingId, CurrentUserId);
         var result = await _mediator.Send(command, cancellationToken);
 
         _logger.LogInformation("Time slot {SlotId} locked successfully", slotId);

@@ -71,7 +71,11 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
                 }
 
                 if (slot.SlotStatus != CourtManager.Domain.Enums.SlotStatus.Available)
-                    throw new ValidationException($"Slot {slotId} is not available.");
+                {
+                    bool isLockedByCurrentUser = slot.SlotStatus == CourtManager.Domain.Enums.SlotStatus.Locked && slot.LockedBy == request.UserId;
+                    if (!isLockedByCurrentUser)
+                        throw new ValidationException($"Slot {slotId} is not available.");
+                }
 
                 slots.Add(slot);
             }

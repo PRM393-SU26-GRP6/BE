@@ -9,7 +9,7 @@ public class Message
     public Guid RoomId { get; set; }
     public Guid SenderId { get; set; }
     public string MessageText { get; set; } = string.Empty;
-    public bool IsRead { get; set; } = false;
+    public DateTime? ReadAt { get; set; } // null = unread
     public DateTime SentAt { get; set; }
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }

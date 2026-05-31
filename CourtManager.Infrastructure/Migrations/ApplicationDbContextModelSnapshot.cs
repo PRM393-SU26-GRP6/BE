@@ -97,6 +97,38 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Bookings", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("60000000-0000-0000-0000-000000000001"),
+                            BookingStatus = "Completed",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 100000m,
+                            IsDeleted = false,
+                            TotalPrice = 200000m,
+                            UserId = new Guid("20000000-0000-0000-0000-000000000006")
+                        },
+                        new
+                        {
+                            Id = new Guid("60000000-0000-0000-0000-000000000002"),
+                            BookingStatus = "Completed",
+                            CreatedAt = new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 100000m,
+                            IsDeleted = false,
+                            TotalPrice = 200000m,
+                            UserId = new Guid("20000000-0000-0000-0000-000000000007")
+                        },
+                        new
+                        {
+                            Id = new Guid("60000000-0000-0000-0000-000000000003"),
+                            BookingStatus = "Completed",
+                            CreatedAt = new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 100000m,
+                            IsDeleted = false,
+                            TotalPrice = 200000m,
+                            UserId = new Guid("20000000-0000-0000-0000-000000000008")
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.BookingDiscount", b =>
@@ -181,9 +213,10 @@ namespace CourtManager.Infrastructure.Migrations
 
                     b.HasKey("RoomId");
 
-                    b.HasIndex("CustomerId");
-
                     b.HasIndex("HostId");
+
+                    b.HasIndex("CustomerId", "HostId")
+                        .IsUnique();
 
                     b.ToTable("ChatRooms", (string)null);
                 });
@@ -196,22 +229,24 @@ namespace CourtManager.Infrastructure.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("DiscountType")
-                        .HasColumnType("integer");
+                    b.Property<string>("DiscountType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("FieldId")
-                        .HasColumnType("uuid");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -220,14 +255,17 @@ namespace CourtManager.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<decimal>("MaxDiscountAmount")
-                        .HasColumnType("numeric");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
 
                     b.Property<decimal>("MinBookingAmount")
-                        .HasColumnType("numeric");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
@@ -242,15 +280,22 @@ namespace CourtManager.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("numeric");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<Guid?>("VenueId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("DiscountId");
 
-                    b.HasIndex("FieldId");
+                    b.HasIndex("Code")
+                        .IsUnique();
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Discounts");
+                    b.HasIndex("VenueId");
+
+                    b.ToTable("Discounts", (string)null);
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.FootballField", b =>
@@ -265,11 +310,6 @@ namespace CourtManager.Infrastructure.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
 
                     b.Property<string>("FieldName")
                         .IsRequired()
@@ -304,6 +344,63 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("VenueId");
 
                     b.ToTable("FootballFields", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("40000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            FieldName = "Sân 5 số 1",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 200000m,
+                            VenueId = new Guid("30000000-0000-0000-0000-000000000001")
+                        },
+                        new
+                        {
+                            Id = new Guid("40000000-0000-0000-0000-000000000002"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            FieldName = "Sân 5 số 2",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 220000m,
+                            VenueId = new Guid("30000000-0000-0000-0000-000000000001")
+                        },
+                        new
+                        {
+                            Id = new Guid("40000000-0000-0000-0000-000000000003"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            FieldName = "Sân 7 VIP",
+                            FieldType = "SevenASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 450000m,
+                            VenueId = new Guid("30000000-0000-0000-0000-000000000001")
+                        },
+                        new
+                        {
+                            Id = new Guid("40000000-0000-0000-0000-000000000004"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            FieldName = "Sân A",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 180000m,
+                            VenueId = new Guid("30000000-0000-0000-0000-000000000002")
+                        },
+                        new
+                        {
+                            Id = new Guid("40000000-0000-0000-0000-000000000005"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            FieldName = "Sân B",
+                            FieldType = "SevenASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 400000m,
+                            VenueId = new Guid("30000000-0000-0000-0000-000000000002")
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.Message", b =>
@@ -318,13 +415,13 @@ namespace CourtManager.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("MessageText")
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("RoomId")
                         .HasColumnType("uuid");
@@ -399,9 +496,6 @@ namespace CourtManager.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("boolean");
-
                     b.Property<Guid>("NotificationId")
                         .HasColumnType("uuid");
 
@@ -435,26 +529,6 @@ namespace CourtManager.Infrastructure.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Gateway")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("GatewayAccountNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("GatewayRawContent")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("GatewayReferenceCode")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("GatewayTransactionId")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -476,6 +550,14 @@ namespace CourtManager.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<decimal?>("RefundAmount")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<string>("RefundReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<string>("TransactionCode")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -486,12 +568,6 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("BookingId");
 
                     b.HasIndex("TransactionCode")
-                        .IsUnique();
-
-                    b.HasIndex("Gateway", "GatewayReferenceCode")
-                        .IsUnique();
-
-                    b.HasIndex("Gateway", "GatewayTransactionId")
                         .IsUnique();
 
                     b.ToTable("Payments", (string)null);
@@ -540,6 +616,41 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("VenueId");
 
                     b.ToTable("Reviews", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ReviewId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            BookingId = new Guid("60000000-0000-0000-0000-000000000001"),
+                            Comment = "Sân rất đẹp, đèn sáng.",
+                            CreatedAt = new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Rating = 5,
+                            UserId = new Guid("20000000-0000-0000-0000-000000000006"),
+                            VenueId = new Guid("30000000-0000-0000-0000-000000000001")
+                        },
+                        new
+                        {
+                            ReviewId = new Guid("50000000-0000-0000-0000-000000000002"),
+                            BookingId = new Guid("60000000-0000-0000-0000-000000000002"),
+                            Comment = "Cỏ hơi mòn ở khu vực giữa sân.",
+                            CreatedAt = new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Rating = 4,
+                            UserId = new Guid("20000000-0000-0000-0000-000000000007"),
+                            VenueId = new Guid("30000000-0000-0000-0000-000000000001")
+                        },
+                        new
+                        {
+                            ReviewId = new Guid("50000000-0000-0000-0000-000000000003"),
+                            BookingId = new Guid("60000000-0000-0000-0000-000000000003"),
+                            Comment = "Giá cả hợp lý, chủ sân nhiệt tình.",
+                            CreatedAt = new DateTime(2025, 1, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Rating = 5,
+                            UserId = new Guid("20000000-0000-0000-0000-000000000008"),
+                            VenueId = new Guid("30000000-0000-0000-0000-000000000002")
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.Role", b =>
@@ -577,6 +688,35 @@ namespace CourtManager.Infrastructure.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("Roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("10000000-0000-0000-0000-000000000001"),
+                            ConcurrencyStamp = "10000000-0000-0000-0000-000000000001",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Administrator with full access",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = new Guid("10000000-0000-0000-0000-000000000002"),
+                            ConcurrencyStamp = "10000000-0000-0000-0000-000000000002",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Court manager",
+                            Name = "Manager",
+                            NormalizedName = "MANAGER"
+                        },
+                        new
+                        {
+                            Id = new Guid("10000000-0000-0000-0000-000000000003"),
+                            ConcurrencyStamp = "10000000-0000-0000-0000-000000000003",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Regular player",
+                            Name = "Player",
+                            NormalizedName = "PLAYER"
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.TimeSlot", b =>
@@ -602,6 +742,9 @@ namespace CourtManager.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid?>("LockedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("LockedUntil")
                         .HasColumnType("timestamp with time zone");
 
@@ -623,7 +766,9 @@ namespace CourtManager.Infrastructure.Migrations
 
                     b.HasKey("SlotId");
 
-                    b.HasIndex("FieldId");
+                    b.HasIndex("LockedBy");
+
+                    b.HasIndex("FieldId", "StartTime");
 
                     b.ToTable("TimeSlots", (string)null);
                 });
@@ -734,6 +879,275 @@ namespace CourtManager.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000001"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000001",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "admin1@court.com",
+                            EmailConfirmed = false,
+                            FullName = "System Admin1",
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockoutEnabled = false,
+                            LoyaltyPoints = 0,
+                            NormalizedEmail = "ADMIN1@COURT.COM",
+                            NormalizedUserName = "ADMIN1@COURT.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            Phone = "0900000001",
+                            PhoneNumber = "0900000001",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "20000000-0000-0000-0000-000000000001",
+                            TwoFactorEnabled = false,
+                            UserName = "admin1@court.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000002"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000002",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "admin2@court.com",
+                            EmailConfirmed = false,
+                            FullName = "System Admin2",
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockoutEnabled = false,
+                            LoyaltyPoints = 0,
+                            NormalizedEmail = "ADMIN2@COURT.COM",
+                            NormalizedUserName = "ADMIN2@COURT.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            Phone = "0900000002",
+                            PhoneNumber = "0900000002",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "20000000-0000-0000-0000-000000000002",
+                            TwoFactorEnabled = false,
+                            UserName = "admin2@court.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000003"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000003",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "manager1@court.com",
+                            EmailConfirmed = false,
+                            FullName = "Court Manager1",
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockoutEnabled = false,
+                            LoyaltyPoints = 0,
+                            NormalizedEmail = "MANAGER1@COURT.COM",
+                            NormalizedUserName = "MANAGER1@COURT.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            Phone = "0900000003",
+                            PhoneNumber = "0900000003",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "20000000-0000-0000-0000-000000000003",
+                            TwoFactorEnabled = false,
+                            UserName = "manager1@court.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000004"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000004",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "manager2@court.com",
+                            EmailConfirmed = false,
+                            FullName = "Court Manager2",
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockoutEnabled = false,
+                            LoyaltyPoints = 0,
+                            NormalizedEmail = "MANAGER2@COURT.COM",
+                            NormalizedUserName = "MANAGER2@COURT.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            Phone = "0900000004",
+                            PhoneNumber = "0900000004",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "20000000-0000-0000-0000-000000000004",
+                            TwoFactorEnabled = false,
+                            UserName = "manager2@court.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000005"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000005",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "manager3@court.com",
+                            EmailConfirmed = false,
+                            FullName = "Court Manager3",
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockoutEnabled = false,
+                            LoyaltyPoints = 0,
+                            NormalizedEmail = "MANAGER3@COURT.COM",
+                            NormalizedUserName = "MANAGER3@COURT.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            Phone = "0900000005",
+                            PhoneNumber = "0900000005",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "20000000-0000-0000-0000-000000000005",
+                            TwoFactorEnabled = false,
+                            UserName = "manager3@court.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000006"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000006",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "player1@court.com",
+                            EmailConfirmed = false,
+                            FullName = "Pro Player1",
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockoutEnabled = false,
+                            LoyaltyPoints = 0,
+                            NormalizedEmail = "PLAYER1@COURT.COM",
+                            NormalizedUserName = "PLAYER1@COURT.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            Phone = "0900000006",
+                            PhoneNumber = "0900000006",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "20000000-0000-0000-0000-000000000006",
+                            TwoFactorEnabled = false,
+                            UserName = "player1@court.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000007"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000007",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "player2@court.com",
+                            EmailConfirmed = false,
+                            FullName = "Pro Player2",
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockoutEnabled = false,
+                            LoyaltyPoints = 0,
+                            NormalizedEmail = "PLAYER2@COURT.COM",
+                            NormalizedUserName = "PLAYER2@COURT.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            Phone = "0900000007",
+                            PhoneNumber = "0900000007",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "20000000-0000-0000-0000-000000000007",
+                            TwoFactorEnabled = false,
+                            UserName = "player2@court.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000008"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000008",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "player3@court.com",
+                            EmailConfirmed = false,
+                            FullName = "Casual Player3",
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockoutEnabled = false,
+                            LoyaltyPoints = 0,
+                            NormalizedEmail = "PLAYER3@COURT.COM",
+                            NormalizedUserName = "PLAYER3@COURT.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            Phone = "0900000008",
+                            PhoneNumber = "0900000008",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "20000000-0000-0000-0000-000000000008",
+                            TwoFactorEnabled = false,
+                            UserName = "player3@court.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000009"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000009",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "player4@court.com",
+                            EmailConfirmed = false,
+                            FullName = "Casual Player4",
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockoutEnabled = false,
+                            LoyaltyPoints = 0,
+                            NormalizedEmail = "PLAYER4@COURT.COM",
+                            NormalizedUserName = "PLAYER4@COURT.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            Phone = "0900000009",
+                            PhoneNumber = "0900000009",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "20000000-0000-0000-0000-000000000009",
+                            TwoFactorEnabled = false,
+                            UserName = "player4@court.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000010"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000010",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "player5@court.com",
+                            EmailConfirmed = false,
+                            FullName = "Newbie Player5",
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockoutEnabled = false,
+                            LoyaltyPoints = 0,
+                            NormalizedEmail = "PLAYER5@COURT.COM",
+                            NormalizedUserName = "PLAYER5@COURT.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            Phone = "0900000010",
+                            PhoneNumber = "0900000010",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "20000000-0000-0000-0000-000000000010",
+                            TwoFactorEnabled = false,
+                            UserName = "player5@court.com"
+                        });
+                });
+
+            modelBuilder.Entity("CourtManager.Domain.Entities.UserDevice", b =>
+                {
+                    b.Property<Guid>("DeviceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("DeviceType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("FcmToken")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("DeviceId");
+
+                    b.HasIndex("FcmToken")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserDevices", (string)null);
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.UserRole", b =>
@@ -754,6 +1168,68 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("UserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("20000000-0000-0000-0000-000000000001"),
+                            RoleId = new Guid("10000000-0000-0000-0000-000000000001"),
+                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = new Guid("20000000-0000-0000-0000-000000000002"),
+                            RoleId = new Guid("10000000-0000-0000-0000-000000000001"),
+                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = new Guid("20000000-0000-0000-0000-000000000003"),
+                            RoleId = new Guid("10000000-0000-0000-0000-000000000002"),
+                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = new Guid("20000000-0000-0000-0000-000000000004"),
+                            RoleId = new Guid("10000000-0000-0000-0000-000000000002"),
+                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = new Guid("20000000-0000-0000-0000-000000000005"),
+                            RoleId = new Guid("10000000-0000-0000-0000-000000000002"),
+                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = new Guid("20000000-0000-0000-0000-000000000006"),
+                            RoleId = new Guid("10000000-0000-0000-0000-000000000003"),
+                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = new Guid("20000000-0000-0000-0000-000000000007"),
+                            RoleId = new Guid("10000000-0000-0000-0000-000000000003"),
+                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = new Guid("20000000-0000-0000-0000-000000000008"),
+                            RoleId = new Guid("10000000-0000-0000-0000-000000000003"),
+                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = new Guid("20000000-0000-0000-0000-000000000009"),
+                            RoleId = new Guid("10000000-0000-0000-0000-000000000003"),
+                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = new Guid("20000000-0000-0000-0000-000000000010"),
+                            RoleId = new Guid("10000000-0000-0000-0000-000000000003"),
+                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.Venue", b =>
@@ -764,8 +1240,7 @@ namespace CourtManager.Infrastructure.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -784,39 +1259,66 @@ namespace CourtManager.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<decimal>("Latitude")
-                        .HasPrecision(18, 10)
-                        .HasColumnType("numeric(18,10)");
+                        .HasColumnType("numeric");
 
                     b.Property<decimal>("Longitude")
-                        .HasPrecision(18, 10)
-                        .HasColumnType("numeric(18,10)");
+                        .HasColumnType("numeric");
 
                     b.Property<string>("OpeningHours")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("PhoneContact")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("VenueName")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("text");
 
                     b.HasKey("VenueId");
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Venues", (string)null);
+                    b.ToTable("Venues");
+
+                    b.HasData(
+                        new
+                        {
+                            VenueId = new Guid("30000000-0000-0000-0000-000000000001"),
+                            Address = "30 Phan Thúc Duyện, Tân Bình, TP.HCM",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Cụm sân bóng mini lớn nhất Tân Bình.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Latitude = 10.8016m,
+                            Longitude = 106.6653m,
+                            OpeningHours = "06:00 - 23:00",
+                            OwnerId = new Guid("20000000-0000-0000-0000-000000000003"),
+                            PhoneContact = "0900000003",
+                            VenueName = "Sân Bóng Chảo Lửa"
+                        },
+                        new
+                        {
+                            VenueId = new Guid("30000000-0000-0000-0000-000000000002"),
+                            Address = "Hẻm 12 Thăng Long, Tân Bình, TP.HCM",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Sân cỏ nhân tạo mới thay, chất lượng cao.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Latitude = 10.8030m,
+                            Longitude = 106.6620m,
+                            OpeningHours = "05:00 - 24:00",
+                            OwnerId = new Guid("20000000-0000-0000-0000-000000000003"),
+                            PhoneContact = "0900000003",
+                            VenueName = "Sân Bóng Thăng Long"
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.VenueAmenity", b =>
@@ -1026,19 +1528,20 @@ namespace CourtManager.Infrastructure.Migrations
 
             modelBuilder.Entity("CourtManager.Domain.Entities.Discount", b =>
                 {
-                    b.HasOne("CourtManager.Domain.Entities.FootballField", "Field")
-                        .WithMany("Discounts")
-                        .HasForeignKey("FieldId");
-
                     b.HasOne("CourtManager.Domain.Entities.User", "Owner")
                         .WithMany("CreatedDiscounts")
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Field");
+                    b.HasOne("CourtManager.Domain.Entities.Venue", "Venue")
+                        .WithMany("Discounts")
+                        .HasForeignKey("VenueId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Owner");
+
+                    b.Navigation("Venue");
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.FootballField", b =>
@@ -1143,7 +1646,25 @@ namespace CourtManager.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CourtManager.Domain.Entities.User", "LockedByUser")
+                        .WithMany()
+                        .HasForeignKey("LockedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Field");
+
+                    b.Navigation("LockedByUser");
+                });
+
+            modelBuilder.Entity("CourtManager.Domain.Entities.UserDevice", b =>
+                {
+                    b.HasOne("CourtManager.Domain.Entities.User", "User")
+                        .WithMany("Devices")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.UserRole", b =>
@@ -1170,7 +1691,7 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasOne("CourtManager.Domain.Entities.User", "Owner")
                         .WithMany("OwnedVenues")
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Owner");
@@ -1272,8 +1793,6 @@ namespace CourtManager.Infrastructure.Migrations
                 {
                     b.Navigation("Bookings");
 
-                    b.Navigation("Discounts");
-
                     b.Navigation("TimeSlots");
                 });
 
@@ -1300,6 +1819,8 @@ namespace CourtManager.Infrastructure.Migrations
 
                     b.Navigation("CustomerChatRooms");
 
+                    b.Navigation("Devices");
+
                     b.Navigation("HostChatRooms");
 
                     b.Navigation("NotificationRecipients");
@@ -1317,6 +1838,8 @@ namespace CourtManager.Infrastructure.Migrations
 
             modelBuilder.Entity("CourtManager.Domain.Entities.Venue", b =>
                 {
+                    b.Navigation("Discounts");
+
                     b.Navigation("FootballFields");
 
                     b.Navigation("Reviews");

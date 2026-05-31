@@ -12,6 +12,8 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
         builder.Property(p => p.Id).ValueGeneratedNever();
         builder.Property(p => p.BookingId).IsRequired();
         builder.Property(p => p.Amount).HasPrecision(10, 2);
+        builder.Property(p => p.RefundAmount).HasPrecision(10, 2);
+        builder.Property(p => p.RefundReason).HasMaxLength(500);
         builder.Property(p => p.PaymentType).IsRequired().HasConversion<string>().HasMaxLength(50);
         builder.Property(p => p.PaymentMethod).HasConversion<int>();
         builder.Property(p => p.PaymentStatus).IsRequired().HasConversion<string>().HasDefaultValue(CourtManager.Domain.Enums.PaymentStatus.Pending).HasMaxLength(50);

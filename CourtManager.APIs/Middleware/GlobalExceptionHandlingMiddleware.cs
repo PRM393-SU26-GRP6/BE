@@ -40,6 +40,7 @@ public class GlobalExceptionHandlingMiddleware
         {
             case ArgumentNullException:
             case ArgumentException:
+            case InvalidOperationException:
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 response.Message = "Invalid input provided.";
                 response.Details = exception.Message;
@@ -61,6 +62,18 @@ public class GlobalExceptionHandlingMiddleware
             case UnauthorizedAccessException:
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 response.Message = "Unauthorized access.";
+                response.Details = exception.Message;
+                break;
+
+            case CourtManager.Application.Exceptions.ForbiddenException:
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                response.Message = "You do not have permission to perform this action.";
+                response.Details = exception.Message;
+                break;
+
+            case CourtManager.Application.Exceptions.NotFoundException:
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                response.Message = "The requested resource was not found.";
                 response.Details = exception.Message;
                 break;
 

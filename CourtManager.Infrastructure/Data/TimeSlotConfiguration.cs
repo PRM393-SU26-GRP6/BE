@@ -15,6 +15,8 @@ public class TimeSlotConfiguration : IEntityTypeConfiguration<TimeSlot>
         builder.Property(s => s.CreatedAt).ValueGeneratedOnAdd().HasDefaultValueSql("CURRENT_TIMESTAMP");
         builder.HasQueryFilter(s => !s.IsDeleted);
         builder.HasMany(s => s.BookingItems).WithOne(bi => bi.Slot).HasForeignKey(bi => bi.SlotId).OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(s => s.LockedByUser).WithMany().HasForeignKey(s => s.LockedBy).OnDelete(DeleteBehavior.Restrict);
+        builder.HasIndex(s => new { s.FieldId, s.StartTime });
         builder.ToTable("TimeSlots");
     }
 }

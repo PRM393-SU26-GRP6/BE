@@ -1,5 +1,6 @@
 using CourtManager.Application.DTOs;
-using CourtManager.Application.Features.Venues;
+using CourtManager.Application.Features.Venues.Commands;
+using CourtManager.Application.Features.Venues.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,8 +8,8 @@ using System.Security.Claims;
 
 namespace CourtManager.APIs.Controllers;
 
+[Route("api/v1/[controller]")]
 [ApiController]
-[Route("api/v1/venues")]
 public class VenuesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -19,105 +20,124 @@ public class VenuesController : ControllerBase
     }
 
     [HttpGet]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(IEnumerable<VenueDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<VenueDto>>> GetVenues([FromQuery] VenueQueryDto query, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetVenues([FromQuery] GetVenuesQuery query)
     {
-        var venues = await _mediator.Send(new GetVenuesQuery(query), cancellationToken);
-        return Ok(venues);
+        var result = await _mediator.Send(query);
+        
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = result,
+            errors = Array.Empty<string>()
+        });
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetVenueById(Guid id)
+    {
+        var result = await _mediator.Send(new GetVenueByIdQuery(id));
+        
+        if (result == null)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "Venue not found.",
+                errors = new[] { "VENUE_NOT_FOUND" }
+            });
+        }
+
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = result,
+            errors = Array.Empty<string>()
+        });
+    }
+
+    [HttpGet("{id}/fields")]
+    public async Task<IActionResult> GetVenueFields(Guid id)
+    {
+        var result = await _mediator.Send(new GetVenueFieldsQuery(id));
+        
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = result,
+            errors = Array.Empty<string>()
+        });
+    }
+
+    [HttpGet("{id}/amenities")]
+    public async Task<IActionResult> GetVenueAmenities(Guid id)
+    {
+        var result = await _mediator.Send(new GetVenueAmenitiesQuery(id));
+        
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = result,
+            errors = Array.Empty<string>()
+        });
+    }
+
+    [HttpGet("{id}/images")]
+    public async Task<IActionResult> GetVenueImages(Guid id)
+    {
+        var result = await _mediator.Send(new GetVenueImagesQuery(id));
+        
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = result,
+            errors = Array.Empty<string>()
+        });
     }
 
     [HttpGet("search")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(IEnumerable<VenueDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<VenueDto>>> SearchVenues([FromQuery] string? q, CancellationToken cancellationToken)
+    public async Task<IActionResult> SearchVenues([FromQuery] string q, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        var venues = await _mediator.Send(new GetVenuesQuery(new VenueQueryDto { Q = q }), cancellationToken);
-        return Ok(venues);
+        var query = new GetVenuesQuery
+        {
+            Q = q,
+            Page = page,
+            PageSize = pageSize
+        };
+
+        var result = await _mediator.Send(query);
+        
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = result,
+            errors = Array.Empty<string>()
+        });
     }
 
     [HttpGet("map/nearby")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(IEnumerable<VenueDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<VenueDto>>> GetNearbyVenues(
-        [FromQuery] decimal lat,
-        [FromQuery] decimal lng,
-        [FromQuery] decimal radiusKm = 10,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 20,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetNearbyVenues([FromQuery] double lat, [FromQuery] double lng, [FromQuery] double radius = 5.0)
     {
-        var venues = await _mediator.Send(new GetNearbyVenuesQuery(lat, lng, radiusKm, pageNumber, pageSize), cancellationToken);
-        return Ok(venues);
-    }
+        var query = new GetNearbyVenuesQuery
+        {
+            Latitude = lat,
+            Longitude = lng,
+            RadiusInKm = radius
+        };
 
-    [HttpGet("{id:guid}")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(VenueDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<VenueDto>> GetVenueById(Guid id, CancellationToken cancellationToken)
-    {
-        var venue = await _mediator.Send(new GetVenueByIdQuery(id), cancellationToken);
-        return Ok(venue);
-    }
-
-    [HttpGet("{id:guid}/fields")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(IEnumerable<FootballFieldDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<FootballFieldDto>>> GetVenueFields(Guid id, CancellationToken cancellationToken)
-    {
-        var venue = await _mediator.Send(new GetVenueByIdQuery(id), cancellationToken);
-        return Ok(venue.Fields);
-    }
-
-    [HttpGet("{id:guid}/amenities")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<string>>> GetVenueAmenities(Guid id, CancellationToken cancellationToken)
-    {
-        var venue = await _mediator.Send(new GetVenueByIdQuery(id), cancellationToken);
-        return Ok(venue.Amenities);
-    }
-
-    [HttpGet("{id:guid}/images")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<string>>> GetVenueImages(Guid id, CancellationToken cancellationToken)
-    {
-        var venue = await _mediator.Send(new GetVenueByIdQuery(id), cancellationToken);
-        return Ok(venue.ImageUrls);
-    }
-
-    [NonAction]
-    [Authorize(Roles = "Owner,Admin")]
-    [ProducesResponseType(typeof(VenueDto), StatusCodes.Status201Created)]
-    public async Task<ActionResult<VenueDto>> CreateVenue([FromBody] CreateVenueDto venue, CancellationToken cancellationToken)
-    {
-        var ownerId = GetCurrentUserId();
-        var created = await _mediator.Send(new CreateVenueCommand(ownerId, venue), cancellationToken);
-        return CreatedAtAction(nameof(GetVenueById), new { id = created.VenueId }, created);
-    }
-
-    [NonAction]
-    [Authorize(Roles = "Owner,Admin")]
-    [ProducesResponseType(typeof(VenueDto), StatusCodes.Status200OK)]
-    public async Task<ActionResult<VenueDto>> UpdateVenue(Guid id, [FromBody] UpdateVenueDto venue, CancellationToken cancellationToken)
-    {
-        var updated = await _mediator.Send(new UpdateVenueCommand(id, GetCurrentUserId(), venue), cancellationToken);
-        return Ok(updated);
-    }
-
-    [NonAction]
-    [Authorize(Roles = "Owner,Admin")]
-    public async Task<IActionResult> DeleteVenue(Guid id, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new DeleteVenueCommand(id, GetCurrentUserId()), cancellationToken);
-        return Ok(new { success = result });
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return Guid.TryParse(userIdString, out var userId) ? userId : Guid.Empty;
+        var result = await _mediator.Send(query);
+        
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = result,
+            errors = Array.Empty<string>()
+        });
     }
 }

@@ -5,4 +5,3 @@ namespace CourtManager.Domain.Interfaces;
 public interface IAmenityRepository : IRepository<Amenity>
 {
 }
-

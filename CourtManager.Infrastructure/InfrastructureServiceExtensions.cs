@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using CourtManager.Domain.Entities;
 using CourtManager.Domain.Interfaces;
 using CourtManager.Infrastructure.Repositories;
+using CourtManager.Application.Interfaces;
+using CourtManager.Infrastructure.Services;
 
 namespace CourtManager.Infrastructure;
 
@@ -41,11 +43,22 @@ public static class InfrastructureServiceExtensions
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
 
+        // Register Cloudflare R2 / AWS S3
+        var r2Config = configuration.GetSection("CloudflareR2");
+        var awsOptions = new Amazon.S3.AmazonS3Config
+        {
+            ServiceURL = r2Config["ServiceURL"],
+        };
+
+        services.AddSingleton<Amazon.S3.IAmazonS3>(new Amazon.S3.AmazonS3Client(
+            r2Config["AccessKey"],
+            r2Config["SecretKey"],
+            awsOptions
+        ));
+
         // Register repositories
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IVenueRepository, VenueRepository>();
         services.AddScoped<IFootballFieldRepository, FootballFieldRepository>();
-        services.AddScoped<IDiscountRepository, DiscountRepository>();
         services.AddScoped<IBookingRepository, BookingRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
@@ -54,8 +67,9 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IReviewRepository, ReviewRepository>();
+        services.AddScoped<IVenueRepository, VenueRepository>();
         services.AddScoped<IAmenityRepository, AmenityRepository>();
-        services.AddScoped<IVenueAmenityRepository, VenueAmenityRepository>();
+        services.AddScoped<IStorageService, CloudflareR2StorageService>();
 
         return services;
     }

@@ -9,7 +9,7 @@ public class Discount
 {
     public Guid DiscountId { get; set; }
     public Guid OwnerId { get; set; }
-    public Guid? FieldId { get; set; } // Nullable: applies to all fields of owner if null
+    public Guid? VenueId { get; set; } // Nullable: applies to all venues of owner if null
     public string Code { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public DiscountType DiscountType { get; set; }
@@ -27,6 +27,6 @@ public class Discount
 
     // Navigation properties
     public User? Owner { get; set; }
-    public FootballField? Field { get; set; }
+    public Venue? Venue { get; set; }
     public ICollection<BookingDiscount> BookingDiscounts { get; set; } = [];
 }

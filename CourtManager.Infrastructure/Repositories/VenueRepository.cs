@@ -1,5 +1,4 @@
 using CourtManager.Domain.Entities;
-using CourtManager.Domain.Enums;
 using CourtManager.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,129 +6,186 @@ namespace CourtManager.Infrastructure.Repositories;
 
 public class VenueRepository : Repository<Venue>, IVenueRepository
 {
-    public VenueRepository(ApplicationDbContext context) : base(context) { }
+    private readonly ApplicationDbContext _dbContext;
 
-    public override async Task<Venue?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public VenueRepository(ApplicationDbContext context) : base(context)
     {
-        return await GetDetailsAsync(id, cancellationToken);
+        _dbContext = context;
     }
 
-    public async Task<Venue?> GetDetailsAsync(Guid venueId, CancellationToken cancellationToken = default)
+    private IQueryable<Venue> BuildFilterQuery(
+        string? q, 
+        decimal? priceMin, 
+        decimal? priceMax, 
+        double? minRating)
     {
-        return await IncludeDetails(_dbSet)
-            .FirstOrDefaultAsync(v => v.VenueId == venueId, cancellationToken);
-    }
+        var query = _dbContext.Venues
+            .Include(v => v.Owner)
+            .Include(v => v.FootballFields)
+            .Include(v => v.Reviews)
+            .Where(v => v.IsActive && !v.IsDeleted);
 
-    public async Task<IEnumerable<Venue>> SearchAsync(
-        string? query,
-        FieldType? fieldType,
-        decimal? minPrice,
-        decimal? maxPrice,
-        decimal? minRating,
-        string? amenity,
-        string? sortBy,
-        decimal? lat,
-        decimal? lng,
-        int pageNumber,
-        int pageSize,
-        CancellationToken cancellationToken = default)
-    {
-        var venues = IncludeDetails(_dbSet).Where(v => v.IsActive);
-
-        if (!string.IsNullOrWhiteSpace(query))
+        if (!string.IsNullOrWhiteSpace(q))
         {
-            var keyword = query.Trim().ToLower();
-            venues = venues.Where(v => v.VenueName.ToLower().Contains(keyword) || v.Address.ToLower().Contains(keyword));
+            var search = q.ToLower();
+            query = query.Where(v => v.VenueName.ToLower().Contains(search) || v.Address.ToLower().Contains(search));
         }
 
-        if (fieldType.HasValue)
+        if (priceMin.HasValue)
         {
-            venues = venues.Where(v => v.FootballFields.Any(f => f.FieldType == fieldType && f.IsActive));
+            query = query.Where(v => v.FootballFields.Any() && v.FootballFields.Min(f => f.PricePerHour) >= priceMin.Value);
         }
 
-        if (minPrice.HasValue)
+        if (priceMax.HasValue)
         {
-            venues = venues.Where(v => v.FootballFields.Any(f => f.IsActive && f.PricePerHour >= minPrice.Value));
-        }
-
-        if (maxPrice.HasValue)
-        {
-            venues = venues.Where(v => v.FootballFields.Any(f => f.IsActive && f.PricePerHour <= maxPrice.Value));
+            query = query.Where(v => v.FootballFields.Any() && v.FootballFields.Min(f => f.PricePerHour) <= priceMax.Value);
         }
 
         if (minRating.HasValue)
         {
-            venues = venues.Where(v => v.Reviews.Any() && (decimal)v.Reviews.Average(r => r.Rating) >= minRating.Value);
+            query = query.Where(v => v.Reviews.Any() && v.Reviews.Average(r => r.Rating) >= minRating.Value);
         }
 
-        if (!string.IsNullOrWhiteSpace(amenity))
-        {
-            var amenityKeyword = amenity.Trim().ToLower();
-            venues = venues.Where(v => v.VenueAmenities.Any(va => va.Amenity != null && va.Amenity.Name.ToLower().Contains(amenityKeyword)));
-        }
-
-        var list = await venues.ToListAsync(cancellationToken);
-
-        list = sortBy?.Trim().ToLowerInvariant() switch
-        {
-            "rating" or "rating_desc" => list.OrderByDescending(v => v.Reviews.Any() ? v.Reviews.Average(r => r.Rating) : 0).ToList(),
-            "price" or "price_asc" => list.OrderBy(v => v.FootballFields.Where(f => f.IsActive).Select(f => (decimal?)f.PricePerHour).Min() ?? decimal.MaxValue).ToList(),
-            "nearest" when lat.HasValue && lng.HasValue => list.OrderBy(v => DistanceKm(lat.Value, lng.Value, v.Latitude, v.Longitude)).ToList(),
-            _ => list.OrderBy(v => v.VenueName).ToList()
-        };
-
-        return list
-            .Skip((Math.Max(pageNumber, 1) - 1) * Math.Max(pageSize, 1))
-            .Take(Math.Max(pageSize, 1))
-            .ToList();
+        return query;
     }
 
-    public async Task<IEnumerable<Venue>> GetNearbyAsync(decimal lat, decimal lng, decimal radiusKm, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Venue>> GetVenuesAsync(
+        string? q, 
+        decimal? priceMin, 
+        decimal? priceMax, 
+        double? minRating, 
+        int skip, 
+        int take, 
+        CancellationToken cancellationToken = default)
     {
-        var venues = await IncludeDetails(_dbSet)
-            .Where(v => v.IsActive)
+        var query = BuildFilterQuery(q, priceMin, priceMax, minRating);
+        
+        return await query
+            .OrderByDescending(v => v.CreatedAt)
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> GetTotalCountAsync(
+        string? q, 
+        decimal? priceMin, 
+        decimal? priceMax, 
+        double? minRating, 
+        CancellationToken cancellationToken = default)
+    {
+        var query = BuildFilterQuery(q, priceMin, priceMax, minRating);
+        return await query.CountAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<(Venue Venue, double Distance)>> GetNearbyVenuesAsync(
+        double latitude,
+        double longitude,
+        double radiusInKm,
+        CancellationToken cancellationToken = default)
+    {
+        // Simple bounding box for SQL performance (1 deg lat ~ 111km, 1 deg lng ~ 111km at equator)
+        decimal latOffset = (decimal)(radiusInKm / 111.0);
+        decimal lngOffset = (decimal)(radiusInKm / (111.0 * Math.Cos(latitude * Math.PI / 180.0)));
+
+        decimal minLat = (decimal)latitude - latOffset;
+        decimal maxLat = (decimal)latitude + latOffset;
+        decimal minLng = (decimal)longitude - lngOffset;
+        decimal maxLng = (decimal)longitude + lngOffset;
+
+        var venues = await _dbContext.Venues
+            .Include(v => v.Owner)
+            .Include(v => v.FootballFields)
+            .Include(v => v.Reviews)
+            .Where(v => v.IsActive && !v.IsDeleted &&
+                        v.Latitude >= minLat && v.Latitude <= maxLat &&
+                        v.Longitude >= minLng && v.Longitude <= maxLng)
             .ToListAsync(cancellationToken);
 
+        // Precise Haversine distance in memory
         return venues
-            .Select(v => new { Venue = v, Distance = DistanceKm(lat, lng, v.Latitude, v.Longitude) })
-            .Where(v => v.Distance <= (double)radiusKm)
-            .OrderBy(v => v.Distance)
-            .Skip((Math.Max(pageNumber, 1) - 1) * Math.Max(pageSize, 1))
-            .Take(Math.Max(pageSize, 1))
-            .Select(v => v.Venue)
+            .Select(v => (Venue: v, Distance: CalculateDistance(latitude, longitude, (double)v.Latitude, (double)v.Longitude)))
+            .Where(x => x.Distance <= radiusInKm)
+            .OrderBy(x => x.Distance)
             .ToList();
     }
 
-    public async Task<IEnumerable<Venue>> GetByOwnerAsync(Guid ownerId, CancellationToken cancellationToken = default)
+    public async Task<Venue?> GetVenueByIdAsync(Guid venueId, CancellationToken cancellationToken = default)
     {
-        return await IncludeDetails(_dbSet)
-            .Where(v => v.OwnerId == ownerId)
-            .OrderBy(v => v.VenueName)
-            .ToListAsync(cancellationToken);
-    }
-
-    private static IQueryable<Venue> IncludeDetails(IQueryable<Venue> query)
-    {
-        return query
+        return await _dbContext.Venues
             .Include(v => v.Owner)
             .Include(v => v.FootballFields)
             .Include(v => v.VenueImages)
-            .Include(v => v.Reviews)
             .Include(v => v.VenueAmenities)
-                .ThenInclude(va => va.Amenity);
+                .ThenInclude(va => va.Amenity)
+            .Include(v => v.Reviews)
+                .ThenInclude(r => r.User)
+            .FirstOrDefaultAsync(v => v.VenueId == venueId && v.IsActive && !v.IsDeleted, cancellationToken);
     }
 
-    private static double DistanceKm(decimal lat1, decimal lng1, decimal lat2, decimal lng2)
+    public async Task<IEnumerable<Amenity>> GetVenueAmenitiesAsync(Guid venueId, CancellationToken cancellationToken = default)
     {
-        const double earthRadiusKm = 6371;
-        var dLat = ToRadians((double)(lat2 - lat1));
-        var dLng = ToRadians((double)(lng2 - lng1));
-        var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2)
-            + Math.Cos(ToRadians((double)lat1)) * Math.Cos(ToRadians((double)lat2))
-            * Math.Sin(dLng / 2) * Math.Sin(dLng / 2);
-        var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-        return earthRadiusKm * c;
+        return await _dbContext.VenueAmenities
+            .Where(va => va.VenueId == venueId)
+            .Include(va => va.Amenity)
+            .Select(va => va.Amenity!)
+            .ToListAsync(cancellationToken);
     }
 
-    private static double ToRadians(double degrees) => degrees * Math.PI / 180;
+    private IQueryable<Venue> BuildOwnerQuery(Guid ownerId, bool? isActive)
+    {
+        var query = _dbContext.Venues
+            .Include(v => v.Owner)
+            .Include(v => v.FootballFields)
+            .Include(v => v.Reviews)
+            .Where(v => v.OwnerId == ownerId && !v.IsDeleted);
+
+        if (isActive.HasValue)
+        {
+            query = query.Where(v => v.IsActive == isActive.Value);
+        }
+
+        return query;
+    }
+
+    public async Task<IEnumerable<Venue>> GetOwnerVenuesAsync(
+        Guid ownerId,
+        bool? isActive,
+        int skip,
+        int take,
+        CancellationToken cancellationToken = default)
+    {
+        return await BuildOwnerQuery(ownerId, isActive)
+            .OrderByDescending(v => v.CreatedAt)
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> GetOwnerVenuesCountAsync(
+        Guid ownerId,
+        bool? isActive,
+        CancellationToken cancellationToken = default)
+    {
+        return await BuildOwnerQuery(ownerId, isActive).CountAsync(cancellationToken);
+    }
+
+    private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+    {
+        var R = 6371; // Radius of the earth in km
+        var dLat = Deg2Rad(lat2 - lat1);
+        var dLon = Deg2Rad(lon2 - lon1);
+        var a =
+            Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+            Math.Cos(Deg2Rad(lat1)) * Math.Cos(Deg2Rad(lat2)) *
+            Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+        var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+        var d = R * c; // Distance in km
+        return d;
+    }
+
+    private double Deg2Rad(double deg)
+    {
+        return deg * (Math.PI / 180);
+    }
 }

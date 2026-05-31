@@ -50,14 +50,6 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
             };
         }
 
-        var role = request.Role.Trim().ToLowerInvariant() switch
-        {
-            "customer" or "player" or "user" => "User",
-            "owner" or "manager" => "Owner",
-            "guest" => "Guest",
-            _ => "User"
-        };
-
         // Create new user
         var user = new User
         {
@@ -82,7 +74,8 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
             };
         }
 
-        await _userManager.AddToRoleAsync(user, role);
+        // Add default role "User"
+        await _userManager.AddToRoleAsync(user, "User");
 
         // Get user roles
         var roles = await _userManager.GetRolesAsync(user);
@@ -108,8 +101,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
                 Id = user.Id,
                 FullName = user.FullName,
                 Email = user.Email!,
-                PhoneNumber = user.PhoneNumber ?? string.Empty,
-                Roles = roles
+                PhoneNumber = user.PhoneNumber ?? string.Empty
             }
         };
     }

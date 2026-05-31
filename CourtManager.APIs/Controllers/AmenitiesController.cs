@@ -1,6 +1,5 @@
-using CourtManager.Application.Features.Amenities;
+using CourtManager.Application.Features.Amenities.Queries;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourtManager.APIs.Controllers;
@@ -17,10 +16,15 @@ public class AmenitiesController : ControllerBase
     }
 
     [HttpGet]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetAmenities(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllAmenities()
     {
-        var amenities = await _mediator.Send(new GetAmenitiesQuery(), cancellationToken);
-        return Ok(amenities);
+        var result = await _mediator.Send(new GetAllAmenitiesQuery());
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = result,
+            errors = Array.Empty<string>()
+        });
     }
 }

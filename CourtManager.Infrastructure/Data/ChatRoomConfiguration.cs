@@ -28,6 +28,9 @@ public class ChatRoomConfiguration : IEntityTypeConfiguration<ChatRoom>
         // Soft delete query filter
         builder.HasQueryFilter(r => !r.IsDeleted);
 
+        // One chat room per customer-host pair
+        builder.HasIndex(r => new { r.CustomerId, r.HostId }).IsUnique();
+
         // Relationships
         builder.HasOne(r => r.Customer)
             .WithMany(u => u.CustomerChatRooms)

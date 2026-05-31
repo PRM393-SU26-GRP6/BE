@@ -26,4 +26,5 @@ public class Venue
     public ICollection<VenueImage> VenueImages { get; set; } = [];
     public ICollection<VenueAmenity> VenueAmenities { get; set; } = [];
     public ICollection<Review> Reviews { get; set; } = [];
+    public ICollection<Discount> Discounts { get; set; } = [];
 }

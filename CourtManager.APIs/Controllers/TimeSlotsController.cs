@@ -1,7 +1,4 @@
 using CourtManager.Application.DTOs;
-using CourtManager.Application.Features.Bookings.Commands;
-using CourtManager.Application.Features.Bookings.Queries;
-using CourtManager.Application.Features.TimeSlots;
 using CourtManager.Application.Features.TimeSlots.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +14,7 @@ namespace CourtManager.APIs.Controllers;
 [ApiController]
 [Route("api/v1/slots")]
 [Authorize]
-public class TimeSlotsController : ControllerBase
+public class TimeSlotsController : BaseApiController
 {
     private readonly IMediator _mediator;
     private readonly ILogger<TimeSlotsController> _logger;
@@ -33,14 +30,13 @@ public class TimeSlotsController : ControllerBase
     /// </summary>
     /// <param name="fieldId">The field ID</param>
     /// <returns>List of time slots</returns>
-    [NonAction]
+    [HttpGet]
     [AllowAnonymous]
     [ProducesResponseType(typeof(IEnumerable<TimeSlotDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<TimeSlotDto>>> GetSlotsByField([FromQuery] Guid fieldId, CancellationToken cancellationToken = default)
+    public IActionResult GetSlotsByField([FromQuery] Guid fieldId)
     {
         _logger.LogInformation("Fetching time slots for field {FieldId}", fieldId);
-        var result = await _mediator.Send(new GetSlotsByFieldQuery(fieldId), cancellationToken);
-        return Ok(result);
+        return Ok(new { message = "Get slots by field endpoint - implementation pending" });
     }
 
     /// <summary>
@@ -48,15 +44,14 @@ public class TimeSlotsController : ControllerBase
     /// </summary>
     /// <param name="id">The time slot ID</param>
     /// <returns>Time slot details</returns>
-    [NonAction]
+    [HttpGet("{id}")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(TimeSlotDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TimeSlotDto>> GetSlotById(Guid id, CancellationToken cancellationToken = default)
+    public IActionResult GetSlotById(Guid id)
     {
         _logger.LogInformation("Fetching time slot {SlotId}", id);
-        var result = await _mediator.Send(new GetTimeSlotByIdQuery(id), cancellationToken);
-        return Ok(result);
+        return Ok(new { message = "Get slot by ID endpoint - implementation pending" });
     }
 
     /// <summary>
@@ -68,31 +63,88 @@ public class TimeSlotsController : ControllerBase
     [HttpGet("available")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(IEnumerable<TimeSlotDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<TimeSlotDto>>> GetAvailableSlots([FromQuery] Guid fieldId, [FromQuery] DateTime date, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAvailableSlots([FromQuery] Guid fieldId, [FromQuery] DateTime date)
     {
-        _logger.LogInformation("Fetching available slots for field {FieldId} on {Date}", fieldId, date);
-        var result = await _mediator.Send(new GetAvailableSlotsQuery(fieldId, date), cancellationToken);
-        return Ok(result);
+        var query = new CourtManager.Application.Features.TimeSlots.Queries.GetAvailableSlotsQuery(fieldId, date);
+        var result = await _mediator.Send(query);
+
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = result,
+            errors = Array.Empty<string>()
+        });
     }
 
-    [HttpPost("{id:guid}/lock")]
-    [Authorize(Roles = "User,Admin")]
+    [HttpPost("{id}/lock")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> LockSlot(Guid id, CancellationToken cancellationToken = default)
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> LockSlot(Guid id)
     {
-        _logger.LogInformation("Locking slot {SlotId}", id);
-        var result = await _mediator.Send(new LockTimeSlotCommand(id, Guid.NewGuid()), cancellationToken);
-        return Ok(new { success = result, message = "Time slot locked successfully" });
+        try
+        {
+            var userId = CurrentUserId;
+            var command = new CourtManager.Application.Features.TimeSlots.Commands.LockSlotCommand(id, userId);
+            var result = await _mediator.Send(command);
+
+            return Ok(new
+            {
+                success = true,
+                message = "Slot locked successfully for 15 minutes.",
+                data = new { },
+                errors = Array.Empty<string>()
+            });
+        }
+        catch (CourtManager.Application.Exceptions.NotFoundException ex)
+        {
+            return NotFound(new { success = false, message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = "Failed to lock slot", errors = new[] { ex.Message } });
+        }
     }
 
-    [HttpPost("{id:guid}/unlock")]
-    [Authorize(Roles = "User,Admin")]
+    [HttpPost("{id}/unlock")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> UnlockSlot(Guid id, CancellationToken cancellationToken = default)
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UnlockSlot(Guid id)
     {
-        _logger.LogInformation("Unlocking slot {SlotId}", id);
-        var result = await _mediator.Send(new UnlockTimeSlotCommand(id, "CustomerUnlock"), cancellationToken);
-        return Ok(new { success = result, message = "Time slot unlocked successfully" });
+        try
+        {
+            var userId = CurrentUserId;
+            var command = new CourtManager.Application.Features.TimeSlots.Commands.UnlockSlotCommand(id, userId);
+            var result = await _mediator.Send(command);
+
+            return Ok(new
+            {
+                success = true,
+                message = "Slot unlocked successfully.",
+                data = new { },
+                errors = Array.Empty<string>()
+            });
+        }
+        catch (CourtManager.Application.Exceptions.NotFoundException ex)
+        {
+            return NotFound(new { success = false, message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = "Failed to unlock slot", errors = new[] { ex.Message } });
+        }
     }
 
     /// <summary>
@@ -100,16 +152,15 @@ public class TimeSlotsController : ControllerBase
     /// </summary>
     /// <param name="slot">The time slot creation data</param>
     /// <returns>Created time slot</returns>
-    [NonAction]
+    [HttpPost]
     [Authorize(Roles = "Owner,Admin")]
     [ProducesResponseType(typeof(TimeSlotDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<TimeSlotDto>> CreateSlot([FromBody] TimeSlotDto slot, CancellationToken cancellationToken = default)
+    public IActionResult CreateSlot([FromBody] TimeSlotDto slot)
     {
         _logger.LogInformation("Creating new time slot for field {FieldId}", slot.FieldId);
-        var result = await _mediator.Send(new CreateTimeSlotCommand(GetCurrentUserId(), slot), cancellationToken);
-        return CreatedAtAction(nameof(GetSlotById), new { id = result.SlotId }, result);
+        return Ok(new { message = "Create slot endpoint - implementation pending" });
     }
 
     /// <summary>
@@ -118,17 +169,16 @@ public class TimeSlotsController : ControllerBase
     /// <param name="id">The time slot ID</param>
     /// <param name="slot">The updated time slot data</param>
     /// <returns>Updated time slot</returns>
-    [NonAction]
+    [HttpPut("{id}")]
     [Authorize(Roles = "Owner,Admin")]
     [ProducesResponseType(typeof(TimeSlotDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<TimeSlotDto>> UpdateSlot(Guid id, [FromBody] TimeSlotDto slot, CancellationToken cancellationToken = default)
+    public IActionResult UpdateSlot(Guid id, [FromBody] TimeSlotDto slot)
     {
         _logger.LogInformation("Updating time slot {SlotId}", id);
-        var result = await _mediator.Send(new UpdateTimeSlotCommand(GetCurrentUserId(), id, slot), cancellationToken);
-        return Ok(result);
+        return Ok(new { message = "Update slot endpoint - implementation pending" });
     }
 
     /// <summary>
@@ -137,7 +187,7 @@ public class TimeSlotsController : ControllerBase
     /// <param name="id">The time slot ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [NonAction]
+    [HttpDelete("{id}")]
     [Authorize(Roles = "Owner,Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -149,11 +199,5 @@ public class TimeSlotsController : ControllerBase
         var result = await _mediator.Send(command, cancellationToken);
         _logger.LogInformation("Time slot {SlotId} deleted successfully (soft delete)", id);
         return Ok(new { success = result, message = "Time slot deleted successfully" });
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return Guid.TryParse(userIdString, out var userId) ? userId : Guid.Empty;
     }
 }

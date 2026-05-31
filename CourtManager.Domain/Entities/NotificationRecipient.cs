@@ -8,8 +8,7 @@ public class NotificationRecipient
     public Guid RecipientId { get; set; }
     public Guid NotificationId { get; set; }
     public Guid UserId { get; set; }
-    public bool IsRead { get; set; } = false;
-    public DateTime? ReadAt { get; set; }
+    public DateTime? ReadAt { get; set; } // null = unread
 
     // Navigation properties
     public Notification? Notification { get; set; }

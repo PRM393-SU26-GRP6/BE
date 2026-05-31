@@ -1,61 +1,65 @@
-using CourtManager.Application.DTOs;
-using CourtManager.Application.Features.Admin;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CourtManager.APIs.Attributes;
 
 namespace CourtManager.APIs.Controllers;
 
+/// <summary>
+/// Controller for admin operations requiring specific roles.
+/// </summary>
 [ApiController]
-[Route("api/v1/admin")]
-[Authorize(Roles = "Admin")]
+[Route("api/[controller]")]
+[Authorize]
 public class AdminController : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public AdminController(IMediator mediator)
+    /// <summary>
+    /// Get user statistics (Admin only).
+    /// </summary>
+    [HttpGet("stats")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public IActionResult GetStatistics()
     {
-        _mediator = mediator;
+        return Ok(new
+        {
+            message = "Admin statistics",
+            totalUsers = 150,
+            totalBookings = 500
+        });
     }
 
-    [HttpGet("users")]
-    public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
+    /// <summary>
+    /// Manage courts (Admin or Manager only).
+    /// </summary>
+    [HttpGet("courts")]
+    [Authorize(Roles = "Admin,Owner")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public IActionResult ManageCourts()
     {
-        var users = await _mediator.Send(new GetAdminUsersQuery(), cancellationToken);
-        return Ok(users);
+        return Ok(new
+        {
+            message = "Court management interface",
+            courts = new[] { "Court 1", "Court 2" }
+        });
     }
 
-    [HttpPut("users/{id:guid}/role")]
-    public async Task<IActionResult> UpdateUserRole(Guid id, [FromBody] UpdateUserRoleDto request)
+    /// <summary>
+    /// Example of checking role programmatically.
+    /// </summary>
+    [HttpPost("test-role")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public IActionResult TestRole()
     {
-        var result = await _mediator.Send(new UpdateAdminUserRoleCommand(id, request));
-        return Ok(result);
-    }
+        var userRole = User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value;
 
-    [HttpGet("venues")]
-    public async Task<IActionResult> GetVenues(CancellationToken cancellationToken)
-    {
-        var venues = await _mediator.Send(new GetAdminVenuesQuery(), cancellationToken);
-        return Ok(venues);
-    }
+        if (userRole == "Admin")
+        {
+            return Ok(new { message = "You are an Admin!" });
+        }
 
-    [HttpPut("venues/{id:guid}/status")]
-    public async Task<IActionResult> UpdateVenueStatus(Guid id, [FromBody] UpdateStatusDto request, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new UpdateAdminVenueStatusCommand(id, request), cancellationToken);
-        return Ok(result);
-    }
-
-    [HttpPost("notifications/broadcast")]
-    public async Task<IActionResult> BroadcastNotification([FromBody] BroadcastNotificationDto request, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new BroadcastNotificationCommand(GetCurrentUserId(), request), cancellationToken);
-        return Ok(result);
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdString, out var userId) ? userId : Guid.Empty;
+        return Forbid();
     }
 }

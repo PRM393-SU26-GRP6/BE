@@ -9,5 +9,5 @@ public interface IFootballFieldRepository : IRepository<FootballField>
 {
     Task<IEnumerable<FootballField>> GetAvailableFieldsAsync(CancellationToken cancellationToken = default);
     Task<FootballField?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
-    Task<IEnumerable<FootballField>> GetByVenueIdAsync(Guid venueId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<FootballField>> GetFieldsByVenueIdAsync(Guid venueId, CancellationToken cancellationToken = default);
 }

@@ -1,5 +1,4 @@
 using CourtManager.Application.DTOs;
-using CourtManager.Application.Features.Reviews;
 using CourtManager.Application.Features.Reviews.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -15,7 +14,7 @@ namespace CourtManager.APIs.Controllers;
 [ApiController]
 [Route("api/v1/reviews")]
 [Authorize]
-public class ReviewsController : ControllerBase
+public class ReviewsController : BaseApiController
 {
     private readonly IMediator _mediator;
     private readonly ILogger<ReviewsController> _logger;
@@ -27,30 +26,28 @@ public class ReviewsController : ControllerBase
     }
 
     /// <summary>
-    /// Gets all reviews for a specific field.
+    /// Gets all reviews for a specific venue.
     /// </summary>
-    /// <param name="fieldId">The field ID</param>
-    /// <param name="pageNumber">Page number (default 1)</param>
+    /// <param name="id">The venue ID</param>
+    /// <param name="page">Page number (default 1)</param>
     /// <param name="pageSize">Page size (default 10)</param>
-    /// <returns>Paginated list of reviews</returns>
-    [NonAction]
+    /// <returns>Paginated list of reviews and average rating</returns>
+    [HttpGet("venue/{id}")]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(IEnumerable<ReviewDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(VenueReviewsResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IEnumerable<ReviewDto>>> GetReviewsByField(Guid fieldId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetVenueReviews(Guid id, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        _logger.LogInformation("Fetching reviews for field {FieldId}", fieldId);
-        var result = await _mediator.Send(new GetReviewsByFieldQuery(fieldId, pageNumber, pageSize), cancellationToken);
-        return Ok(result);
-    }
+        var query = new CourtManager.Application.Features.Reviews.Queries.GetVenueReviewsQuery(id, page, pageSize);
+        var result = await _mediator.Send(query);
 
-    [HttpGet("venue/{venueId}")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(IEnumerable<ReviewDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<ReviewDto>>> GetReviewsByVenue(Guid venueId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
-    {
-        var result = await _mediator.Send(new GetReviewsByVenueQuery(venueId, pageNumber, pageSize), cancellationToken);
-        return Ok(result);
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = result,
+            errors = Array.Empty<string>()
+        });
     }
 
     /// <summary>
@@ -58,15 +55,14 @@ public class ReviewsController : ControllerBase
     /// </summary>
     /// <param name="id">The review ID</param>
     /// <returns>Review details</returns>
-    [NonAction]
+    [HttpGet("{id}")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ReviewDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ReviewDto>> GetReviewById(Guid id, CancellationToken cancellationToken = default)
+    public IActionResult GetReviewById(Guid id)
     {
         _logger.LogInformation("Fetching review {ReviewId}", id);
-        var result = await _mediator.Send(new GetReviewByIdQuery(id), cancellationToken);
-        return Ok(result);
+        return Ok(new { message = "Get review by ID endpoint - implementation pending" });
     }
 
     /// <summary>
@@ -74,74 +70,117 @@ public class ReviewsController : ControllerBase
     /// </summary>
     /// <param name="fieldId">The field ID</param>
     /// <returns>Average rating</returns>
-    [NonAction]
+    [HttpGet("field/{fieldId}/average-rating")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<object>> GetAverageRating(Guid fieldId, CancellationToken cancellationToken = default)
+    public IActionResult GetAverageRating(Guid fieldId)
     {
         _logger.LogInformation("Fetching average rating for field {FieldId}", fieldId);
-        var reviews = await _mediator.Send(new GetReviewsByFieldQuery(fieldId, 1, int.MaxValue), cancellationToken);
-        var list = reviews.ToList();
-        return Ok(new { fieldId, averageRating = list.Count == 0 ? 0 : list.Average(r => r.Rating), reviewCount = list.Count });
-    }
-
-    [NonAction]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-    public async Task<ActionResult<object>> GetAverageVenueRating(Guid venueId, CancellationToken cancellationToken = default)
-    {
-        var result = await _mediator.Send(new GetAverageVenueRatingQuery(venueId), cancellationToken);
-        return Ok(result);
+        return Ok(new { message = "Get average rating endpoint - implementation pending" });
     }
 
     /// <summary>
     /// Gets all reviews by the current user.
     /// </summary>
     /// <returns>List of user's reviews</returns>
-    [NonAction]
+    [HttpGet("my-reviews")]
     [ProducesResponseType(typeof(IEnumerable<ReviewDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<ReviewDto>>> GetMyReviews(CancellationToken cancellationToken = default)
+    public IActionResult GetMyReviews()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = CurrentUserId;
         _logger.LogInformation("Fetching reviews for current user {UserId}", userId);
-        var result = await _mediator.Send(new GetMyReviewsQuery(GetCurrentUserId()), cancellationToken);
-        return Ok(result);
+        return Ok(new { message = "Get my reviews endpoint - implementation pending" });
     }
 
     /// <summary>
-    /// Creates a new review for a field.
+    /// Creates a new review for a venue after a completed booking.
     /// </summary>
-    /// <param name="review">The review creation data</param>
+    /// <param name="request">The review creation data</param>
     /// <returns>Created review</returns>
     [HttpPost]
     [ProducesResponseType(typeof(ReviewDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<ReviewDto>> CreateReview([FromBody] ReviewDto review, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> CreateReview([FromBody] CreateReviewRequestDto request)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        _logger.LogInformation("Creating review for field {FieldId} by user {UserId}", review.FieldId, userId);
-        var result = await _mediator.Send(new CreateReviewCommand(GetCurrentUserId(), review), cancellationToken);
-        return Created($"/api/v1/reviews/{result.ReviewId}", result);
+        if (request.Rating < 1 || request.Rating > 5)
+        {
+            return BadRequest(new { success = false, message = "Rating must be between 1 and 5." });
+        }
+
+        try
+        {
+            var command = new CourtManager.Application.Features.Reviews.Commands.CreateReviewCommand(
+                request.VenueId, request.BookingId, request.Rating, request.Comment, CurrentUserId);
+            
+            var result = await _mediator.Send(command);
+
+            return CreatedAtAction(nameof(GetReviewById), new { id = result.ReviewId }, new
+            {
+                success = true,
+                message = "Review created successfully",
+                data = result,
+                errors = Array.Empty<string>()
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = "Failed to create review", errors = new[] { ex.Message } });
+        }
     }
 
     /// <summary>
     /// Updates an existing review (Owner only).
     /// </summary>
     /// <param name="id">The review ID</param>
-    /// <param name="review">The updated review data</param>
+    /// <param name="request">The updated review data</param>
     /// <returns>Updated review</returns>
-    [NonAction]
+    [HttpPut("{id}")]
     [ProducesResponseType(typeof(ReviewDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<ReviewDto>> UpdateReview(Guid id, [FromBody] ReviewDto review, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> UpdateReview(Guid id, [FromBody] UpdateReviewRequestDto request)
     {
         _logger.LogInformation("Updating review {ReviewId}", id);
-        var result = await _mediator.Send(new UpdateReviewCommand(GetCurrentUserId(), id, review), cancellationToken);
-        return Ok(result);
+        
+        if (request.Rating < 1 || request.Rating > 5)
+        {
+            return BadRequest(new { success = false, message = "Rating must be between 1 and 5." });
+        }
+
+        try
+        {
+            var command = new CourtManager.Application.Features.Reviews.Commands.UpdateReviewCommand(
+                id, request.Rating, request.Comment, CurrentUserId);
+
+            var result = await _mediator.Send(command);
+
+            return Ok(new
+            {
+                success = true,
+                message = "Review updated successfully",
+                data = result,
+                errors = Array.Empty<string>()
+            });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { success = false, message = ex.Message });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = "Failed to update review", errors = new[] { ex.Message } });
+        }
     }
 
     /// <summary>
@@ -150,7 +189,8 @@ public class ReviewsController : ControllerBase
     /// <param name="id">The review ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [NonAction]
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin,Owner")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -161,11 +201,5 @@ public class ReviewsController : ControllerBase
         var result = await _mediator.Send(command, cancellationToken);
         _logger.LogInformation("Review {ReviewId} deleted successfully (soft delete)", id);
         return Ok(new { success = result, message = "Review deleted successfully" });
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return Guid.TryParse(userIdString, out var userId) ? userId : Guid.Empty;
     }
 }

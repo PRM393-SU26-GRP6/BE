@@ -36,6 +36,18 @@ erDiagram
     }
 
     %% =========================================================
+    %% USER_DEVICES - Thiet bi cua user de push FCM (nhieu/user)
+    %% =========================================================
+    USER_DEVICES {
+        uuid device_id PK
+        uuid user_id FK
+        string fcm_token UK
+        string device_type "android|ios"
+        datetime created_at
+        datetime updated_at
+    }
+
+    %% =========================================================
     %% VENUES - Cum san/khu san cua 1 owner (vd: "San bong A")
     %% =========================================================
     VENUES {
@@ -105,6 +117,7 @@ erDiagram
         decimal price
         enum slot_status "available|locked|booked"
         datetime locked_until
+        uuid locked_by FK "user dang giu slot, nullable"
         datetime updated_at
     }
 
@@ -139,11 +152,13 @@ erDiagram
         uuid payment_id PK
         uuid booking_id FK
         decimal amount
-        enum payment_type "deposit|final"
+        enum payment_type "deposit|final|refund"
         string payment_method "momo|vnpay|cash"
         enum payment_status "pending|success|failed|refunded"
         string transaction_code
         datetime paid_at
+        decimal refund_amount "nullable, khi payment_type=refund"
+        string refund_reason "nullable"
     }
 
     %% =========================================================
@@ -165,7 +180,7 @@ erDiagram
         uuid room_id FK
         uuid sender_id FK
         string message_text
-        boolean is_read
+        datetime read_at "null = chua doc"
         datetime sent_at
     }
 
@@ -189,8 +204,7 @@ erDiagram
         uuid recipient_id PK
         uuid notification_id FK
         uuid user_id FK
-        boolean is_read
-        datetime read_at
+        datetime read_at "null = chua doc"
     }
 
     %% =========================================================
@@ -212,7 +226,7 @@ erDiagram
     DISCOUNTS {
         uuid discount_id PK
         uuid owner_id FK
-        uuid field_id FK "nullable - null = áp dụng mọi sân của owner"
+        uuid venue_id FK "nullable - null = ap dung moi venue cua owner"
         string code UK "vd: SUMMER2025"
         string name
         enum discount_type "percentage|fixed"
@@ -249,16 +263,18 @@ erDiagram
     USERS ||--o{ CHAT_ROOMS : host
     USERS ||--o{ MESSAGES : sends
     USERS ||--o{ DISCOUNTS : creates
+    USERS ||--o{ USER_DEVICES : registers
+    USERS |o--o{ TIME_SLOTS : locks
 
     %% VENUES & FIELDS & AMENITIES
     VENUES ||--o{ FOOTBALL_FIELDS : contains
     VENUES ||--o{ VENUE_IMAGES : has
     VENUES ||--o{ VENUE_AMENITIES : has
     VENUES ||--o{ REVIEWS : receives
+    VENUES |o--o{ DISCOUNTS : applies_to
     AMENITIES ||--o{ VENUE_AMENITIES : in
     
     FOOTBALL_FIELDS ||--o{ TIME_SLOTS : contains
-    FOOTBALL_FIELDS |o--o{ DISCOUNTS : applies_to 
 
     %% BOOKINGS & TRANSACTIONS
     TIME_SLOTS ||--o{ BOOKING_ITEMS : reserved_in

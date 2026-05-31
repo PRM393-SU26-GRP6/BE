@@ -1,15 +1,16 @@
 using CourtManager.Application.DTOs;
 using CourtManager.Application.Features.Auth.Commands;
-using CourtManager.Application.Features.Users;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace CourtManager.APIs.Controllers;
 
-[ApiController]
+/// <summary>
+/// User profile endpoints for the currently logged-in user.
+/// </summary>
 [Route("api/v1/users")]
+[ApiController]
 [Authorize]
 public class UsersController : ControllerBase
 {
@@ -20,49 +21,28 @@ public class UsersController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet("profile")]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-    public async Task<ActionResult<UserDto>> GetProfile(CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new GetUserProfileQuery(GetCurrentUserId()), cancellationToken);
-        return Ok(result);
-    }
-
+    /// <summary>
+    /// Updates the current user's profile (full name, phone, avatar URL).
+    /// Email and password are not updated here.
+    /// </summary>
     [HttpPut("profile")]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-    public async Task<ActionResult<UserDto>> UpdateProfile([FromBody] UpdateUserProfileDto profile, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequestDto request)
     {
-        var result = await _mediator.Send(new UpdateUserProfileCommand(GetCurrentUserId(), profile), cancellationToken);
-        return Ok(result);
-    }
-
-    [HttpPut("password")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<AuthResponseDto>> ChangePassword([FromBody] ChangeUserPasswordDto request, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new ChangePasswordCommand
+        var command = new UpdateProfileCommand
         {
-            CurrentPassword = request.OldPassword,
-            NewPassword = request.NewPassword
-        }, cancellationToken);
+            FullName = request.FullName,
+            Phone = request.Phone,
+            AvatarUrl = request.AvatarUrl
+        };
 
-        if (!result.Success)
+        var result = await _mediator.Send(command);
+
+        return Ok(new
         {
-            return BadRequest(result);
-        }
-
-        return Ok(result);
+            success = true,
+            message = "Profile updated successfully",
+            data = result,
+            errors = Array.Empty<string>()
+        });
     }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return Guid.TryParse(userIdString, out var userId) ? userId : Guid.Empty;
-    }
-}
-
-public class ChangeUserPasswordDto
-{
-    public string OldPassword { get; set; } = string.Empty;
-    public string NewPassword { get; set; } = string.Empty;
 }

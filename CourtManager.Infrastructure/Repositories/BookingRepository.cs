@@ -1,12 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using CourtManager.Domain.Entities;
+using CourtManager.Domain.Enums;
 using CourtManager.Domain.Interfaces;
 
 namespace CourtManager.Infrastructure.Repositories;
 
 public class BookingRepository : Repository<Booking>, IBookingRepository
 {
-    public BookingRepository(ApplicationDbContext context) : base(context) { }
+    private readonly ApplicationDbContext _db;
+
+    public BookingRepository(ApplicationDbContext context) : base(context)
+    {
+        _db = context;
+    }
 
     public override async Task<Booking?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -68,5 +74,30 @@ public class BookingRepository : Repository<Booking>, IBookingRepository
                 .ThenInclude(i => i.Slot)
                     .ThenInclude(s => s!.Field)
                         .ThenInclude(f => f!.Venue);
+    }
+
+    public async Task<bool> HasActiveBookingsForVenueAsync(Guid venueId, CancellationToken cancellationToken = default)
+    {
+        // Active = Pending, Accepted, or Deposited (still in-flight, not yet completed/rejected/cancelled)
+        var activeStatuses = new[] { BookingStatus.Pending, BookingStatus.Accepted, BookingStatus.Deposited };
+
+        return await _db.Bookings
+            .Where(b => !b.IsDeleted && activeStatuses.Contains(b.BookingStatus))
+            .AnyAsync(b => b.BookingItems.Any(bi =>
+                bi.Slot != null &&
+                bi.Slot.Field != null &&
+                bi.Slot.Field.VenueId == venueId),
+            cancellationToken);
+    }
+
+    public async Task<bool> IsBookingValidForReviewAsync(Guid bookingId, Guid venueId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _db.Bookings
+            .Where(b => b.Id == bookingId && b.UserId == userId && b.BookingStatus == BookingStatus.Completed && !b.IsDeleted)
+            .AnyAsync(b => b.BookingItems.Any(bi =>
+                bi.Slot != null &&
+                bi.Slot.Field != null &&
+                bi.Slot.Field.VenueId == venueId),
+            cancellationToken);
     }
 }

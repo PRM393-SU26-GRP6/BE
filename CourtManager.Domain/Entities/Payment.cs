@@ -20,6 +20,8 @@ public class Payment
     public string? GatewayAccountNumber { get; set; }
     public string? GatewayRawContent { get; set; }
     public DateTime? PaidAt { get; set; }
+    public decimal? RefundAmount { get; set; } // Set when PaymentType = Refund
+    public string? RefundReason { get; set; }
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }
 

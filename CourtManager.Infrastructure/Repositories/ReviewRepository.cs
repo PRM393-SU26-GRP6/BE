@@ -10,86 +10,41 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
 
     public async Task<IEnumerable<Review>> GetReviewsByFieldIdAsync(Guid fieldId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
-        var venueId = await _context.FootballFields
-            .Where(f => f.Id == fieldId)
-            .Select(f => (Guid?)f.VenueId)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return venueId.HasValue
-            ? await GetReviewsByVenueIdAsync(venueId.Value, pageNumber, pageSize, cancellationToken)
-            : [];
-    }
-
-    public async Task<IEnumerable<Review>> GetReviewsByVenueIdAsync(Guid venueId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
-    {
-        return await _dbSet
-            .Include(r => r.User)
-            .Include(r => r.Venue)
-            .Where(r => r.VenueId == venueId)
-            .OrderByDescending(r => r.CreatedAt)
-            .Skip((Math.Max(pageNumber, 1) - 1) * Math.Max(pageSize, 1))
-            .Take(Math.Max(pageSize, 1))
-            .ToListAsync(cancellationToken);
+        throw new NotImplementedException();
     }
 
     public async Task<Review?> GetUserReviewAsync(Guid userId, Guid fieldId, CancellationToken cancellationToken = default)
     {
-        var venueId = await _context.FootballFields
-            .Where(f => f.Id == fieldId)
-            .Select(f => (Guid?)f.VenueId)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return venueId.HasValue
-            ? await _dbSet.FirstOrDefaultAsync(r => r.UserId == userId && r.VenueId == venueId.Value, cancellationToken)
-            : null;
+        throw new NotImplementedException();
     }
 
-    public async Task<Review?> GetUserReviewForBookingAsync(Guid userId, Guid bookingId, CancellationToken cancellationToken = default)
+    public async Task<(IEnumerable<Review> Reviews, int TotalCount, decimal AverageRating)> GetVenueReviewsAsync(
+        Guid venueId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
-        return await _dbSet
-            .Include(r => r.Venue)
-            .FirstOrDefaultAsync(r => r.UserId == userId && r.BookingId == bookingId, cancellationToken);
-    }
+        var query = _dbSet.Where(r => r.VenueId == venueId && !r.IsDeleted);
 
-    public async Task<decimal> GetAverageRatingAsync(Guid fieldId, CancellationToken cancellationToken = default)
-    {
-        var venueId = await _context.FootballFields
-            .Where(f => f.Id == fieldId)
-            .Select(f => (Guid?)f.VenueId)
-            .FirstOrDefaultAsync(cancellationToken);
+        var totalCount = await query.CountAsync(cancellationToken);
+        decimal averageRating = 0;
+        
+        if (totalCount > 0)
+        {
+            // Cast to double for Average calculation, then cast back to decimal
+            var avg = await query.AverageAsync(r => (double)r.Rating, cancellationToken);
+            averageRating = (decimal)Math.Round(avg, 1);
+        }
 
-        return venueId.HasValue
-            ? await GetAverageRatingByVenueIdAsync(venueId.Value, cancellationToken)
-            : 0;
-    }
-
-    public async Task<decimal> GetAverageRatingByVenueIdAsync(Guid venueId, CancellationToken cancellationToken = default)
-    {
-        var ratings = await _dbSet
-            .Where(r => r.VenueId == venueId)
-            .Select(r => r.Rating)
+        var reviews = await query
+            .Include(r => r.User)
+            .OrderByDescending(r => r.CreatedAt)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        return ratings.Count == 0 ? 0 : (decimal)ratings.Average();
+        return (reviews, totalCount, averageRating);
     }
 
-    public async Task<int> GetReviewCountAsync(Guid fieldId, CancellationToken cancellationToken = default)
+    public async Task<Review?> GetReviewByBookingIdAsync(Guid bookingId, CancellationToken cancellationToken = default)
     {
-        var venueId = await _context.FootballFields
-            .Where(f => f.Id == fieldId)
-            .Select(f => (Guid?)f.VenueId)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return venueId.HasValue
-            ? await _dbSet.CountAsync(r => r.VenueId == venueId.Value, cancellationToken)
-            : 0;
-    }
-
-    public override async Task<Review?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        return await _dbSet
-            .Include(r => r.User)
-            .Include(r => r.Venue)
-            .FirstOrDefaultAsync(r => r.ReviewId == id, cancellationToken);
+        return await _dbSet.FirstOrDefaultAsync(r => r.BookingId == bookingId && !r.IsDeleted, cancellationToken);
     }
 }

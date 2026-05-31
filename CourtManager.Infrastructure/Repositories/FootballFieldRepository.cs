@@ -15,7 +15,6 @@ public class FootballFieldRepository : Repository<FootballField>, IFootballField
     public async Task<IEnumerable<FootballField>> GetAvailableFieldsAsync(CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Include(f => f.Venue)
             .Where(f => f.IsActive)
             .ToListAsync(cancellationToken);
     }
@@ -23,24 +22,13 @@ public class FootballFieldRepository : Repository<FootballField>, IFootballField
     public async Task<FootballField?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Include(f => f.Venue)
             .FirstOrDefaultAsync(f => f.FieldName == name, cancellationToken);
     }
 
-    public override async Task<FootballField?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<FootballField>> GetFieldsByVenueIdAsync(Guid venueId, CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Include(f => f.Venue)
-            .Include(f => f.TimeSlots)
-            .FirstOrDefaultAsync(f => f.Id == id, cancellationToken);
-    }
-
-    public async Task<IEnumerable<FootballField>> GetByVenueIdAsync(Guid venueId, CancellationToken cancellationToken = default)
-    {
-        return await _dbSet
-            .Include(f => f.Venue)
-            .Where(f => f.VenueId == venueId)
-            .OrderBy(f => f.FieldName)
+            .Where(f => f.VenueId == venueId && !f.IsDeleted)
             .ToListAsync(cancellationToken);
     }
 }

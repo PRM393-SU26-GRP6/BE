@@ -22,20 +22,14 @@ public class ReviewDto
     public string? UserName { get; set; }
 
     /// <summary>
-    /// Legacy field identifier. The persisted review belongs to a venue.
+    /// Foreign key referencing the reviewed venue.
     /// </summary>
-    public Guid FieldId { get; set; }
-
     public Guid VenueId { get; set; }
 
-    public Guid BookingId { get; set; }
-
     /// <summary>
-    /// Name of the reviewed field (optional).
+    /// Foreign key referencing the booking.
     /// </summary>
-    public string? FieldName { get; set; }
-
-    public string? VenueName { get; set; }
+    public Guid BookingId { get; set; }
 
     /// <summary>
     /// Rating score (typically 1-5).

@@ -1,8 +1,6 @@
 using CourtManager.Application.Features.Bookings.Commands;
 using CourtManager.Application.Features.Bookings.Queries;
 using CourtManager.Application.DTOs;
-using CourtManager.Application.Features.Payments;
-using CourtManager.Application.Features.Reviews;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +15,7 @@ namespace CourtManager.APIs.Controllers;
 [ApiController]
 [Route("api/v1/bookings")]
 [Authorize]
-public class BookingsController : ControllerBase
+public class BookingsController : BaseApiController
 {
     private readonly IMediator _mediator;
     private readonly ILogger<BookingsController> _logger;
@@ -42,11 +40,7 @@ public class BookingsController : ControllerBase
         [FromBody] CreateBookingCommand command,
         CancellationToken cancellationToken = default)
     {
-        var userIdString = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var currentUserId))
-        {
-            return Unauthorized();
-        }
+        var currentUserId = CurrentUserId;
 
         // Force the command to use the logged-in user's ID
         // (Prevents IDOR: User creating booking for someone else)
@@ -69,7 +63,7 @@ public class BookingsController : ControllerBase
     /// <param name="id">The booking ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The booking details</returns>
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id}")]
     [ProducesResponseType(typeof(BookingDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -79,54 +73,47 @@ public class BookingsController : ControllerBase
     {
         _logger.LogInformation("Fetching booking with ID: {BookingId}", id);
 
-        var query = new GetBookingByIdQuery(
-            id,
-            GetCurrentUserId(),
-            User.IsInRole("Owner"),
-            User.IsInRole("Admin"));
+        var query = new GetBookingByIdQuery(id);
         var result = await _mediator.Send(query, cancellationToken);
 
+        // Resource-based Authorization: Only Admin/Manager or the owner can view this booking
+        var currentUserId = CurrentUserId.ToString();
+        var isAdminOrManager = User.IsInRole("Admin") || User.IsInRole("Owner");
+
+        if (!isAdminOrManager && result.UserId.ToString() != currentUserId)
+        {
+            _logger.LogWarning("User {UserId} attempted to access booking {BookingId} which they do not own.", currentUserId, id);
+            return Forbid();
+        }
+
         return Ok(result);
     }
 
-    [HttpGet("history")]
-    [ProducesResponseType(typeof(IEnumerable<BookingDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingHistory(
-        [FromQuery] string? status = null,
-        [FromQuery] DateTime? from = null,
-        [FromQuery] DateTime? to = null,
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 20,
+    /// <summary>
+    /// Checks if a booking already has a review.
+    /// </summary>
+    /// <param name="id">The booking ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The review details or null if no review exists</returns>
+    [HttpGet("{id}/review")]
+    [ProducesResponseType(typeof(CourtManager.Application.DTOs.ReviewDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetBookingReview(
+        Guid id,
         CancellationToken cancellationToken = default)
     {
-        var currentUserId = GetCurrentUserId();
-        var result = await _mediator.Send(new GetUserBookingsQuery(currentUserId, status, from, to, page, pageSize), cancellationToken);
-        return Ok(result);
-    }
+        _logger.LogInformation("Checking review for booking with ID: {BookingId}", id);
 
-    [HttpGet("{id:guid}/payments")]
-    [ProducesResponseType(typeof(IEnumerable<PaymentDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<PaymentDto>>> GetBookingPayments(Guid id, CancellationToken cancellationToken = default)
-    {
-        var result = await _mediator.Send(new GetPaymentsByBookingQuery(id, GetCurrentUserId(), User.IsInRole("Owner") || User.IsInRole("Admin")), cancellationToken);
-        return Ok(result);
-    }
+        var query = new CourtManager.Application.Features.Reviews.Queries.GetBookingReviewQuery(id);
+        var result = await _mediator.Send(query, cancellationToken);
 
-    [HttpGet("{id:guid}/review")]
-    [ProducesResponseType(typeof(ReviewDto), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ReviewDto?>> GetBookingReview(Guid id, CancellationToken cancellationToken = default)
-    {
-        var review = await _mediator.Send(new GetUserReviewForBookingQuery(GetCurrentUserId(), id), cancellationToken);
-        return Ok(review);
-    }
-
-    [NonAction]
-    [Authorize(Roles = "Owner,Admin")]
-    [ProducesResponseType(typeof(IEnumerable<BookingDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<BookingDto>>> GetOwnerPendingBookings(CancellationToken cancellationToken = default)
-    {
-        var result = await _mediator.Send(new GetOwnerPendingBookingsQuery(GetCurrentUserId()), cancellationToken);
-        return Ok(result);
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = result,
+            errors = Array.Empty<string>()
+        });
     }
 
     /// <summary>
@@ -136,8 +123,7 @@ public class BookingsController : ControllerBase
     /// <param name="id">The booking ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [NonAction]
-    [Authorize(Roles = "Owner,Admin")]
+    [HttpPut("{id}/accept")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -148,7 +134,7 @@ public class BookingsController : ControllerBase
     {
         _logger.LogInformation("Accepting booking with ID: {BookingId}", id);
 
-        var command = new AcceptBookingCommand(id, GetCurrentUserId());
+        var command = new AcceptBookingCommand(id);
         var result = await _mediator.Send(command, cancellationToken);
 
         _logger.LogInformation("Booking {BookingId} accepted successfully", id);
@@ -164,8 +150,7 @@ public class BookingsController : ControllerBase
     /// <param name="rejectionReason">Optional reason for rejection</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [NonAction]
-    [Authorize(Roles = "Owner,Admin")]
+    [HttpPut("{id}/reject")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -177,7 +162,7 @@ public class BookingsController : ControllerBase
     {
         _logger.LogInformation("Rejecting booking with ID: {BookingId}", id);
 
-        var command = new RejectBookingCommand(id, rejectionReason, GetCurrentUserId());
+        var command = new RejectBookingCommand(id, rejectionReason);
         var result = await _mediator.Send(command, cancellationToken);
 
         _logger.LogInformation("Booking {BookingId} rejected successfully", id);
@@ -193,7 +178,7 @@ public class BookingsController : ControllerBase
     /// <param name="cancellationReason">Optional reason for cancellation</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [HttpPut("{id:guid}/cancel")]
+    [HttpPut("{id}/cancel")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -205,11 +190,7 @@ public class BookingsController : ControllerBase
     {
         _logger.LogInformation("Cancelling booking with ID: {BookingId}", id);
 
-        var command = new CancelBookingCommand(
-            id,
-            GetCurrentUserId(),
-            false,
-            cancellationReason);
+        var command = new CancelBookingCommand(id, cancellationReason);
         var result = await _mediator.Send(command, cancellationToken);
 
         _logger.LogInformation("Booking {BookingId} cancelled successfully", id);
@@ -226,7 +207,7 @@ public class BookingsController : ControllerBase
     /// <param name="bookingId">The associated booking ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [NonAction]
+    [HttpPut("slots/{slotId}/lock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -255,7 +236,7 @@ public class BookingsController : ControllerBase
     /// <param name="unlockReason">Reason for unlock (e.g., "PaymentFailed", "PaymentTimeout", "Refund")</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [NonAction]
+    [HttpPut("slots/{slotId}/unlock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -275,10 +256,13 @@ public class BookingsController : ControllerBase
         return Ok(new { success = result, message = "Time slot unlocked successfully" });
     }
 
-
-    private Guid GetCurrentUserId()
+    /// <summary>
+    /// Health check endpoint for API.
+    /// </summary>
+    [HttpGet("health")]
+    [AllowAnonymous]
+    public IActionResult Health()
     {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return Guid.TryParse(userIdString, out var userId) ? userId : Guid.Empty;
+        return Ok(new { status = "API is running" });
     }
 }

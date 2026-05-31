@@ -15,7 +15,7 @@ namespace CourtManager.APIs.Controllers;
 [ApiController]
 [Route("api/v1/chats")]
 [Authorize]
-public class ChatsController : ControllerBase
+public class ChatsController : BaseApiController
 {
     private readonly IMediator _mediator;
     private readonly ILogger<ChatsController> _logger;
@@ -36,7 +36,7 @@ public class ChatsController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<ChatRoomDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<ChatRoomDto>>> GetChatRooms([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = CurrentUserId;
         _logger.LogInformation("Fetching chat rooms for user {UserId}", userId);
         var result = await _mediator.Send(new GetChatRoomsQuery(GetCurrentUserId(), pageNumber, pageSize), cancellationToken);
         return Ok(result);
@@ -52,7 +52,7 @@ public class ChatsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ChatRoomDto>> GetOrCreateChatRoom(Guid otherUserId, CancellationToken cancellationToken = default)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = CurrentUserId;
         _logger.LogInformation("Getting or creating chat room between users {UserId} and {OtherUserId}", userId, otherUserId);
         var result = await _mediator.Send(new GetOrCreateChatRoomQuery(GetCurrentUserId(), otherUserId), cancellationToken);
         return Ok(result);
@@ -119,7 +119,7 @@ public class ChatsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<MessageDto>> SendMessage(Guid roomId, [FromBody] MessageDto message, CancellationToken cancellationToken = default)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = CurrentUserId;
         _logger.LogInformation("Sending message to room {RoomId} from user {UserId}", roomId, userId);
         var result = await _mediator.Send(new SendMessageCommand(GetCurrentUserId(), roomId, message.MessageText), cancellationToken);
         return CreatedAtAction(nameof(GetMessages), new { roomId }, result);

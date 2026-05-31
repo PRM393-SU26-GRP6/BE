@@ -15,7 +15,7 @@ namespace CourtManager.APIs.Controllers;
 [ApiController]
 [Route("api/v1/notifications")]
 [Authorize]
-public class NotificationsController : ControllerBase
+public class NotificationsController : BaseApiController
 {
     private readonly IMediator _mediator;
     private readonly ILogger<NotificationsController> _logger;
@@ -37,7 +37,7 @@ public class NotificationsController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<NotificationDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<NotificationDto>>> GetNotifications([FromQuery] bool unreadOnly = false, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = CurrentUserId;
         _logger.LogInformation("Fetching notifications for user {UserId}", userId);
         var result = await _mediator.Send(new GetNotificationsQuery(GetCurrentUserId(), unreadOnly, pageNumber, pageSize), cancellationToken);
         return Ok(result);
@@ -66,7 +66,7 @@ public class NotificationsController : ControllerBase
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     public async Task<ActionResult<object>> GetUnreadCount(CancellationToken cancellationToken = default)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = CurrentUserId;
         _logger.LogInformation("Fetching unread notification count for user {UserId}", userId);
         var result = await _mediator.Send(new GetUnreadNotificationCountQuery(GetCurrentUserId()), cancellationToken);
         return Ok(result);
@@ -97,7 +97,7 @@ public class NotificationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> MarkAllAsRead(CancellationToken cancellationToken = default)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = CurrentUserId;
         _logger.LogInformation("Marking all notifications as read for user {UserId}", userId);
         var result = await _mediator.Send(new MarkAllNotificationsAsReadCommand(GetCurrentUserId()), cancellationToken);
         return Ok(new { success = result });

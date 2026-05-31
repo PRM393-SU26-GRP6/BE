@@ -29,4 +29,14 @@ public interface IMessageRepository : IRepository<Message>
     Task<int> GetMessageCountAsync(
         Guid roomId,
         CancellationToken cancellationToken = default);
+
+    Task MarkRoomMessagesAsReadAsync(
+        Guid roomId,
+        Guid readerId,
+        CancellationToken cancellationToken = default);
+
+    Task<int> GetUnreadCountForRoomAsync(
+        Guid roomId,
+        Guid userId,
+        CancellationToken cancellationToken = default);
 }

@@ -59,10 +59,24 @@ public class ReviewsController : BaseApiController
     [AllowAnonymous]
     [ProducesResponseType(typeof(ReviewDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetReviewById(Guid id)
+    public async Task<IActionResult> GetReviewById(Guid id)
     {
         _logger.LogInformation("Fetching review {ReviewId}", id);
-        return Ok(new { message = "Get review by ID endpoint - implementation pending" });
+        try
+        {
+            var result = await _mediator.Send(new CourtManager.Application.Features.Reviews.GetReviewByIdQuery(id));
+            return Ok(new
+            {
+                success = true,
+                message = "OK",
+                data = result,
+                errors = Array.Empty<string>()
+            });
+        }
+        catch (CourtManager.Application.Exceptions.NotFoundException ex)
+        {
+            return NotFound(new { success = false, message = ex.Message });
+        }
     }
 
     /// <summary>
@@ -74,10 +88,21 @@ public class ReviewsController : BaseApiController
     [AllowAnonymous]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetAverageRating(Guid fieldId)
+    public async Task<IActionResult> GetAverageRating(Guid fieldId)
     {
         _logger.LogInformation("Fetching average rating for field {FieldId}", fieldId);
-        return Ok(new { message = "Get average rating endpoint - implementation pending" });
+        // We will need to use GetReviewsByFieldQuery and calculate the average, since there isn't a direct field average query yet, or we can just fetch and calculate
+        var result = await _mediator.Send(new CourtManager.Application.Features.Reviews.GetReviewsByFieldQuery(fieldId, 1, 1000));
+        var reviews = result.ToList();
+        decimal averageRating = reviews.Any() ? (decimal)Math.Round(reviews.Average(r => (double)r.Rating), 1) : 0;
+        
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = new { fieldId, averageRating, totalReviews = reviews.Count },
+            errors = Array.Empty<string>()
+        });
     }
 
     /// <summary>
@@ -86,11 +111,19 @@ public class ReviewsController : BaseApiController
     /// <returns>List of user's reviews</returns>
     [HttpGet("my-reviews")]
     [ProducesResponseType(typeof(IEnumerable<ReviewDto>), StatusCodes.Status200OK)]
-    public IActionResult GetMyReviews()
+    public async Task<IActionResult> GetMyReviews()
     {
         var userId = CurrentUserId;
         _logger.LogInformation("Fetching reviews for current user {UserId}", userId);
-        return Ok(new { message = "Get my reviews endpoint - implementation pending" });
+        
+        var result = await _mediator.Send(new CourtManager.Application.Features.Reviews.GetMyReviewsQuery(userId));
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = result,
+            errors = Array.Empty<string>()
+        });
     }
 
     /// <summary>

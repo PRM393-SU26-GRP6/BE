@@ -12,6 +12,13 @@ public class MessageRepository : Repository<Message>, IMessageRepository
 {
     public MessageRepository(ApplicationDbContext context) : base(context) { }
 
+    public override async Task<Message?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(m => m.Sender)
+            .FirstOrDefaultAsync(m => m.MessageId == id, cancellationToken);
+    }
+
     public async Task<IEnumerable<Message>> GetMessagesByRoomIdAsync(
         Guid roomId,
         int pageNumber,
@@ -19,6 +26,7 @@ public class MessageRepository : Repository<Message>, IMessageRepository
         CancellationToken cancellationToken = default)
     {
         return await _dbSet
+            .Include(m => m.Sender)
             .Where(m => m.RoomId == roomId)
             .OrderByDescending(m => m.SentAt)
             .Skip((pageNumber - 1) * pageSize)
@@ -43,5 +51,23 @@ public class MessageRepository : Repository<Message>, IMessageRepository
         return await _dbSet
             .Where(m => m.RoomId == roomId)
             .CountAsync(cancellationToken);
+    }
+
+    public async Task MarkRoomMessagesAsReadAsync(Guid roomId, Guid readerId, CancellationToken cancellationToken = default)
+    {
+        var messages = await _dbSet
+            .Where(m => m.RoomId == roomId && m.SenderId != readerId && m.ReadAt == null)
+            .ToListAsync(cancellationToken);
+
+        foreach (var message in messages)
+        {
+            message.ReadAt = DateTime.UtcNow;
+        }
+    }
+
+    public async Task<int> GetUnreadCountForRoomAsync(Guid roomId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .CountAsync(m => m.RoomId == roomId && m.SenderId != userId && m.ReadAt == null, cancellationToken);
     }
 }

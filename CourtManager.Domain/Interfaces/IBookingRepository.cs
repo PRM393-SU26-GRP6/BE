@@ -9,6 +9,8 @@ public interface IBookingRepository : IRepository<Booking>
 {
     Task<IEnumerable<Booking>> GetBookingsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<IEnumerable<Booking>> GetBookingsByCourtIdAsync(Guid courtId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Booking>> GetPendingBookingsForOwnerAsync(Guid ownerId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Booking>> GetBookingsForOwnerAsync(Guid ownerId, CancellationToken cancellationToken = default);
     Task<bool> IsCourtAvailableAsync(Guid courtId, DateTime startTime, DateTime endTime, CancellationToken cancellationToken = default);
 
     /// <summary>

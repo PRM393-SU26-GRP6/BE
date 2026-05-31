@@ -19,9 +19,15 @@ public class LockTimeSlotCommand : IRequest<bool>
     /// </summary>
     public Guid BookingId { get; set; }
 
-    public LockTimeSlotCommand(Guid slotId, Guid bookingId)
+    /// <summary>
+    /// The ID of the user locking the slot.
+    /// </summary>
+    public Guid UserId { get; set; }
+
+    public LockTimeSlotCommand(Guid slotId, Guid bookingId, Guid userId)
     {
         SlotId = slotId;
         BookingId = bookingId;
+        UserId = userId;
     }
 }

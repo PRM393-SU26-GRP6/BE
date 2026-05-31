@@ -10,7 +10,7 @@ namespace CourtManager.APIs.Controllers;
 /// Controller for user authentication endpoints (register, login, refresh token).
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/auth")]
 public class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -23,7 +23,7 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Get current logged-in user profile.
     /// </summary>
-    [HttpGet("me")]
+    [NonAction]
     [Microsoft.AspNetCore.Authorization.Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -53,9 +53,10 @@ public class AuthController : ControllerBase
         {
             FullName = request.FullName,
             Email = request.Email,
-            PhoneNumber = request.PhoneNumber,
+            PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? request.Phone : request.PhoneNumber,
             Password = request.Password,
-            ConfirmPassword = request.ConfirmPassword
+            ConfirmPassword = request.ConfirmPassword,
+            Role = request.Role
         };
 
         var result = await _mediator.Send(command);
@@ -155,7 +156,7 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Change current user's password.
     /// </summary>
-    [HttpPost("change-password")]
+    [NonAction]
     [Microsoft.AspNetCore.Authorization.Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -181,7 +182,7 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Request a password reset token.
     /// </summary>
-    [HttpPost("forgot-password")]
+    [NonAction]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<AuthResponseDto>> ForgotPassword([FromBody] ForgotPasswordRequestDto request)
@@ -195,7 +196,7 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Reset password using a reset token.
     /// </summary>
-    [HttpPost("reset-password")]
+    [NonAction]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<AuthResponseDto>> ResetPassword([FromBody] ResetPasswordRequestDto request)

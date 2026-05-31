@@ -11,11 +11,20 @@ public static class ApiServiceExtensions
 {
     public static IServiceCollection AddWebApiServices(this IServiceCollection services, IConfiguration configuration, JwtSettings jwtSettings)
     {
-        services.AddControllers();
+        services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+            options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+            options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        });
         services.AddEndpointsApiExplorer();
+        services.AddHttpClient();
         
         services.AddHttpContextAccessor();
         services.AddScoped<CourtManager.Application.Interfaces.ICurrentUserService, CourtManager.APIs.Services.CurrentUserService>();
+
+        // SePay Configuration
+        services.Configure<SePaySettings>(configuration.GetSection("SePay"));
 
         // Swagger Configuration
         services.AddSwaggerGen(options =>
@@ -35,6 +44,14 @@ public static class ApiServiceExtensions
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
                 Description = "Enter your JWT token in the text input below.\n\nExample: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            });
+
+            options.AddSecurityDefinition("SePayApiKey", new OpenApiSecurityScheme
+            {
+                Name = "X-API-Key",
+                Type = SecuritySchemeType.ApiKey,
+                In = ParameterLocation.Header,
+                Description = "SePay webhook API key"
             });
 
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement

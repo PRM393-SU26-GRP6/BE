@@ -1,4 +1,5 @@
 using CourtManager.Application.DTOs;
+using CourtManager.Application.Features.Chats;
 using CourtManager.Application.Features.Chats.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +13,7 @@ namespace CourtManager.APIs.Controllers;
 /// Provides endpoints for real-time communication between users.
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/chats")]
 [Authorize]
 public class ChatsController : BaseApiController
 {
@@ -33,11 +34,12 @@ public class ChatsController : BaseApiController
     /// <returns>Paginated list of chat rooms</returns>
     [HttpGet("rooms")]
     [ProducesResponseType(typeof(IEnumerable<ChatRoomDto>), StatusCodes.Status200OK)]
-    public IActionResult GetChatRooms([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<ChatRoomDto>>> GetChatRooms([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
         var userId = CurrentUserId;
         _logger.LogInformation("Fetching chat rooms for user {UserId}", userId);
-        return Ok(new { message = "Get chat rooms endpoint - implementation pending" });
+        var result = await _mediator.Send(new GetChatRoomsQuery(GetCurrentUserId(), pageNumber, pageSize), cancellationToken);
+        return Ok(result);
     }
 
     /// <summary>
@@ -45,14 +47,46 @@ public class ChatsController : BaseApiController
     /// </summary>
     /// <param name="otherUserId">The other user's ID</param>
     /// <returns>Chat room details</returns>
-    [HttpGet("room/{otherUserId}")]
+    [NonAction]
     [ProducesResponseType(typeof(ChatRoomDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetOrCreateChatRoom(Guid otherUserId)
+    public async Task<ActionResult<ChatRoomDto>> GetOrCreateChatRoom(Guid otherUserId, CancellationToken cancellationToken = default)
     {
         var userId = CurrentUserId;
         _logger.LogInformation("Getting or creating chat room between users {UserId} and {OtherUserId}", userId, otherUserId);
-        return Ok(new { message = "Get or create chat room endpoint - implementation pending" });
+        var result = await _mediator.Send(new GetOrCreateChatRoomQuery(GetCurrentUserId(), otherUserId), cancellationToken);
+        return Ok(result);
+    }
+
+    [NonAction]
+    [ProducesResponseType(typeof(ChatRoomDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ChatRoomDto>> GetOrCreateVenueChatRoom(Guid venueId, CancellationToken cancellationToken = default)
+    {
+        var result = await _mediator.Send(new GetOrCreateVenueChatRoomQuery(GetCurrentUserId(), venueId), cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPost("rooms")]
+    [ProducesResponseType(typeof(ChatRoomDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ChatRoomDto>> CreateOrGetRoom([FromBody] CreateChatRoomRequestDto request, CancellationToken cancellationToken = default)
+    {
+        ChatRoomDto result;
+        if (request.VenueId.HasValue)
+        {
+            result = await _mediator.Send(new GetOrCreateVenueChatRoomQuery(GetCurrentUserId(), request.VenueId.Value), cancellationToken);
+        }
+        else
+        {
+            var otherUserId = request.CustomerId == GetCurrentUserId() ? request.OwnerId : request.CustomerId;
+            if (otherUserId == Guid.Empty)
+            {
+                otherUserId = request.OwnerId;
+            }
+
+            result = await _mediator.Send(new GetOrCreateChatRoomQuery(GetCurrentUserId(), otherUserId), cancellationToken);
+        }
+
+        return Ok(result);
     }
 
     /// <summary>
@@ -65,10 +99,11 @@ public class ChatsController : BaseApiController
     [HttpGet("rooms/{roomId}/messages")]
     [ProducesResponseType(typeof(IEnumerable<MessageDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetMessages(Guid roomId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20)
+    public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessages(Guid roomId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Fetching messages for room {RoomId}", roomId);
-        return Ok(new { message = "Get messages endpoint - implementation pending" });
+        var result = await _mediator.Send(new GetMessagesQuery(GetCurrentUserId(), roomId, pageNumber, pageSize), cancellationToken);
+        return Ok(result);
     }
 
     /// <summary>
@@ -82,11 +117,20 @@ public class ChatsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public IActionResult SendMessage(Guid roomId, [FromBody] MessageDto message)
+    public async Task<ActionResult<MessageDto>> SendMessage(Guid roomId, [FromBody] MessageDto message, CancellationToken cancellationToken = default)
     {
         var userId = CurrentUserId;
         _logger.LogInformation("Sending message to room {RoomId} from user {UserId}", roomId, userId);
-        return Ok(new { message = "Send message endpoint - implementation pending" });
+        var result = await _mediator.Send(new SendMessageCommand(GetCurrentUserId(), roomId, message.MessageText), cancellationToken);
+        return CreatedAtAction(nameof(GetMessages), new { roomId }, result);
+    }
+
+    [NonAction]
+    [ProducesResponseType(typeof(MessageDto), StatusCodes.Status201Created)]
+    public async Task<ActionResult<MessageDto>> SendMessageByBody([FromBody] MessageDto message, CancellationToken cancellationToken = default)
+    {
+        var result = await _mediator.Send(new SendMessageCommand(GetCurrentUserId(), message.RoomId, message.MessageText), cancellationToken);
+        return CreatedAtAction(nameof(GetMessages), new { roomId = message.RoomId }, result);
     }
 
     /// <summary>
@@ -96,7 +140,7 @@ public class ChatsController : BaseApiController
     /// <param name="messageId">The message ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [HttpDelete("rooms/{roomId}/messages/{messageId}")]
+    [NonAction]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -115,7 +159,7 @@ public class ChatsController : BaseApiController
     /// <param name="roomId">The chat room ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [HttpDelete("rooms/{roomId}")]
+    [NonAction]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -127,4 +171,26 @@ public class ChatsController : BaseApiController
         _logger.LogInformation("Chat room {RoomId} closed successfully (soft delete)", roomId);
         return Ok(new { success = result, message = "Chat room closed successfully" });
     }
+
+    [HttpPut("rooms/{roomId:guid}/read")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> MarkRoomAsRead(Guid roomId, CancellationToken cancellationToken = default)
+    {
+        await _mediator.Send(new GetMessagesQuery(GetCurrentUserId(), roomId, 1, 1), cancellationToken);
+        return Ok(new { unreadCount = 0 });
+    }
+
+    private Guid GetCurrentUserId()
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Guid.TryParse(userIdString, out var userId) ? userId : Guid.Empty;
+    }
+}
+
+public class CreateChatRoomRequestDto
+{
+    public Guid CustomerId { get; set; }
+    public Guid OwnerId { get; set; }
+    public Guid? VenueId { get; set; }
+    public Guid? BookingId { get; set; }
 }

@@ -84,7 +84,8 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto
                 Id = user.Id,
                 FullName = user.FullName,
                 Email = user.Email!,
-                PhoneNumber = user.PhoneNumber ?? string.Empty
+                PhoneNumber = user.PhoneNumber ?? string.Empty,
+                Roles = roles
             }
         };
     }

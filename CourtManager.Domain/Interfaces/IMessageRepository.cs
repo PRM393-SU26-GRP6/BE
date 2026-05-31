@@ -30,6 +30,7 @@ public interface INotificationRepository : IRepository<Notification>
     /// </summary>
     Task MarkAsReadAsync(
         Guid notificationId,
+        Guid userId,
         CancellationToken cancellationToken = default);
 
     /// <summary>

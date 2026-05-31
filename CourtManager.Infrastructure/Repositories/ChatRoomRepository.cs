@@ -41,6 +41,8 @@ public class ChatRoomRepository : Repository<ChatRoom>, IChatRoomRepository
         CancellationToken cancellationToken = default)
     {
         return await _dbSet
+            .Include(r => r.Customer)
+            .Include(r => r.Host)
             .FirstOrDefaultAsync(r =>
                 (r.CustomerId == userId1 && r.HostId == userId2) ||
                 (r.CustomerId == userId2 && r.HostId == userId1),
@@ -52,8 +54,11 @@ public class ChatRoomRepository : Repository<ChatRoom>, IChatRoomRepository
         CancellationToken cancellationToken = default)
     {
         return await _dbSet
+            .Include(r => r.Customer)
+            .Include(r => r.Host)
+            .Include(r => r.Messages)
             .Where(r => r.CustomerId == userId || r.HostId == userId)
-            .OrderByDescending(r => r.CreatedAt)
+            .OrderByDescending(r => r.LastMessageAt ?? r.CreatedAt)
             .ToListAsync(cancellationToken);
     }
 
@@ -64,10 +69,22 @@ public class ChatRoomRepository : Repository<ChatRoom>, IChatRoomRepository
         CancellationToken cancellationToken = default)
     {
         return await _dbSet
+            .Include(r => r.Customer)
+            .Include(r => r.Host)
+            .Include(r => r.Messages)
             .Where(r => r.CustomerId == userId || r.HostId == userId)
-            .OrderByDescending(r => r.CreatedAt)
+            .OrderByDescending(r => r.LastMessageAt ?? r.CreatedAt)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+    }
+
+    public override async Task<ChatRoom?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(r => r.Customer)
+            .Include(r => r.Host)
+            .Include(r => r.Messages)
+            .FirstOrDefaultAsync(r => r.RoomId == id, cancellationToken);
     }
 }

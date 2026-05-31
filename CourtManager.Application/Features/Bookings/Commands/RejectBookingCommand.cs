@@ -18,10 +18,12 @@ public class RejectBookingCommand : IRequest<bool>
     /// Optional reason for rejection.
     /// </summary>
     public string? RejectionReason { get; set; }
+    public Guid OwnerId { get; set; }
 
-    public RejectBookingCommand(Guid bookingId, string? rejectionReason = null)
+    public RejectBookingCommand(Guid bookingId, string? rejectionReason = null, Guid ownerId = default)
     {
         BookingId = bookingId;
         RejectionReason = rejectionReason;
+        OwnerId = ownerId;
     }
 }

@@ -28,6 +28,13 @@ public class GetBookingByIdQueryHandler : IRequestHandler<GetBookingByIdQuery, B
         if (booking == null)
             throw new NotFoundException(nameof(Booking), request.BookingId);
 
+        var isBookingUser = booking.UserId == request.UserId;
+        var isBookingOwner = request.IsOwner && booking.BookingItems.Any(i =>
+            i.Slot?.Field?.Venue?.OwnerId == request.UserId);
+
+        if (!request.IsAdmin && !isBookingUser && !isBookingOwner)
+            throw new ValidationException("You are not allowed to view this booking.");
+
         return _mapper.Map<BookingDto>(booking);
     }
 }

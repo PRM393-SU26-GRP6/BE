@@ -10,6 +10,7 @@ public class FootballField
     public Guid Id { get; set; }
     public Guid VenueId { get; set; }
     public string FieldName { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
     public FieldType FieldType { get; set; }
     public decimal PricePerHour { get; set; }
     public DateTime CreatedAt { get; set; }

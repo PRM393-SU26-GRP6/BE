@@ -31,6 +31,8 @@ public class MessageDto
     /// </summary>
     public string MessageText { get; set; } = string.Empty;
 
+    public bool IsRead { get; set; }
+
     /// <summary>
     /// Timestamp when the message was sent.
     /// </summary>

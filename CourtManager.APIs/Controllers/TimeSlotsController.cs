@@ -33,10 +33,17 @@ public class TimeSlotsController : BaseApiController
     [HttpGet]
     [AllowAnonymous]
     [ProducesResponseType(typeof(IEnumerable<TimeSlotDto>), StatusCodes.Status200OK)]
-    public IActionResult GetSlotsByField([FromQuery] Guid fieldId)
+    public async Task<IActionResult> GetSlotsByField([FromQuery] Guid fieldId)
     {
         _logger.LogInformation("Fetching time slots for field {FieldId}", fieldId);
-        return Ok(new { message = "Get slots by field endpoint - implementation pending" });
+        var result = await _mediator.Send(new CourtManager.Application.Features.TimeSlots.GetSlotsByFieldQuery(fieldId));
+        return Ok(new
+        {
+            success = true,
+            message = "OK",
+            data = result,
+            errors = Array.Empty<string>()
+        });
     }
 
     /// <summary>
@@ -48,10 +55,24 @@ public class TimeSlotsController : BaseApiController
     [AllowAnonymous]
     [ProducesResponseType(typeof(TimeSlotDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetSlotById(Guid id)
+    public async Task<IActionResult> GetSlotById(Guid id)
     {
         _logger.LogInformation("Fetching time slot {SlotId}", id);
-        return Ok(new { message = "Get slot by ID endpoint - implementation pending" });
+        try
+        {
+            var result = await _mediator.Send(new CourtManager.Application.Features.TimeSlots.GetTimeSlotByIdQuery(id));
+            return Ok(new
+            {
+                success = true,
+                message = "OK",
+                data = result,
+                errors = Array.Empty<string>()
+            });
+        }
+        catch (CourtManager.Application.Exceptions.NotFoundException ex)
+        {
+            return NotFound(new { success = false, message = ex.Message });
+        }
     }
 
     /// <summary>
@@ -65,7 +86,8 @@ public class TimeSlotsController : BaseApiController
     [ProducesResponseType(typeof(IEnumerable<TimeSlotDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAvailableSlots([FromQuery] Guid fieldId, [FromQuery] DateTime date)
     {
-        var query = new CourtManager.Application.Features.TimeSlots.Queries.GetAvailableSlotsQuery(fieldId, date);
+        var targetDate = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+        var query = new CourtManager.Application.Features.TimeSlots.Queries.GetAvailableSlotsQuery(fieldId, targetDate);
         var result = await _mediator.Send(query);
 
         return Ok(new
@@ -157,10 +179,29 @@ public class TimeSlotsController : BaseApiController
     [ProducesResponseType(typeof(TimeSlotDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public IActionResult CreateSlot([FromBody] TimeSlotDto slot)
+    public async Task<IActionResult> CreateSlot([FromBody] TimeSlotDto slot)
     {
         _logger.LogInformation("Creating new time slot for field {FieldId}", slot.FieldId);
-        return Ok(new { message = "Create slot endpoint - implementation pending" });
+        try
+        {
+            var command = new CourtManager.Application.Features.TimeSlots.CreateTimeSlotCommand(CurrentUserId, slot);
+            var result = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetSlotById), new { id = result.SlotId }, new
+            {
+                success = true,
+                message = "Slot created successfully",
+                data = result,
+                errors = Array.Empty<string>()
+            });
+        }
+        catch (CourtManager.Application.Exceptions.ValidationException ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = "Failed to create slot", errors = new[] { ex.Message } });
+        }
     }
 
     /// <summary>
@@ -175,10 +216,33 @@ public class TimeSlotsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public IActionResult UpdateSlot(Guid id, [FromBody] TimeSlotDto slot)
+    public async Task<IActionResult> UpdateSlot(Guid id, [FromBody] TimeSlotDto slot)
     {
         _logger.LogInformation("Updating time slot {SlotId}", id);
-        return Ok(new { message = "Update slot endpoint - implementation pending" });
+        try
+        {
+            var command = new CourtManager.Application.Features.TimeSlots.UpdateTimeSlotCommand(CurrentUserId, id, slot);
+            var result = await _mediator.Send(command);
+            return Ok(new
+            {
+                success = true,
+                message = "Slot updated successfully",
+                data = result,
+                errors = Array.Empty<string>()
+            });
+        }
+        catch (CourtManager.Application.Exceptions.NotFoundException ex)
+        {
+            return NotFound(new { success = false, message = ex.Message });
+        }
+        catch (CourtManager.Application.Exceptions.ValidationException ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = "Failed to update slot", errors = new[] { ex.Message } });
+        }
     }
 
     /// <summary>

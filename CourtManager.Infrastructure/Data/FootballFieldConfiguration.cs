@@ -11,6 +11,7 @@ public class FootballFieldConfiguration : IEntityTypeConfiguration<FootballField
         builder.HasKey(f => f.Id);
         builder.Property(f => f.Id).ValueGeneratedNever();
         builder.Property(f => f.FieldName).IsRequired().HasMaxLength(200);
+        builder.Property(f => f.Description).HasMaxLength(1000);
         builder.Property(f => f.FieldType).IsRequired().HasConversion<string>().HasMaxLength(100);
         builder.Property(f => f.PricePerHour).HasPrecision(10, 2);
         builder.Property(f => f.CreatedAt).ValueGeneratedOnAdd().HasDefaultValueSql("CURRENT_TIMESTAMP");

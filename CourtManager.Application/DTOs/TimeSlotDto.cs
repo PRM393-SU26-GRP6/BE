@@ -26,6 +26,8 @@ public class TimeSlotDto
     /// </summary>
     public DateTime EndTime { get; set; }
 
+    public decimal Price { get; set; }
+
     /// <summary>
     /// Current status of the slot (Available, Locked, Booked, etc.).
     /// </summary>

@@ -31,6 +31,12 @@ public class NotificationDto
     /// </summary>
     public bool IsRead { get; set; }
 
+    public string Type { get; set; } = string.Empty;
+
+    public string RefId { get; set; } = string.Empty;
+
+    public DateTime? ReadAt { get; set; }
+
     /// <summary>
     /// Timestamp when the notification was created.
     /// </summary>

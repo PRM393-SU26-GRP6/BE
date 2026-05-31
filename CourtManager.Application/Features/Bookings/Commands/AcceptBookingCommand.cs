@@ -13,9 +13,11 @@ public class AcceptBookingCommand : IRequest<bool>
     /// The ID of the booking to accept.
     /// </summary>
     public Guid BookingId { get; set; }
+    public Guid OwnerId { get; set; }
 
-    public AcceptBookingCommand(Guid bookingId)
+    public AcceptBookingCommand(Guid bookingId, Guid ownerId = default)
     {
         BookingId = bookingId;
+        OwnerId = ownerId;
     }
 }

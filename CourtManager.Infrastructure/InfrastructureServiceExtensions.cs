@@ -61,6 +61,7 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IFootballFieldRepository, FootballFieldRepository>();
         services.AddScoped<IBookingRepository, BookingRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<IDiscountRepository, DiscountRepository>();
         services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
         services.AddScoped<IVenueImageRepository, VenueImageRepository>();
         services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
@@ -69,6 +70,8 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.AddScoped<IVenueRepository, VenueRepository>();
         services.AddScoped<IAmenityRepository, AmenityRepository>();
+        services.AddScoped<IVenueAmenityRepository, VenueAmenityRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IStorageService, CloudflareR2StorageService>();
 
         return services;

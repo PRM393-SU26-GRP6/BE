@@ -1,5 +1,7 @@
 namespace CourtManager.APIs.Middleware;
 
+using CourtManager.Application.Exceptions;
+
 /// <summary>
 /// Global exception handling middleware for API.
 /// Catches all unhandled exceptions and returns appropriate HTTP responses.
@@ -45,8 +47,15 @@ public class GlobalExceptionHandlingMiddleware
                 break;
 
             case KeyNotFoundException:
+            case NotFoundException:
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
                 response.Message = "The requested resource was not found.";
+                response.Details = exception.Message;
+                break;
+
+            case ValidationException:
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                response.Message = exception.Message;
                 response.Details = exception.Message;
                 break;
 
@@ -62,11 +71,6 @@ public class GlobalExceptionHandlingMiddleware
                 response.Details = exception.Message;
                 break;
 
-            case CourtManager.Application.Exceptions.NotFoundException:
-                context.Response.StatusCode = StatusCodes.Status404NotFound;
-                response.Message = "The requested resource was not found.";
-                response.Details = exception.Message;
-                break;
 
             default:
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;

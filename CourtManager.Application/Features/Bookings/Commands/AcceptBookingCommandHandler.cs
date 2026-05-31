@@ -29,6 +29,9 @@ public class AcceptBookingCommandHandler : IRequestHandler<AcceptBookingCommand,
         if (booking == null)
             throw new NotFoundException(nameof(Booking), request.BookingId);
 
+        if (request.OwnerId != Guid.Empty && !booking.BookingItems.Any(i => i.Slot?.Field?.Venue?.OwnerId == request.OwnerId))
+            throw new ValidationException("Only the owner of the booked venue can accept this booking.");
+
         // Verify booking is in Pending status
         if (booking.BookingStatus != CourtManager.Domain.Enums.BookingStatus.Pending)
             throw new ValidationException(

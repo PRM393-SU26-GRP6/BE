@@ -15,13 +15,25 @@ public class CancelBookingCommand : IRequest<bool>
     public Guid BookingId { get; set; }
 
     /// <summary>
+    /// The user requesting the cancellation.
+    /// </summary>
+    public Guid UserId { get; set; }
+
+    /// <summary>
+    /// Whether the user can manage bookings beyond their own.
+    /// </summary>
+    public bool IsOwnerOrAdmin { get; set; }
+
+    /// <summary>
     /// Optional reason for cancellation.
     /// </summary>
     public string? CancellationReason { get; set; }
 
-    public CancelBookingCommand(Guid bookingId, string? cancellationReason = null)
+    public CancelBookingCommand(Guid bookingId, Guid userId, bool isOwnerOrAdmin = false, string? cancellationReason = null)
     {
         BookingId = bookingId;
+        UserId = userId;
+        IsOwnerOrAdmin = isOwnerOrAdmin;
         CancellationReason = cancellationReason;
     }
 }

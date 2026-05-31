@@ -10,12 +10,30 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
 
     public async Task<IEnumerable<Review>> GetReviewsByFieldIdAsync(Guid fieldId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _dbSet
+            .Include(r => r.User)
+            .Include(r => r.Booking)
+            .Where(r => r.Booking != null && r.Booking.BookingItems.Any(bi => bi.Slot != null && bi.Slot.FieldId == fieldId) && !r.IsDeleted)
+            .OrderByDescending(r => r.CreatedAt)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<Review?> GetUserReviewAsync(Guid userId, Guid fieldId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _dbSet
+            .Include(r => r.Booking)
+            .FirstOrDefaultAsync(r => r.UserId == userId && r.Booking != null && r.Booking.BookingItems.Any(bi => bi.Slot != null && bi.Slot.FieldId == fieldId) && !r.IsDeleted, cancellationToken);
+    }
+
+    public async Task<IEnumerable<Review>> GetReviewsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(r => r.Venue)
+            .Where(r => r.UserId == userId && !r.IsDeleted)
+            .OrderByDescending(r => r.CreatedAt)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<(IEnumerable<Review> Reviews, int TotalCount, decimal AverageRating)> GetVenueReviewsAsync(

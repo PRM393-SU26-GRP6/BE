@@ -37,6 +37,8 @@ public class LockTimeSlotCommandHandler : IRequestHandler<LockTimeSlotCommand, b
 
         // Lock the slot
         slot.SlotStatus = CourtManager.Domain.Enums.SlotStatus.Locked;
+        slot.LockedUntil = DateTime.UtcNow.AddMinutes(15);
+        slot.LockedBy = request.UserId;
         slot.UpdatedAt = DateTime.UtcNow;
 
         // Save changes

@@ -1,5 +1,6 @@
 using CourtManager.Application.Exceptions;
 using CourtManager.Domain.Entities;
+using CourtManager.Domain.Enums;
 using CourtManager.Domain.Interfaces;
 using MediatR;
 
@@ -13,13 +14,16 @@ public class CancelBookingCommandHandler : IRequestHandler<CancelBookingCommand,
 {
     private readonly IBookingRepository _bookingRepository;
     private readonly ITimeSlotRepository _timeSlotRepository;
+    private readonly INotificationRepository _notificationRepository;
 
     public CancelBookingCommandHandler(
         IBookingRepository bookingRepository,
-        ITimeSlotRepository timeSlotRepository)
+        ITimeSlotRepository timeSlotRepository,
+        INotificationRepository notificationRepository)
     {
         _bookingRepository = bookingRepository;
         _timeSlotRepository = timeSlotRepository;
+        _notificationRepository = notificationRepository;
     }
 
     /// <summary>
@@ -34,13 +38,16 @@ public class CancelBookingCommandHandler : IRequestHandler<CancelBookingCommand,
         if (booking == null)
             throw new NotFoundException(nameof(Booking), request.BookingId);
 
+        if (!request.IsOwnerOrAdmin && booking.UserId != request.UserId)
+            throw new ValidationException("Only the booking customer can cancel this booking.");
+
         // Verify booking is in a cancellable status (Pending or Confirmed)
-        if (booking.BookingStatus != CourtManager.Domain.Enums.BookingStatus.Pending && booking.BookingStatus != CourtManager.Domain.Enums.BookingStatus.Accepted)
+        if (booking.BookingStatus != BookingStatus.Pending && booking.BookingStatus != BookingStatus.Accepted)
             throw new ValidationException(
                 $"Cannot cancel booking. Current status is '{booking.BookingStatus}'. Only 'Pending' or 'Accepted' bookings can be cancelled.");
 
         // Update booking status to Cancelled and store cancellation reason
-        booking.BookingStatus = CourtManager.Domain.Enums.BookingStatus.Cancelled;
+        booking.BookingStatus = BookingStatus.Cancelled;
         if (!string.IsNullOrEmpty(request.CancellationReason))
         {
             booking.Note = $"Cancelled: {request.CancellationReason}";
@@ -52,6 +59,35 @@ public class CancelBookingCommandHandler : IRequestHandler<CancelBookingCommand,
         {
             var slotIds = booking.BookingItems.Select(bi => bi.SlotId).ToList();
             await _timeSlotRepository.BatchUpdateSlotStatusAsync(slotIds, "Available", cancellationToken);
+        }
+
+        var bookingItems = booking.BookingItems ?? [];
+        var ownerId = bookingItems
+            .Select(i => i.Slot?.Field?.Venue?.OwnerId)
+            .FirstOrDefault(id => id.HasValue && id.Value != Guid.Empty);
+
+        if (ownerId.HasValue)
+        {
+            var notification = new Notification
+            {
+                NotificationId = Guid.NewGuid(),
+                SenderId = request.UserId,
+                Title = "Booking cancelled",
+                Message = $"Booking {booking.Id} has been cancelled.",
+                Type = NotificationType.Booking,
+                RefId = booking.Id.ToString(),
+                CreatedAt = DateTime.UtcNow,
+                NotificationRecipients =
+                [
+                    new NotificationRecipient
+                    {
+                        RecipientId = Guid.NewGuid(),
+                        UserId = ownerId.Value
+                    }
+                ]
+            };
+
+            await _notificationRepository.AddAsync(notification, cancellationToken);
         }
 
         // Save changes

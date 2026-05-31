@@ -12,10 +12,12 @@ namespace CourtManager.Application.Features.Bookings.Commands;
 public class RejectBookingCommandHandler : IRequestHandler<RejectBookingCommand, bool>
 {
     private readonly IBookingRepository _bookingRepository;
+    private readonly ITimeSlotRepository _timeSlotRepository;
 
-    public RejectBookingCommandHandler(IBookingRepository bookingRepository)
+    public RejectBookingCommandHandler(IBookingRepository bookingRepository, ITimeSlotRepository timeSlotRepository)
     {
         _bookingRepository = bookingRepository;
+        _timeSlotRepository = timeSlotRepository;
     }
 
     /// <summary>
@@ -29,6 +31,9 @@ public class RejectBookingCommandHandler : IRequestHandler<RejectBookingCommand,
         if (booking == null)
             throw new NotFoundException(nameof(Booking), request.BookingId);
 
+        if (request.OwnerId != Guid.Empty && !booking.BookingItems.Any(i => i.Slot?.Field?.Venue?.OwnerId == request.OwnerId))
+            throw new ValidationException("Only the owner of the booked venue can reject this booking.");
+
         // Verify booking is in Pending status
         if (booking.BookingStatus != CourtManager.Domain.Enums.BookingStatus.Pending)
             throw new ValidationException(
@@ -41,6 +46,11 @@ public class RejectBookingCommandHandler : IRequestHandler<RejectBookingCommand,
             booking.Note = $"Rejected: {request.RejectionReason}";
         }
         booking.UpdatedAt = DateTime.UtcNow;
+
+        if (booking.BookingItems.Any())
+        {
+            await _timeSlotRepository.BatchUpdateSlotStatusAsync(booking.BookingItems.Select(i => i.SlotId), "Available", cancellationToken);
+        }
 
         // Save changes
         await _bookingRepository.UpdateAsync(booking, cancellationToken);

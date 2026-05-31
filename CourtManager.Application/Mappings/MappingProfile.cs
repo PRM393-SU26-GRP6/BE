@@ -13,9 +13,16 @@ public class MappingProfile : Profile
     {
         // User mappings
         CreateMap<User, UserDto>().ReverseMap();
+        CreateMap<Amenity, AmenityDto>().ReverseMap();
 
         // FootballField mappings
-        CreateMap<FootballField, FootballFieldDto>().ReverseMap();
+        CreateMap<FootballField, FootballFieldDto>()
+            .ForMember(dest => dest.OwnerId, opt => opt.MapFrom(src => src.Venue != null ? src.Venue.OwnerId : Guid.Empty))
+            .ForMember(dest => dest.FieldType, opt => opt.MapFrom(src => src.FieldType.ToString()))
+            .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Venue != null ? src.Venue.Address : string.Empty))
+            .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.Venue != null ? src.Venue.Latitude : 0))
+            .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Venue != null ? src.Venue.Longitude : 0))
+            .ReverseMap();
 
         // Venue mappings
         CreateMap<Venue, VenueDto>()
@@ -38,7 +45,22 @@ public class MappingProfile : Profile
         CreateMap<Amenity, AmenityDto>().ReverseMap();
 
         // Booking mappings
-        CreateMap<Booking, BookingDto>().ReverseMap();
+        CreateMap<BookingItem, BookingItemDto>()
+            .ForMember(dest => dest.FieldId, opt => opt.MapFrom(src => src.Slot != null ? src.Slot.FieldId : Guid.Empty))
+            .ForMember(dest => dest.FieldName, opt => opt.MapFrom(src => src.Slot != null && src.Slot.Field != null ? src.Slot.Field.FieldName : null))
+            .ForMember(dest => dest.VenueId, opt => opt.MapFrom(src => src.Slot != null && src.Slot.Field != null ? src.Slot.Field.VenueId : Guid.Empty))
+            .ForMember(dest => dest.VenueName, opt => opt.MapFrom(src => src.Slot != null && src.Slot.Field != null && src.Slot.Field.Venue != null ? src.Slot.Field.Venue.VenueName : null))
+            .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.Slot != null ? src.Slot.StartTime : default))
+            .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.Slot != null ? src.Slot.EndTime : default));
+        CreateMap<Booking, BookingDto>()
+            .ForMember(dest => dest.FieldId, opt => opt.MapFrom(src => src.BookingItems.Select(i => i.Slot != null ? i.Slot.FieldId : Guid.Empty).FirstOrDefault()))
+            .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.BookingItems.Any() ? src.BookingItems.Min(i => i.Slot != null ? i.Slot.StartTime : DateTime.MinValue) : DateTime.MinValue))
+            .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.BookingItems.Any() ? src.BookingItems.Max(i => i.Slot != null ? i.Slot.EndTime : DateTime.MinValue) : DateTime.MinValue))
+            .ForMember(dest => dest.BookingStatus, opt => opt.MapFrom(src => src.BookingStatus.ToString()))
+            .ForMember(dest => dest.DiscountAmount, opt => opt.MapFrom(src => src.BookingDiscounts.Sum(d => d.DiscountAmount)))
+            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.BookingItems))
+            .ForMember(dest => dest.Payments, opt => opt.MapFrom(src => src.Payments))
+            .ReverseMap();
         CreateMap<Booking, CreateBookingDto>().ReverseMap();
         CreateMap<Booking, BookingHistoryDto>()
             //.ForMember(dest => dest.FieldName, opt => opt.MapFrom(src => src.Field != null ? src.Field.FieldName : null))
@@ -47,10 +69,16 @@ public class MappingProfile : Profile
             .ReverseMap();
 
         // Payment mappings
-        CreateMap<Payment, PaymentDto>().ReverseMap();
+        CreateMap<Payment, PaymentDto>()
+            .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => src.PaymentStatus.ToString()))
+            .ForMember(dest => dest.PaymentType, opt => opt.MapFrom(src => src.PaymentType.ToString()))
+            .ForMember(dest => dest.BookingStatus, opt => opt.MapFrom(src => src.Booking != null ? src.Booking.BookingStatus.ToString() : null))
+            .ReverseMap();
 
         // TimeSlot mappings
-        CreateMap<TimeSlot, TimeSlotDto>().ReverseMap();
+        CreateMap<TimeSlot, TimeSlotDto>()
+            .ForMember(dest => dest.SlotStatus, opt => opt.MapFrom(src => src.SlotStatus.ToString()))
+            .ReverseMap();
 
         // FieldImage mappings
         // CreateMap<FieldImage, FieldImageDto>().ReverseMap();
@@ -67,12 +95,18 @@ public class MappingProfile : Profile
             .ReverseMap();
 
         // Notification mappings
-        CreateMap<Notification, NotificationDto>().ReverseMap();
+        CreateMap<Notification, NotificationDto>()
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
+            .ReverseMap();
 
         // Review mappings
         CreateMap<Review, ReviewDto>()
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User != null ? src.User.FullName : null))
-            //.ForMember(dest => dest.FieldName, opt => opt.MapFrom(src => src.Field != null ? src.Field.FieldName : null))
+            .ForMember(dest => dest.VenueName, opt => opt.MapFrom(src => src.Venue != null ? src.Venue.VenueName : null))
+            .ReverseMap();
+
+        CreateMap<Discount, DiscountDto>()
+            .ForMember(dest => dest.DiscountType, opt => opt.MapFrom(src => src.DiscountType.ToString()))
             .ReverseMap();
     }
 }

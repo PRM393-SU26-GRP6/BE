@@ -42,6 +42,11 @@ public class ReviewDto
     public string? Comment { get; set; }
 
     /// <summary>
+    /// Name of the venue being reviewed.
+    /// </summary>
+    public string? VenueName { get; set; }
+
+    /// <summary>
     /// Timestamp when the review was created.
     /// </summary>
     public DateTime CreatedAt { get; set; }

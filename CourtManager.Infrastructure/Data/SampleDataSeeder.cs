@@ -219,18 +219,18 @@ public static class SampleDataSeeder
 
         var discounts = new[]
         {
-            Discount(1, users.Owners[0], fields[0].Id, "RIVER20", "Riverside weekday promotion", DiscountType.Percentage, 20, 200000, 60000, 40, 5, true, now),
+            Discount(1, users.Owners[0], venues[0].VenueId, "RIVER20", "Riverside weekday promotion", DiscountType.Percentage, 20, 200000, 60000, 40, 5, true, now),
             Discount(2, users.Owners[0], null, "COMMUNITY50", "Community club voucher", DiscountType.Fixed, 50000, 300000, 50000, 30, 8, true, now),
-            Discount(3, users.Owners[1], fields[4].Id, "GREEN10", "Green Pitch early week", DiscountType.Percentage, 10, 0, 40000, 25, 4, true, now),
+            Discount(3, users.Owners[1], venues[2].VenueId, "GREEN10", "Green Pitch early week", DiscountType.Percentage, 10, 0, 40000, 25, 4, true, now),
             Discount(4, users.Owners[1], null, "ARENA75", "Arena loyalty discount", DiscountType.Fixed, 75000, 500000, 75000, 20, 6, true, now),
-            Discount(5, users.Owners[2], fields[8].Id, "STUDENT15", "Student evening offer", DiscountType.Percentage, 15, 150000, 45000, 60, 12, true, now),
+            Discount(5, users.Owners[2], venues[4].VenueId, "STUDENT15", "Student evening offer", DiscountType.Percentage, 15, 150000, 45000, 60, 12, true, now),
             Discount(6, users.Owners[2], null, "THUDUC30", "Thu Duc neighborhood voucher", DiscountType.Fixed, 30000, 180000, 30000, 80, 18, true, now),
-            Discount(7, users.Owners[3], fields[12].Id, "FLIGHT12", "Airport field promotion", DiscountType.Percentage, 12, 200000, 50000, 35, 7, true, now),
+            Discount(7, users.Owners[3], venues[6].VenueId, "FLIGHT12", "Airport field promotion", DiscountType.Percentage, 12, 200000, 50000, 35, 7, true, now),
             Discount(8, users.Owners[3], null, "WEEKEND40", "Weekend booking voucher", DiscountType.Fixed, 40000, 250000, 40000, 45, 9, true, now),
-            Discount(9, users.Owners[0], fields[16].Id, "WESTSIDE8", "West side happy hour", DiscountType.Percentage, 8, 0, 30000, 50, 3, true, now),
-            Discount(10, users.Owners[1], fields[18].Id, "HANRIVER60", "Han River group voucher", DiscountType.Fixed, 60000, 360000, 60000, 28, 5, true, now),
-            Discount(11, users.Owners[2], fields[20].Id, "WESTLAKE18", "West Lake membership discount", DiscountType.Percentage, 18, 300000, 70000, 22, 10, true, now),
-            Discount(12, users.Owners[3], fields[22].Id, "NINHKIEU25", "Ninh Kieu off-peak voucher", DiscountType.Fixed, 25000, 120000, 25000, 70, 11, true, now)
+            Discount(9, users.Owners[0], venues[8].VenueId, "WESTSIDE8", "West side happy hour", DiscountType.Percentage, 8, 0, 30000, 50, 3, true, now),
+            Discount(10, users.Owners[1], venues[9].VenueId, "HANRIVER60", "Han River group voucher", DiscountType.Fixed, 60000, 360000, 60000, 28, 5, true, now),
+            Discount(11, users.Owners[2], venues[10].VenueId, "WESTLAKE18", "West Lake membership discount", DiscountType.Percentage, 18, 300000, 70000, 22, 10, true, now),
+            Discount(12, users.Owners[3], venues[11].VenueId, "NINHKIEU25", "Ninh Kieu off-peak voucher", DiscountType.Fixed, 25000, 120000, 25000, 70, 11, true, now)
         };
 
         var bookings = new[]
@@ -303,7 +303,7 @@ public static class SampleDataSeeder
             RoomId = room.RoomId,
             SenderId = index % 2 == 0 ? room.CustomerId : room.HostId,
             MessageText = SampleMessages[index],
-            IsRead = index % 3 != 0,
+            ReadAt = index % 3 != 0 ? (room.LastMessageAt ?? now) : null,
             SentAt = room.LastMessageAt ?? now
         }).ToArray();
 
@@ -325,7 +325,6 @@ public static class SampleDataSeeder
             RecipientId = Id("notification-recipient", index + 1),
             NotificationId = notification.NotificationId,
             UserId = index % 2 == 0 ? users.Customers[index % users.Customers.Length] : users.Owners[index % users.Owners.Length],
-            IsRead = index % 4 == 0,
             ReadAt = index % 4 == 0 ? notification.CreatedAt.AddHours(2) : null
         }).ToArray();
 
@@ -454,7 +453,7 @@ public static class SampleDataSeeder
         {
             DiscountId = Id("discount", id),
             OwnerId = ownerId,
-            FieldId = fieldId,
+            VenueId = fieldId,
             Code = code,
             Name = name,
             DiscountType = type,

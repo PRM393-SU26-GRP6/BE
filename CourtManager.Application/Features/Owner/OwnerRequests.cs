@@ -20,7 +20,7 @@ public class GetOwnerStatsQueryHandler : IRequestHandler<GetOwnerStatsQuery, Own
 
     public async Task<OwnerStatsDto> Handle(GetOwnerStatsQuery request, CancellationToken cancellationToken)
     {
-        var venues = (await _venueRepository.GetByOwnerAsync(request.OwnerId, cancellationToken)).ToList();
+        var venues = (await _venueRepository.GetOwnerVenuesAsync(request.OwnerId, null, 0, int.MaxValue, cancellationToken)).ToList();
         var bookings = (await _bookingRepository.GetBookingsForOwnerAsync(request.OwnerId, cancellationToken)).ToList();
         var successfulPayments = bookings
             .SelectMany(b => b.Payments)

@@ -6,7 +6,8 @@ using CourtManager.Application.Features.Fields;
 using CourtManager.Application.Features.Owner;
 using CourtManager.Application.Features.TimeSlots;
 using CourtManager.Application.Features.TimeSlots.Commands;
-using CourtManager.Application.Features.Venues;
+using CourtManager.Application.Features.Venues.Commands;
+using CourtManager.Application.Features.Venues.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,49 +42,7 @@ public class OwnerController : ControllerBase
         return Ok(data);
     }
 
-    [HttpGet("venues")]
-    [ProducesResponseType(typeof(IEnumerable<VenueDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<VenueDto>>> GetVenues(CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new GetOwnerVenuesQuery(GetCurrentUserId()), cancellationToken);
-        return Ok(result);
-    }
 
-    [HttpPost("venues")]
-    [ProducesResponseType(typeof(VenueDto), StatusCodes.Status201Created)]
-    public async Task<ActionResult<VenueDto>> CreateVenue([FromBody] CreateVenueDto venue, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new CreateVenueCommand(GetCurrentUserId(), venue), cancellationToken);
-        return Created($"/api/v1/venues/{result.VenueId}", result);
-    }
-
-    [HttpPut("venues/{id:guid}")]
-    public async Task<ActionResult<VenueDto>> UpdateVenue(Guid id, [FromBody] UpdateVenueDto venue, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new UpdateVenueCommand(id, GetCurrentUserId(), venue), cancellationToken);
-        return Ok(result);
-    }
-
-    [HttpPut("venues/{id:guid}/status")]
-    public async Task<IActionResult> UpdateVenueStatus(Guid id, [FromBody] UpdateStatusDto request, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new UpdateOwnerVenueStatusCommand(GetCurrentUserId(), id, request), cancellationToken);
-        return Ok(result);
-    }
-
-    [HttpPost("venues/{id:guid}/images")]
-    public async Task<IActionResult> AddVenueImage(Guid id, [FromBody] VenueImageRequestDto request, CancellationToken cancellationToken)
-    {
-        var image = await _mediator.Send(new AddVenueImageCommand(GetCurrentUserId(), id, request), cancellationToken);
-        return Created($"/api/v1/venues/{id}/images", image);
-    }
-
-    [HttpDelete("venues/{id:guid}/images/{imageId:guid}")]
-    public async Task<IActionResult> DeleteVenueImage(Guid id, Guid imageId, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new DeleteVenueImageCommand(GetCurrentUserId(), id, imageId), cancellationToken);
-        return Ok(new { success = result });
-    }
 
     [HttpPost("venues/{id:guid}/amenities")]
     public async Task<IActionResult> AddVenueAmenities(Guid id, [FromBody] VenueAmenityRequestDto request, CancellationToken cancellationToken)
@@ -115,19 +74,7 @@ public class OwnerController : ControllerBase
         return Created($"/api/v1/fields/{result.Id}", result);
     }
 
-    [HttpPut("fields/{id:guid}")]
-    public async Task<ActionResult<FootballFieldDto>> UpdateField(Guid id, [FromBody] FootballFieldDto field, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new UpdateFieldCommand(GetCurrentUserId(), id, field), cancellationToken);
-        return Ok(result);
-    }
 
-    [HttpPut("fields/{id:guid}/status")]
-    public async Task<IActionResult> UpdateFieldStatus(Guid id, [FromBody] UpdateStatusDto request, CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(new UpdateFieldStatusCommand(GetCurrentUserId(), id, request), cancellationToken);
-        return Ok(result);
-    }
 
     [HttpPost("fields/{id:guid}/slots/bulk")]
     public async Task<IActionResult> BulkCreateSlots(Guid id, [FromBody] BulkCreateSlotsDto request, CancellationToken cancellationToken)

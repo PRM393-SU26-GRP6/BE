@@ -12,7 +12,7 @@ public class DiscountRepository : Repository<Discount>, IDiscountRepository
     {
         var normalizedCode = code.Trim().ToUpperInvariant();
         var query = _dbSet
-            .Include(d => d.Field)
+            .Include(d => d.Venue)
             .Where(d => d.Code.ToUpper() == normalizedCode);
 
         if (ownerId.HasValue)
@@ -22,11 +22,11 @@ public class DiscountRepository : Repository<Discount>, IDiscountRepository
 
         if (fieldId.HasValue)
         {
-            query = query.Where(d => d.FieldId == null || d.FieldId == fieldId.Value);
+            query = query.Where(d => d.VenueId == null || d.VenueId == fieldId.Value);
         }
 
         return await query
-            .OrderByDescending(d => d.FieldId.HasValue)
+            .OrderByDescending(d => d.VenueId.HasValue)
             .FirstOrDefaultAsync(cancellationToken);
     }
 

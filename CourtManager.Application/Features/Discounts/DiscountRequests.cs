@@ -87,7 +87,7 @@ public class CreateDiscountCommandHandler : IRequestHandler<CreateDiscountComman
         {
             DiscountId = Guid.NewGuid(),
             OwnerId = request.OwnerId,
-            FieldId = request.Discount.FieldId,
+            VenueId = request.Discount.FieldId,
             Code = request.Discount.Code.Trim().ToUpperInvariant(),
             Name = request.Discount.Name.Trim(),
             DiscountType = ParseDiscountType(request.Discount.DiscountType),
@@ -147,7 +147,7 @@ public class UpdateDiscountCommandHandler : IRequestHandler<UpdateDiscountComman
 
         CreateDiscountCommandHandler.ValidateDiscount(request.Discount);
 
-        discount.FieldId = request.Discount.FieldId;
+        discount.VenueId = request.Discount.FieldId;
         discount.Code = request.Discount.Code.Trim().ToUpperInvariant();
         discount.Name = request.Discount.Name.Trim();
         discount.DiscountType = CreateDiscountCommandHandler.ParseDiscountType(request.Discount.DiscountType);

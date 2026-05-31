@@ -56,18 +56,18 @@ public class MessageRepository : Repository<Message>, IMessageRepository
     public async Task MarkRoomMessagesAsReadAsync(Guid roomId, Guid readerId, CancellationToken cancellationToken = default)
     {
         var messages = await _dbSet
-            .Where(m => m.RoomId == roomId && m.SenderId != readerId && !m.IsRead)
+            .Where(m => m.RoomId == roomId && m.SenderId != readerId && m.ReadAt == null)
             .ToListAsync(cancellationToken);
 
         foreach (var message in messages)
         {
-            message.IsRead = true;
+            message.ReadAt = DateTime.UtcNow;
         }
     }
 
     public async Task<int> GetUnreadCountForRoomAsync(Guid roomId, Guid userId, CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .CountAsync(m => m.RoomId == roomId && m.SenderId != userId && !m.IsRead, cancellationToken);
+            .CountAsync(m => m.RoomId == roomId && m.SenderId != userId && m.ReadAt == null, cancellationToken);
     }
 }

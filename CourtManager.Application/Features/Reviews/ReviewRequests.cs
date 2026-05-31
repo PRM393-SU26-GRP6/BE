@@ -30,7 +30,7 @@ public class GetReviewsByVenueQueryHandler : IRequestHandler<GetReviewsByVenueQu
 
     public async Task<IEnumerable<ReviewDto>> Handle(GetReviewsByVenueQuery request, CancellationToken cancellationToken)
     {
-        var reviews = await _reviewRepository.GetReviewsByVenueIdAsync(request.VenueId, request.PageNumber, request.PageSize, cancellationToken);
+        var (reviews, _, _) = await _reviewRepository.GetVenueReviewsAsync(request.VenueId, request.PageNumber, request.PageSize, cancellationToken);
         return _mapper.Map<IEnumerable<ReviewDto>>(reviews);
     }
 }
@@ -85,8 +85,8 @@ public class GetAverageVenueRatingQueryHandler : IRequestHandler<GetAverageVenue
 
     public async Task<object> Handle(GetAverageVenueRatingQuery request, CancellationToken cancellationToken)
     {
-        var average = await _reviewRepository.GetAverageRatingByVenueIdAsync(request.VenueId, cancellationToken);
-        return new { venueId = request.VenueId, averageRating = average };
+        var result = await _reviewRepository.GetVenueReviewsAsync(request.VenueId, 1, 1, cancellationToken);
+        return new { venueId = request.VenueId, averageRating = result.AverageRating };
     }
 }
 
@@ -141,7 +141,7 @@ public class CreateReviewCommandHandler : IRequestHandler<CreateReviewCommand, R
         if (venueId == Guid.Empty)
             throw new ValidationException("Cannot determine venue for this booking.");
 
-        if (await _reviewRepository.GetUserReviewForBookingAsync(request.UserId, booking.Id, cancellationToken) != null)
+        if (await _reviewRepository.GetReviewByBookingIdAsync(booking.Id, cancellationToken) != null)
             throw new ValidationException("This booking has already been reviewed.");
 
         var review = new Review
@@ -176,8 +176,8 @@ public class GetUserReviewForBookingQueryHandler : IRequestHandler<GetUserReview
 
     public async Task<ReviewDto?> Handle(GetUserReviewForBookingQuery request, CancellationToken cancellationToken)
     {
-        var review = await _reviewRepository.GetUserReviewForBookingAsync(request.UserId, request.BookingId, cancellationToken);
-        return review == null ? null : _mapper.Map<ReviewDto>(review);
+        var review = await _reviewRepository.GetReviewByBookingIdAsync(request.BookingId, cancellationToken);
+        return review == null || review.UserId != request.UserId ? null : _mapper.Map<ReviewDto>(review);
     }
 }
 

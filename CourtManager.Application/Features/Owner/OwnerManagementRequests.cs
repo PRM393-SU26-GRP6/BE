@@ -83,7 +83,7 @@ public class UpdateOwnerVenueStatusCommandHandler : IRequestHandler<UpdateOwnerV
 
     internal static async Task<Venue> GetOwnedVenue(IVenueRepository venueRepository, Guid venueId, Guid ownerId, CancellationToken cancellationToken)
     {
-        var venue = await venueRepository.GetDetailsAsync(venueId, cancellationToken);
+        var venue = await venueRepository.GetVenueByIdAsync(venueId, cancellationToken);
         if (venue == null)
         {
             throw new NotFoundException(nameof(Venue), venueId);
@@ -197,7 +197,7 @@ public class AddVenueAmenitiesCommandHandler : IRequestHandler<AddVenueAmenities
         }
 
         await _venueAmenityRepository.SaveChangesAsync(cancellationToken);
-        var updated = await _venueRepository.GetDetailsAsync(request.VenueId, cancellationToken);
+        var updated = await _venueRepository.GetVenueByIdAsync(request.VenueId, cancellationToken);
         return updated?.VenueAmenities.Select(va => va.Amenity?.Name).Where(name => name != null).Cast<string>() ?? [];
     }
 }
@@ -232,10 +232,12 @@ public class DeleteVenueAmenityCommandHandler : IRequestHandler<DeleteVenueAmeni
 public class UpdateFieldStatusCommandHandler : IRequestHandler<UpdateFieldStatusCommand, StatusResultDto>
 {
     private readonly IFootballFieldRepository _fieldRepository;
+    private readonly IVenueRepository _venueRepository;
 
-    public UpdateFieldStatusCommandHandler(IFootballFieldRepository fieldRepository)
+    public UpdateFieldStatusCommandHandler(IFootballFieldRepository fieldRepository, IVenueRepository venueRepository)
     {
         _fieldRepository = fieldRepository;
+        _venueRepository = venueRepository;
     }
 
     public async Task<StatusResultDto> Handle(UpdateFieldStatusCommand request, CancellationToken cancellationToken)
@@ -246,7 +248,8 @@ public class UpdateFieldStatusCommandHandler : IRequestHandler<UpdateFieldStatus
             throw new NotFoundException(nameof(FootballField), request.FieldId);
         }
 
-        if (field.Venue?.OwnerId != request.OwnerId)
+        var venue = await _venueRepository.GetByIdAsync(field.VenueId, cancellationToken);
+        if (venue == null || venue.OwnerId != request.OwnerId)
         {
             throw new ValidationException("Only the venue owner can update this field.");
         }
@@ -263,11 +266,13 @@ public class BulkCreateSlotsCommandHandler : IRequestHandler<BulkCreateSlotsComm
 {
     private readonly IFootballFieldRepository _fieldRepository;
     private readonly ITimeSlotRepository _timeSlotRepository;
+    private readonly IVenueRepository _venueRepository;
 
-    public BulkCreateSlotsCommandHandler(IFootballFieldRepository fieldRepository, ITimeSlotRepository timeSlotRepository)
+    public BulkCreateSlotsCommandHandler(IFootballFieldRepository fieldRepository, ITimeSlotRepository timeSlotRepository, IVenueRepository venueRepository)
     {
         _fieldRepository = fieldRepository;
         _timeSlotRepository = timeSlotRepository;
+        _venueRepository = venueRepository;
     }
 
     public async Task<BulkCreateSlotsResultDto> Handle(BulkCreateSlotsCommand request, CancellationToken cancellationToken)
@@ -278,7 +283,8 @@ public class BulkCreateSlotsCommandHandler : IRequestHandler<BulkCreateSlotsComm
             throw new NotFoundException(nameof(FootballField), request.FieldId);
         }
 
-        if (field.Venue?.OwnerId != request.OwnerId)
+        var venue = await _venueRepository.GetByIdAsync(field.VenueId, cancellationToken);
+        if (venue == null || venue.OwnerId != request.OwnerId)
         {
             throw new ValidationException("Only the venue owner can create slots for this field.");
         }
@@ -323,10 +329,14 @@ public class BulkCreateSlotsCommandHandler : IRequestHandler<BulkCreateSlotsComm
 public class UpdateSlotStatusCommandHandler : IRequestHandler<UpdateSlotStatusCommand, StatusResultDto>
 {
     private readonly ITimeSlotRepository _timeSlotRepository;
+    private readonly IFootballFieldRepository _fieldRepository;
+    private readonly IVenueRepository _venueRepository;
 
-    public UpdateSlotStatusCommandHandler(ITimeSlotRepository timeSlotRepository)
+    public UpdateSlotStatusCommandHandler(ITimeSlotRepository timeSlotRepository, IFootballFieldRepository fieldRepository, IVenueRepository venueRepository)
     {
         _timeSlotRepository = timeSlotRepository;
+        _fieldRepository = fieldRepository;
+        _venueRepository = venueRepository;
     }
 
     public async Task<StatusResultDto> Handle(UpdateSlotStatusCommand request, CancellationToken cancellationToken)
@@ -337,7 +347,9 @@ public class UpdateSlotStatusCommandHandler : IRequestHandler<UpdateSlotStatusCo
             throw new NotFoundException(nameof(TimeSlot), request.SlotId);
         }
 
-        if (slot.Field?.Venue?.OwnerId != request.OwnerId)
+        var field = await _fieldRepository.GetByIdAsync(slot.FieldId, cancellationToken);
+        var venue = field != null ? await _venueRepository.GetByIdAsync(field.VenueId, cancellationToken) : null;
+        if (venue == null || venue.OwnerId != request.OwnerId)
         {
             throw new ValidationException("Only the venue owner can update this slot.");
         }

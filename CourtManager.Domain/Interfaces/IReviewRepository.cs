@@ -27,6 +27,11 @@ public interface IReviewRepository : IRepository<Review>
     Task<Review?> GetReviewByBookingIdAsync(Guid bookingId, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets all reviews written by a specific user.
+    /// </summary>
+    Task<IEnumerable<Review>> GetReviewsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Gets reviews, total count, and average rating for a venue.
     /// </summary>
     Task<(IEnumerable<Review> Reviews, int TotalCount, decimal AverageRating)> GetVenueReviewsAsync(

@@ -44,7 +44,7 @@ public class GetNotificationsQueryHandler : IRequestHandler<GetNotificationsQuer
             Message = notification.Message,
             Type = notification.Type.ToString(),
             RefId = notification.RefId,
-            IsRead = recipient?.IsRead ?? false,
+            IsRead = recipient?.ReadAt != null,
             ReadAt = recipient?.ReadAt,
             CreatedAt = notification.CreatedAt
         };

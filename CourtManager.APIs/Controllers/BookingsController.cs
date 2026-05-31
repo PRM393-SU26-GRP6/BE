@@ -73,16 +73,19 @@ public class BookingsController : BaseApiController
     {
         _logger.LogInformation("Fetching booking with ID: {BookingId}", id);
 
-        var query = new GetBookingByIdQuery(id);
+        var currentUserIdStr = CurrentUserId.ToString();
+        var isOwner = User.IsInRole("Owner");
+        var isAdmin = User.IsInRole("Admin");
+
+        var query = new GetBookingByIdQuery(id, CurrentUserId, isOwner, isAdmin);
         var result = await _mediator.Send(query, cancellationToken);
 
         // Resource-based Authorization: Only Admin/Manager or the owner can view this booking
-        var currentUserId = CurrentUserId.ToString();
-        var isAdminOrManager = User.IsInRole("Admin") || User.IsInRole("Owner");
+        var isAdminOrManager = isAdmin || isOwner;
 
-        if (!isAdminOrManager && result.UserId.ToString() != currentUserId)
+        if (!isAdminOrManager && result.UserId.ToString() != currentUserIdStr)
         {
-            _logger.LogWarning("User {UserId} attempted to access booking {BookingId} which they do not own.", currentUserId, id);
+            _logger.LogWarning("User {UserId} attempted to access booking {BookingId} which they do not own.", currentUserIdStr, id);
             return Forbid();
         }
 
@@ -190,7 +193,7 @@ public class BookingsController : BaseApiController
     {
         _logger.LogInformation("Cancelling booking with ID: {BookingId}", id);
 
-        var command = new CancelBookingCommand(id, cancellationReason);
+        var command = new CancelBookingCommand(id, CurrentUserId, false, cancellationReason);
         var result = await _mediator.Send(command, cancellationToken);
 
         _logger.LogInformation("Booking {BookingId} cancelled successfully", id);

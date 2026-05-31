@@ -39,4 +39,32 @@ public class FieldsController : ControllerBase
             });
         }
     }
+
+    [HttpGet("{id}/slots")]
+    public async Task<IActionResult> GetFieldSlots(Guid id, [FromQuery] DateTime? date)
+    {
+        try
+        {
+            var targetDate = date.HasValue ? DateTime.SpecifyKind(date.Value, DateTimeKind.Utc) : DateTime.UtcNow.Date;
+            var query = new CourtManager.Application.Features.TimeSlots.Queries.GetAvailableSlotsQuery(id, targetDate);
+            var result = await _mediator.Send(query);
+
+            return Ok(new
+            {
+                success = true,
+                message = "OK",
+                data = result,
+                errors = Array.Empty<string>()
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Failed to get field slots",
+                errors = new[] { ex.Message }
+            });
+        }
+    }
 }

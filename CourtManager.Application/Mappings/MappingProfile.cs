@@ -15,17 +15,6 @@ public class MappingProfile : Profile
         CreateMap<User, UserDto>().ReverseMap();
         CreateMap<Amenity, AmenityDto>().ReverseMap();
 
-        CreateMap<Venue, VenueDto>()
-            .ForMember(dest => dest.OwnerName, opt => opt.MapFrom(src => src.Owner != null ? src.Owner.FullName : null))
-            .ForMember(dest => dest.AverageRating, opt => opt.MapFrom(src => src.Reviews.Any() ? (decimal)src.Reviews.Average(r => r.Rating) : 0))
-            .ForMember(dest => dest.ReviewCount, opt => opt.MapFrom(src => src.Reviews.Count))
-            .ForMember(dest => dest.MinPrice, opt => opt.MapFrom(src => src.FootballFields.Where(f => f.IsActive).Select(f => (decimal?)f.PricePerHour).Min()))
-            .ForMember(dest => dest.MaxPrice, opt => opt.MapFrom(src => src.FootballFields.Where(f => f.IsActive).Select(f => (decimal?)f.PricePerHour).Max()))
-            .ForMember(dest => dest.PrimaryImageUrl, opt => opt.MapFrom(src => src.VenueImages.Where(i => i.IsPrimary).Select(i => i.ImageUrl).FirstOrDefault()))
-            .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src => src.VenueImages.Select(i => i.ImageUrl)))
-            .ForMember(dest => dest.Amenities, opt => opt.MapFrom(src => src.VenueAmenities.Where(va => va.Amenity != null).Select(va => va.Amenity!.Name)))
-            .ForMember(dest => dest.Fields, opt => opt.MapFrom(src => src.FootballFields));
-
         // FootballField mappings
         CreateMap<FootballField, FootballFieldDto>()
             .ForMember(dest => dest.OwnerId, opt => opt.MapFrom(src => src.Venue != null ? src.Venue.OwnerId : Guid.Empty))

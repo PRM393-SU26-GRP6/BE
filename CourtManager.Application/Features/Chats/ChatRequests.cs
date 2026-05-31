@@ -79,7 +79,7 @@ public class GetOrCreateVenueChatRoomQueryHandler : IRequestHandler<GetOrCreateV
 
     public async Task<ChatRoomDto> Handle(GetOrCreateVenueChatRoomQuery request, CancellationToken cancellationToken)
     {
-        var venue = await _venueRepository.GetDetailsAsync(request.VenueId, cancellationToken);
+        var venue = await _venueRepository.GetVenueByIdAsync(request.VenueId, cancellationToken);
         if (venue == null)
             throw new NotFoundException(nameof(Venue), request.VenueId);
 

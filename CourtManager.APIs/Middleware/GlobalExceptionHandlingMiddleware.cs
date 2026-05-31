@@ -71,11 +71,6 @@ public class GlobalExceptionHandlingMiddleware
                 response.Details = exception.Message;
                 break;
 
-            case CourtManager.Application.Exceptions.NotFoundException:
-                context.Response.StatusCode = StatusCodes.Status404NotFound;
-                response.Message = "The requested resource was not found.";
-                response.Details = exception.Message;
-                break;
 
             default:
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;

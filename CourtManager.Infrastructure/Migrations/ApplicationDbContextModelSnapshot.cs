@@ -311,6 +311,11 @@ namespace CourtManager.Infrastructure.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
                     b.Property<string>("FieldName")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -350,6 +355,7 @@ namespace CourtManager.Infrastructure.Migrations
                         {
                             Id = new Guid("40000000-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "",
                             FieldName = "Sân 5 số 1",
                             FieldType = "FiveASide",
                             IsActive = true,
@@ -361,6 +367,7 @@ namespace CourtManager.Infrastructure.Migrations
                         {
                             Id = new Guid("40000000-0000-0000-0000-000000000002"),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "",
                             FieldName = "Sân 5 số 2",
                             FieldType = "FiveASide",
                             IsActive = true,
@@ -372,6 +379,7 @@ namespace CourtManager.Infrastructure.Migrations
                         {
                             Id = new Guid("40000000-0000-0000-0000-000000000003"),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "",
                             FieldName = "Sân 7 VIP",
                             FieldType = "SevenASide",
                             IsActive = true,
@@ -383,6 +391,7 @@ namespace CourtManager.Infrastructure.Migrations
                         {
                             Id = new Guid("40000000-0000-0000-0000-000000000004"),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "",
                             FieldName = "Sân A",
                             FieldType = "FiveASide",
                             IsActive = true,
@@ -394,6 +403,7 @@ namespace CourtManager.Infrastructure.Migrations
                         {
                             Id = new Guid("40000000-0000-0000-0000-000000000005"),
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "",
                             FieldName = "Sân B",
                             FieldType = "SevenASide",
                             IsActive = true,
@@ -529,6 +539,26 @@ namespace CourtManager.Infrastructure.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Gateway")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("GatewayAccountNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("GatewayRawContent")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("GatewayReferenceCode")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("GatewayTransactionId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -568,6 +598,12 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("BookingId");
 
                     b.HasIndex("TransactionCode")
+                        .IsUnique();
+
+                    b.HasIndex("Gateway", "GatewayReferenceCode")
+                        .IsUnique();
+
+                    b.HasIndex("Gateway", "GatewayTransactionId")
                         .IsUnique();
 
                     b.ToTable("Payments", (string)null);
@@ -704,18 +740,18 @@ namespace CourtManager.Infrastructure.Migrations
                             Id = new Guid("10000000-0000-0000-0000-000000000002"),
                             ConcurrencyStamp = "10000000-0000-0000-0000-000000000002",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Court manager",
-                            Name = "Manager",
-                            NormalizedName = "MANAGER"
+                            Description = "Court owner",
+                            Name = "Owner",
+                            NormalizedName = "OWNER"
                         },
                         new
                         {
                             Id = new Guid("10000000-0000-0000-0000-000000000003"),
                             ConcurrencyStamp = "10000000-0000-0000-0000-000000000003",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Regular player",
-                            Name = "Player",
-                            NormalizedName = "PLAYER"
+                            Description = "Regular user",
+                            Name = "User",
+                            NormalizedName = "USER"
                         });
                 });
 
@@ -933,22 +969,22 @@ namespace CourtManager.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "20000000-0000-0000-0000-000000000003",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "manager1@court.com",
+                            Email = "owner1@court.com",
                             EmailConfirmed = false,
-                            FullName = "Court Manager1",
+                            FullName = "Court Owner1",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "MANAGER1@COURT.COM",
-                            NormalizedUserName = "MANAGER1@COURT.COM",
+                            NormalizedEmail = "OWNER1@COURT.COM",
+                            NormalizedUserName = "OWNER1@COURT.COM",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0900000003",
                             PhoneNumber = "0900000003",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "20000000-0000-0000-0000-000000000003",
                             TwoFactorEnabled = false,
-                            UserName = "manager1@court.com"
+                            UserName = "owner1@court.com"
                         },
                         new
                         {
@@ -956,22 +992,22 @@ namespace CourtManager.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "20000000-0000-0000-0000-000000000004",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "manager2@court.com",
+                            Email = "owner2@court.com",
                             EmailConfirmed = false,
-                            FullName = "Court Manager2",
+                            FullName = "Court Owner2",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "MANAGER2@COURT.COM",
-                            NormalizedUserName = "MANAGER2@COURT.COM",
+                            NormalizedEmail = "OWNER2@COURT.COM",
+                            NormalizedUserName = "OWNER2@COURT.COM",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0900000004",
                             PhoneNumber = "0900000004",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "20000000-0000-0000-0000-000000000004",
                             TwoFactorEnabled = false,
-                            UserName = "manager2@court.com"
+                            UserName = "owner2@court.com"
                         },
                         new
                         {
@@ -979,22 +1015,22 @@ namespace CourtManager.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "20000000-0000-0000-0000-000000000005",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "manager3@court.com",
+                            Email = "owner3@court.com",
                             EmailConfirmed = false,
-                            FullName = "Court Manager3",
+                            FullName = "Court Owner3",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "MANAGER3@COURT.COM",
-                            NormalizedUserName = "MANAGER3@COURT.COM",
+                            NormalizedEmail = "OWNER3@COURT.COM",
+                            NormalizedUserName = "OWNER3@COURT.COM",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0900000005",
                             PhoneNumber = "0900000005",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "20000000-0000-0000-0000-000000000005",
                             TwoFactorEnabled = false,
-                            UserName = "manager3@court.com"
+                            UserName = "owner3@court.com"
                         },
                         new
                         {
@@ -1002,22 +1038,22 @@ namespace CourtManager.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "20000000-0000-0000-0000-000000000006",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "player1@court.com",
+                            Email = "user1@court.com",
                             EmailConfirmed = false,
-                            FullName = "Pro Player1",
+                            FullName = "Pro User1",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "PLAYER1@COURT.COM",
-                            NormalizedUserName = "PLAYER1@COURT.COM",
+                            NormalizedEmail = "USER1@COURT.COM",
+                            NormalizedUserName = "USER1@COURT.COM",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0900000006",
                             PhoneNumber = "0900000006",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "20000000-0000-0000-0000-000000000006",
                             TwoFactorEnabled = false,
-                            UserName = "player1@court.com"
+                            UserName = "user1@court.com"
                         },
                         new
                         {
@@ -1025,22 +1061,22 @@ namespace CourtManager.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "20000000-0000-0000-0000-000000000007",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "player2@court.com",
+                            Email = "user2@court.com",
                             EmailConfirmed = false,
-                            FullName = "Pro Player2",
+                            FullName = "Pro User2",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "PLAYER2@COURT.COM",
-                            NormalizedUserName = "PLAYER2@COURT.COM",
+                            NormalizedEmail = "USER2@COURT.COM",
+                            NormalizedUserName = "USER2@COURT.COM",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0900000007",
                             PhoneNumber = "0900000007",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "20000000-0000-0000-0000-000000000007",
                             TwoFactorEnabled = false,
-                            UserName = "player2@court.com"
+                            UserName = "user2@court.com"
                         },
                         new
                         {
@@ -1048,22 +1084,22 @@ namespace CourtManager.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "20000000-0000-0000-0000-000000000008",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "player3@court.com",
+                            Email = "user3@court.com",
                             EmailConfirmed = false,
-                            FullName = "Casual Player3",
+                            FullName = "Casual User3",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "PLAYER3@COURT.COM",
-                            NormalizedUserName = "PLAYER3@COURT.COM",
+                            NormalizedEmail = "USER3@COURT.COM",
+                            NormalizedUserName = "USER3@COURT.COM",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0900000008",
                             PhoneNumber = "0900000008",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "20000000-0000-0000-0000-000000000008",
                             TwoFactorEnabled = false,
-                            UserName = "player3@court.com"
+                            UserName = "user3@court.com"
                         },
                         new
                         {
@@ -1071,22 +1107,22 @@ namespace CourtManager.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "20000000-0000-0000-0000-000000000009",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "player4@court.com",
+                            Email = "user4@court.com",
                             EmailConfirmed = false,
-                            FullName = "Casual Player4",
+                            FullName = "Casual User4",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "PLAYER4@COURT.COM",
-                            NormalizedUserName = "PLAYER4@COURT.COM",
+                            NormalizedEmail = "USER4@COURT.COM",
+                            NormalizedUserName = "USER4@COURT.COM",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0900000009",
                             PhoneNumber = "0900000009",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "20000000-0000-0000-0000-000000000009",
                             TwoFactorEnabled = false,
-                            UserName = "player4@court.com"
+                            UserName = "user4@court.com"
                         },
                         new
                         {
@@ -1094,22 +1130,22 @@ namespace CourtManager.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "20000000-0000-0000-0000-000000000010",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "player5@court.com",
+                            Email = "user5@court.com",
                             EmailConfirmed = false,
-                            FullName = "Newbie Player5",
+                            FullName = "Newbie User5",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "PLAYER5@COURT.COM",
-                            NormalizedUserName = "PLAYER5@COURT.COM",
+                            NormalizedEmail = "USER5@COURT.COM",
+                            NormalizedUserName = "USER5@COURT.COM",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0900000010",
                             PhoneNumber = "0900000010",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "20000000-0000-0000-0000-000000000010",
                             TwoFactorEnabled = false,
-                            UserName = "player5@court.com"
+                            UserName = "user5@court.com"
                         });
                 });
 

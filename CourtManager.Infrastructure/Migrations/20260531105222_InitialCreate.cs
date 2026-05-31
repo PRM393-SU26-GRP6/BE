@@ -4,10 +4,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace CourtManager.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialDatabaseSchema : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -176,6 +178,28 @@ namespace CourtManager.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserDevices",
+                columns: table => new
+                {
+                    DeviceId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    FcmToken = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    DeviceType = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserDevices", x => x.DeviceId);
+                    table.ForeignKey(
+                        name: "FK_UserDevices_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserLogins",
                 columns: table => new
                 {
@@ -246,13 +270,13 @@ namespace CourtManager.Infrastructure.Migrations
                 {
                     VenueId = table.Column<Guid>(type: "uuid", nullable: false),
                     OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    VenueName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    Address = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    Latitude = table.Column<decimal>(type: "numeric(18,10)", precision: 18, scale: 10, nullable: false),
-                    Longitude = table.Column<decimal>(type: "numeric(18,10)", precision: 18, scale: 10, nullable: false),
+                    VenueName = table.Column<string>(type: "text", nullable: false),
+                    Address = table.Column<string>(type: "text", nullable: false),
+                    Latitude = table.Column<decimal>(type: "numeric", nullable: false),
+                    Longitude = table.Column<decimal>(type: "numeric", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    OpeningHours = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    PhoneContact = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    OpeningHours = table.Column<string>(type: "text", nullable: false),
+                    PhoneContact = table.Column<string>(type: "text", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -267,7 +291,7 @@ namespace CourtManager.Infrastructure.Migrations
                         column: x => x.OwnerId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -278,7 +302,7 @@ namespace CourtManager.Infrastructure.Migrations
                     RoomId = table.Column<Guid>(type: "uuid", nullable: false),
                     SenderId = table.Column<Guid>(type: "uuid", nullable: false),
                     MessageText = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
-                    IsRead = table.Column<bool>(type: "boolean", nullable: false),
+                    ReadAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -307,7 +331,6 @@ namespace CourtManager.Infrastructure.Migrations
                     RecipientId = table.Column<Guid>(type: "uuid", nullable: false),
                     NotificationId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    IsRead = table.Column<bool>(type: "boolean", nullable: false),
                     ReadAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -325,6 +348,45 @@ namespace CourtManager.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Discounts",
+                columns: table => new
+                {
+                    DiscountId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    VenueId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Code = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    DiscountType = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Value = table.Column<decimal>(type: "numeric(10,2)", precision: 10, scale: 2, nullable: false),
+                    MinBookingAmount = table.Column<decimal>(type: "numeric(10,2)", precision: 10, scale: 2, nullable: false),
+                    MaxDiscountAmount = table.Column<decimal>(type: "numeric(10,2)", precision: 10, scale: 2, nullable: false),
+                    UsageLimit = table.Column<int>(type: "integer", nullable: false),
+                    UsedCount = table.Column<int>(type: "integer", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Discounts", x => x.DiscountId);
+                    table.ForeignKey(
+                        name: "FK_Discounts_Users_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Discounts_Venues_VenueId",
+                        column: x => x.VenueId,
+                        principalTable: "Venues",
+                        principalColumn: "VenueId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -433,44 +495,6 @@ namespace CourtManager.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Discounts",
-                columns: table => new
-                {
-                    DiscountId = table.Column<Guid>(type: "uuid", nullable: false),
-                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    FieldId = table.Column<Guid>(type: "uuid", nullable: true),
-                    Code = table.Column<string>(type: "text", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    DiscountType = table.Column<int>(type: "integer", nullable: false),
-                    Value = table.Column<decimal>(type: "numeric", nullable: false),
-                    MinBookingAmount = table.Column<decimal>(type: "numeric", nullable: false),
-                    MaxDiscountAmount = table.Column<decimal>(type: "numeric", nullable: false),
-                    UsageLimit = table.Column<int>(type: "integer", nullable: false),
-                    UsedCount = table.Column<int>(type: "integer", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Discounts", x => x.DiscountId);
-                    table.ForeignKey(
-                        name: "FK_Discounts_FootballFields_FieldId",
-                        column: x => x.FieldId,
-                        principalTable: "FootballFields",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Discounts_Users_OwnerId",
-                        column: x => x.OwnerId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "TimeSlots",
                 columns: table => new
                 {
@@ -481,6 +505,7 @@ namespace CourtManager.Infrastructure.Migrations
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     SlotStatus = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, defaultValue: "Available"),
                     LockedUntil = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LockedBy = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
@@ -494,6 +519,37 @@ namespace CourtManager.Infrastructure.Migrations
                         column: x => x.FieldId,
                         principalTable: "FootballFields",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TimeSlots_Users_LockedBy",
+                        column: x => x.LockedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BookingDiscounts",
+                columns: table => new
+                {
+                    BookingId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DiscountId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DiscountAmount = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookingDiscounts", x => new { x.BookingId, x.DiscountId });
+                    table.ForeignKey(
+                        name: "FK_BookingDiscounts_Bookings_BookingId",
+                        column: x => x.BookingId,
+                        principalTable: "Bookings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BookingDiscounts_Discounts_DiscountId",
+                        column: x => x.DiscountId,
+                        principalTable: "Discounts",
+                        principalColumn: "DiscountId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -514,6 +570,8 @@ namespace CourtManager.Infrastructure.Migrations
                     GatewayAccountNumber = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     GatewayRawContent = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     PaidAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    RefundAmount = table.Column<decimal>(type: "numeric(10,2)", precision: 10, scale: 2, nullable: true),
+                    RefundReason = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -566,31 +624,6 @@ namespace CourtManager.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BookingDiscounts",
-                columns: table => new
-                {
-                    BookingId = table.Column<Guid>(type: "uuid", nullable: false),
-                    DiscountId = table.Column<Guid>(type: "uuid", nullable: false),
-                    DiscountAmount = table.Column<decimal>(type: "numeric", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BookingDiscounts", x => new { x.BookingId, x.DiscountId });
-                    table.ForeignKey(
-                        name: "FK_BookingDiscounts_Bookings_BookingId",
-                        column: x => x.BookingId,
-                        principalTable: "Bookings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BookingDiscounts_Discounts_DiscountId",
-                        column: x => x.DiscountId,
-                        principalTable: "Discounts",
-                        principalColumn: "DiscountId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "BookingItems",
                 columns: table => new
                 {
@@ -619,6 +652,91 @@ namespace CourtManager.Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "ConcurrencyStamp", "CreatedAt", "Description", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { new Guid("10000000-0000-0000-0000-000000000001"), "10000000-0000-0000-0000-000000000001", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Administrator with full access", "Admin", "ADMIN" },
+                    { new Guid("10000000-0000-0000-0000-000000000002"), "10000000-0000-0000-0000-000000000002", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Court owner", "Owner", "OWNER" },
+                    { new Guid("10000000-0000-0000-0000-000000000003"), "10000000-0000-0000-0000-000000000003", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Regular user", "User", "USER" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "AccessFailedCount", "AvatarUrl", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FullName", "IsActive", "IsDeleted", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "Phone", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "RefreshTokenExpiryTime", "SecurityStamp", "TwoFactorEnabled", "UpdatedAt", "UserName" },
+                values: new object[,]
+                {
+                    { new Guid("20000000-0000-0000-0000-000000000001"), 0, null, "20000000-0000-0000-0000-000000000001", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "admin1@court.com", false, "System Admin1", true, false, false, null, "ADMIN1@COURT.COM", "ADMIN1@COURT.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0900000001", "0900000001", false, null, null, "20000000-0000-0000-0000-000000000001", false, null, "admin1@court.com" },
+                    { new Guid("20000000-0000-0000-0000-000000000002"), 0, null, "20000000-0000-0000-0000-000000000002", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "admin2@court.com", false, "System Admin2", true, false, false, null, "ADMIN2@COURT.COM", "ADMIN2@COURT.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0900000002", "0900000002", false, null, null, "20000000-0000-0000-0000-000000000002", false, null, "admin2@court.com" },
+                    { new Guid("20000000-0000-0000-0000-000000000003"), 0, null, "20000000-0000-0000-0000-000000000003", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "owner1@court.com", false, "Court Owner1", true, false, false, null, "OWNER1@COURT.COM", "OWNER1@COURT.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0900000003", "0900000003", false, null, null, "20000000-0000-0000-0000-000000000003", false, null, "owner1@court.com" },
+                    { new Guid("20000000-0000-0000-0000-000000000004"), 0, null, "20000000-0000-0000-0000-000000000004", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "owner2@court.com", false, "Court Owner2", true, false, false, null, "OWNER2@COURT.COM", "OWNER2@COURT.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0900000004", "0900000004", false, null, null, "20000000-0000-0000-0000-000000000004", false, null, "owner2@court.com" },
+                    { new Guid("20000000-0000-0000-0000-000000000005"), 0, null, "20000000-0000-0000-0000-000000000005", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "owner3@court.com", false, "Court Owner3", true, false, false, null, "OWNER3@COURT.COM", "OWNER3@COURT.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0900000005", "0900000005", false, null, null, "20000000-0000-0000-0000-000000000005", false, null, "owner3@court.com" },
+                    { new Guid("20000000-0000-0000-0000-000000000006"), 0, null, "20000000-0000-0000-0000-000000000006", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "user1@court.com", false, "Pro User1", true, false, false, null, "USER1@COURT.COM", "USER1@COURT.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0900000006", "0900000006", false, null, null, "20000000-0000-0000-0000-000000000006", false, null, "user1@court.com" },
+                    { new Guid("20000000-0000-0000-0000-000000000007"), 0, null, "20000000-0000-0000-0000-000000000007", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "user2@court.com", false, "Pro User2", true, false, false, null, "USER2@COURT.COM", "USER2@COURT.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0900000007", "0900000007", false, null, null, "20000000-0000-0000-0000-000000000007", false, null, "user2@court.com" },
+                    { new Guid("20000000-0000-0000-0000-000000000008"), 0, null, "20000000-0000-0000-0000-000000000008", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "user3@court.com", false, "Casual User3", true, false, false, null, "USER3@COURT.COM", "USER3@COURT.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0900000008", "0900000008", false, null, null, "20000000-0000-0000-0000-000000000008", false, null, "user3@court.com" },
+                    { new Guid("20000000-0000-0000-0000-000000000009"), 0, null, "20000000-0000-0000-0000-000000000009", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "user4@court.com", false, "Casual User4", true, false, false, null, "USER4@COURT.COM", "USER4@COURT.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0900000009", "0900000009", false, null, null, "20000000-0000-0000-0000-000000000009", false, null, "user4@court.com" },
+                    { new Guid("20000000-0000-0000-0000-000000000010"), 0, null, "20000000-0000-0000-0000-000000000010", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "user5@court.com", false, "Newbie User5", true, false, false, null, "USER5@COURT.COM", "USER5@COURT.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0900000010", "0900000010", false, null, null, "20000000-0000-0000-0000-000000000010", false, null, "user5@court.com" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Bookings",
+                columns: new[] { "Id", "BookingStatus", "CreatedAt", "DeletedAt", "DepositAmount", "FootballFieldId", "IsDeleted", "Note", "TotalPrice", "UpdatedAt", "UserId" },
+                values: new object[,]
+                {
+                    { new Guid("60000000-0000-0000-0000-000000000001"), "Completed", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, 100000m, null, false, null, 200000m, null, new Guid("20000000-0000-0000-0000-000000000006") },
+                    { new Guid("60000000-0000-0000-0000-000000000002"), "Completed", new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc), null, 100000m, null, false, null, 200000m, null, new Guid("20000000-0000-0000-0000-000000000007") },
+                    { new Guid("60000000-0000-0000-0000-000000000003"), "Completed", new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Utc), null, 100000m, null, false, null, 200000m, null, new Guid("20000000-0000-0000-0000-000000000008") }
+                });
+
+            migrationBuilder.InsertData(
+                table: "UserRoles",
+                columns: new[] { "RoleId", "UserId", "AssignedAt" },
+                values: new object[,]
+                {
+                    { new Guid("10000000-0000-0000-0000-000000000001"), new Guid("20000000-0000-0000-0000-000000000001"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("10000000-0000-0000-0000-000000000001"), new Guid("20000000-0000-0000-0000-000000000002"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("10000000-0000-0000-0000-000000000002"), new Guid("20000000-0000-0000-0000-000000000003"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("10000000-0000-0000-0000-000000000002"), new Guid("20000000-0000-0000-0000-000000000004"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("10000000-0000-0000-0000-000000000002"), new Guid("20000000-0000-0000-0000-000000000005"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("10000000-0000-0000-0000-000000000003"), new Guid("20000000-0000-0000-0000-000000000006"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("10000000-0000-0000-0000-000000000003"), new Guid("20000000-0000-0000-0000-000000000007"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("10000000-0000-0000-0000-000000000003"), new Guid("20000000-0000-0000-0000-000000000008"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("10000000-0000-0000-0000-000000000003"), new Guid("20000000-0000-0000-0000-000000000009"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { new Guid("10000000-0000-0000-0000-000000000003"), new Guid("20000000-0000-0000-0000-000000000010"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Venues",
+                columns: new[] { "VenueId", "Address", "CreatedAt", "DeletedAt", "Description", "IsActive", "IsDeleted", "Latitude", "Longitude", "OpeningHours", "OwnerId", "PhoneContact", "UpdatedAt", "VenueName" },
+                values: new object[,]
+                {
+                    { new Guid("30000000-0000-0000-0000-000000000001"), "30 Phan Thúc Duyện, Tân Bình, TP.HCM", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Cụm sân bóng mini lớn nhất Tân Bình.", true, false, 10.8016m, 106.6653m, "06:00 - 23:00", new Guid("20000000-0000-0000-0000-000000000003"), "0900000003", null, "Sân Bóng Chảo Lửa" },
+                    { new Guid("30000000-0000-0000-0000-000000000002"), "Hẻm 12 Thăng Long, Tân Bình, TP.HCM", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Sân cỏ nhân tạo mới thay, chất lượng cao.", true, false, 10.8030m, 106.6620m, "05:00 - 24:00", new Guid("20000000-0000-0000-0000-000000000003"), "0900000003", null, "Sân Bóng Thăng Long" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "FootballFields",
+                columns: new[] { "Id", "CreatedAt", "DeletedAt", "Description", "FieldName", "FieldType", "IsActive", "IsDeleted", "PricePerHour", "UpdatedAt", "VenueId" },
+                values: new object[,]
+                {
+                    { new Guid("40000000-0000-0000-0000-000000000001"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "", "Sân 5 số 1", "FiveASide", true, false, 200000m, null, new Guid("30000000-0000-0000-0000-000000000001") },
+                    { new Guid("40000000-0000-0000-0000-000000000002"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "", "Sân 5 số 2", "FiveASide", true, false, 220000m, null, new Guid("30000000-0000-0000-0000-000000000001") },
+                    { new Guid("40000000-0000-0000-0000-000000000003"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "", "Sân 7 VIP", "SevenASide", true, false, 450000m, null, new Guid("30000000-0000-0000-0000-000000000001") },
+                    { new Guid("40000000-0000-0000-0000-000000000004"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "", "Sân A", "FiveASide", true, false, 180000m, null, new Guid("30000000-0000-0000-0000-000000000002") },
+                    { new Guid("40000000-0000-0000-0000-000000000005"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "", "Sân B", "SevenASide", true, false, 400000m, null, new Guid("30000000-0000-0000-0000-000000000002") }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Reviews",
+                columns: new[] { "ReviewId", "BookingId", "Comment", "CreatedAt", "DeletedAt", "IsDeleted", "Rating", "UserId", "VenueId" },
+                values: new object[,]
+                {
+                    { new Guid("50000000-0000-0000-0000-000000000001"), new Guid("60000000-0000-0000-0000-000000000001"), "Sân rất đẹp, đèn sáng.", new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc), null, false, 5, new Guid("20000000-0000-0000-0000-000000000006"), new Guid("30000000-0000-0000-0000-000000000001") },
+                    { new Guid("50000000-0000-0000-0000-000000000002"), new Guid("60000000-0000-0000-0000-000000000002"), "Cỏ hơi mòn ở khu vực giữa sân.", new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Utc), null, false, 4, new Guid("20000000-0000-0000-0000-000000000007"), new Guid("30000000-0000-0000-0000-000000000001") },
+                    { new Guid("50000000-0000-0000-0000-000000000003"), new Guid("60000000-0000-0000-0000-000000000003"), "Giá cả hợp lý, chủ sân nhiệt tình.", new DateTime(2025, 1, 4, 0, 0, 0, 0, DateTimeKind.Utc), null, false, 5, new Guid("20000000-0000-0000-0000-000000000008"), new Guid("30000000-0000-0000-0000-000000000002") }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_BookingDiscounts_DiscountId",
                 table: "BookingDiscounts",
@@ -645,9 +763,10 @@ namespace CourtManager.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ChatRooms_CustomerId",
+                name: "IX_ChatRooms_CustomerId_HostId",
                 table: "ChatRooms",
-                column: "CustomerId");
+                columns: new[] { "CustomerId", "HostId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ChatRooms_HostId",
@@ -655,14 +774,20 @@ namespace CourtManager.Infrastructure.Migrations
                 column: "HostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Discounts_FieldId",
+                name: "IX_Discounts_Code",
                 table: "Discounts",
-                column: "FieldId");
+                column: "Code",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Discounts_OwnerId",
                 table: "Discounts",
                 column: "OwnerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Discounts_VenueId",
+                table: "Discounts",
+                column: "VenueId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FootballFields_VenueId",
@@ -745,13 +870,29 @@ namespace CourtManager.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_TimeSlots_FieldId",
+                name: "IX_TimeSlots_FieldId_StartTime",
                 table: "TimeSlots",
-                column: "FieldId");
+                columns: new[] { "FieldId", "StartTime" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TimeSlots_LockedBy",
+                table: "TimeSlots",
+                column: "LockedBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClaims_UserId",
                 table: "UserClaims",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserDevices_FcmToken",
+                table: "UserDevices",
+                column: "FcmToken",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserDevices_UserId",
+                table: "UserDevices",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -817,6 +958,9 @@ namespace CourtManager.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserClaims");
+
+            migrationBuilder.DropTable(
+                name: "UserDevices");
 
             migrationBuilder.DropTable(
                 name: "UserLogins");

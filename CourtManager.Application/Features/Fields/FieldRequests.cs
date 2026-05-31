@@ -27,7 +27,7 @@ public class GetFieldsByVenueQueryHandler : IRequestHandler<GetFieldsByVenueQuer
 
     public async Task<IEnumerable<FootballFieldDto>> Handle(GetFieldsByVenueQuery request, CancellationToken cancellationToken)
     {
-        var fields = await _fieldRepository.GetByVenueIdAsync(request.VenueId, cancellationToken);
+        var fields = await _fieldRepository.GetFieldsByVenueIdAsync(request.VenueId, cancellationToken);
         return _mapper.Map<IEnumerable<FootballFieldDto>>(fields);
     }
 }
@@ -70,7 +70,7 @@ public class CreateFieldCommandHandler : IRequestHandler<CreateFieldCommand, Foo
 
     public async Task<FootballFieldDto> Handle(CreateFieldCommand request, CancellationToken cancellationToken)
     {
-        var venue = await _venueRepository.GetDetailsAsync(request.VenueId, cancellationToken);
+        var venue = await _venueRepository.GetVenueByIdAsync(request.VenueId, cancellationToken);
         if (venue == null)
         {
             throw new NotFoundException(nameof(Venue), request.VenueId);

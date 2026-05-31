@@ -16,7 +16,7 @@ public class NotificationRepository : Repository<Notification>, INotificationRep
 
         if (unreadOnly)
         {
-            query = query.Where(n => n.NotificationRecipients.Any(r => r.UserId == userId && !r.IsRead));
+            query = query.Where(n => n.NotificationRecipients.Any(r => r.UserId == userId && r.ReadAt == null));
         }
 
         return await query
@@ -32,7 +32,7 @@ public class NotificationRepository : Repository<Notification>, INotificationRep
 
         if (unreadOnly)
         {
-            query = query.Where(n => n.NotificationRecipients.Any(r => r.UserId == userId && !r.IsRead));
+            query = query.Where(n => n.NotificationRecipients.Any(r => r.UserId == userId && r.ReadAt == null));
         }
 
         return await query
@@ -46,9 +46,8 @@ public class NotificationRepository : Repository<Notification>, INotificationRep
     {
         var recipient = await _context.NotificationRecipients
             .FirstOrDefaultAsync(r => r.NotificationId == notificationId && r.UserId == userId, cancellationToken);
-        if (recipient != null && !recipient.IsRead)
+        if (recipient != null && recipient.ReadAt == null)
         {
-            recipient.IsRead = true;
             recipient.ReadAt = DateTime.UtcNow;
         }
     }
@@ -56,12 +55,11 @@ public class NotificationRepository : Repository<Notification>, INotificationRep
     public async Task MarkAllAsReadAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var recipients = await _context.NotificationRecipients
-            .Where(r => r.UserId == userId && !r.IsRead)
+            .Where(r => r.UserId == userId && r.ReadAt == null)
             .ToListAsync(cancellationToken);
 
         foreach (var recipient in recipients)
         {
-            recipient.IsRead = true;
             recipient.ReadAt = DateTime.UtcNow;
         }
     }
@@ -69,6 +67,6 @@ public class NotificationRepository : Repository<Notification>, INotificationRep
     public async Task<int> GetUnreadCountAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.NotificationRecipients
-            .CountAsync(r => r.UserId == userId && !r.IsRead, cancellationToken);
+            .CountAsync(r => r.UserId == userId && r.ReadAt == null, cancellationToken);
     }
 }

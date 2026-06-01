@@ -50,11 +50,31 @@ public class BookingsController : BaseApiController
             "Creating booking for User: {UserId} with {SlotCount} slots",
             command.UserId, command.SlotIds.Length);
 
-        var result = await _mediator.Send(command, cancellationToken);
-
-        _logger.LogInformation("Booking created successfully with ID: {BookingId}", result.Id);
-
-        return CreatedAtAction(nameof(GetBookingById), new { id = result.Id }, result);
+        try
+        {
+            var result = await _mediator.Send(command, cancellationToken);
+            _logger.LogInformation("Booking created successfully with ID: {BookingId}", result.Id);
+            
+            return CreatedAtAction(nameof(GetBookingById), new { id = result.Id }, new
+            {
+                success = true,
+                message = "Booking created successfully",
+                data = result,
+                errors = Array.Empty<string>()
+            });
+        }
+        catch (CourtManager.Application.Exceptions.ValidationException ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
+        catch (CourtManager.Application.Exceptions.NotFoundException ex)
+        {
+            return NotFound(new { success = false, message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = "Failed to create booking", errors = new[] { ex.Message } });
+        }
     }
 
     /// <summary>

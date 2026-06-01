@@ -1,7 +1,6 @@
 using CourtManager.Application.DTOs;
 using CourtManager.Application.Features.Payments;
 using CourtManager.APIs.Configuration;
-using CourtManager.APIs.Models.SePay;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

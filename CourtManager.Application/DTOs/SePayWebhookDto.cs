@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace CourtManager.APIs.Models.SePay;
+namespace CourtManager.Application.DTOs;
 
 /// <summary>
 /// Data transfer object for SePay Webhook payload.

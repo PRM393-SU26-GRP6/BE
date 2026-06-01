@@ -1,4 +1,4 @@
-namespace CourtManager.APIs.Models.SePay;
+namespace CourtManager.Application.DTOs;
 
 /// <summary>
 /// Data transfer object for SePay checkout response.

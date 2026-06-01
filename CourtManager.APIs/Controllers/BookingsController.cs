@@ -93,6 +93,34 @@ public class BookingsController : BaseApiController
     }
 
     /// <summary>
+    /// Retrieves booking history for the current customer.
+    /// </summary>
+    /// <param name="status">Optional status filter</param>
+    /// <param name="from">Optional start date</param>
+    /// <param name="to">Optional end date</param>
+    /// <param name="page">Page number</param>
+    /// <param name="pageSize">Page size</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>List of bookings</returns>
+    [HttpGet("history")]
+    [ProducesResponseType(typeof(IEnumerable<BookingDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingHistory(
+        [FromQuery] string? status = null,
+        [FromQuery] DateTime? from = null,
+        [FromQuery] DateTime? to = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Fetching booking history for user: {UserId}", CurrentUserId);
+
+        var query = new GetUserBookingsQuery(CurrentUserId, status, from, to, page, pageSize);
+        var result = await _mediator.Send(query, cancellationToken);
+
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Checks if a booking already has a review.
     /// </summary>
     /// <param name="id">The booking ID</param>

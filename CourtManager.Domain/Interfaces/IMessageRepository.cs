@@ -3,47 +3,50 @@ using CourtManager.Domain.Entities;
 namespace CourtManager.Domain.Interfaces;
 
 /// <summary>
-/// Repository interface for Notification entity operations.
+/// Repository interface for Message entity operations.
 /// </summary>
-public interface INotificationRepository : IRepository<Notification>
+public interface IMessageRepository : IRepository<Message>
 {
     /// <summary>
-    /// Gets notifications for a specific user with optional filtering for unread only.
+    /// Gets messages in a chat room with pagination.
     /// </summary>
-    Task<IEnumerable<Notification>> GetNotificationsByUserIdAsync(
-        Guid userId,
-        bool unreadOnly = false,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Gets paginated notifications for a user.
-    /// </summary>
-    Task<IEnumerable<Notification>> GetNotificationsByUserIdPaginatedAsync(
-        Guid userId,
+    Task<IEnumerable<Message>> GetMessagesByRoomIdAsync(
+        Guid roomId,
         int pageNumber,
         int pageSize,
-        bool unreadOnly = false,
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Marks a specific notification as read.
+    /// Gets latest messages before an optional cursor.
     /// </summary>
-    Task MarkAsReadAsync(
-        Guid notificationId,
-        Guid userId,
+    Task<IEnumerable<Message>> GetMessagesBeforeAsync(
+        Guid roomId,
+        DateTime? beforeSentAt,
+        Guid? beforeMessageId,
+        int limit,
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Marks all notifications for a user as read.
+    /// Gets the last message sent in a chat room.
     /// </summary>
-    Task MarkAllAsReadAsync(
-        Guid userId,
+    Task<Message?> GetLastMessageAsync(
+        Guid roomId,
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Gets unread notification count for a user.
+    /// Gets total message count for a chat room.
     /// </summary>
-    Task<int> GetUnreadCountAsync(
+    Task<int> GetMessageCountAsync(
+        Guid roomId,
+        CancellationToken cancellationToken = default);
+
+    Task MarkRoomMessagesAsReadAsync(
+        Guid roomId,
+        Guid readerId,
+        CancellationToken cancellationToken = default);
+
+    Task<int> GetUnreadCountForRoomAsync(
+        Guid roomId,
         Guid userId,
         CancellationToken cancellationToken = default);
 }

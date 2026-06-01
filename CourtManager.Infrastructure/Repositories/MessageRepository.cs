@@ -34,6 +34,43 @@ public class MessageRepository : Repository<Message>, IMessageRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<Message>> GetMessagesBeforeAsync(
+        Guid roomId,
+        DateTime? beforeSentAt,
+        Guid? beforeMessageId,
+        int limit,
+        CancellationToken cancellationToken = default)
+    {
+        var effectiveBeforeSentAt = beforeSentAt;
+
+        if (beforeMessageId.HasValue)
+        {
+            var cursorMessage = await _dbSet
+                .Where(m => m.RoomId == roomId && m.MessageId == beforeMessageId.Value)
+                .Select(m => new { m.SentAt })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (cursorMessage != null)
+            {
+                effectiveBeforeSentAt = cursorMessage.SentAt;
+            }
+        }
+
+        var query = _dbSet
+            .Include(m => m.Sender)
+            .Where(m => m.RoomId == roomId);
+
+        if (effectiveBeforeSentAt.HasValue)
+        {
+            query = query.Where(m => m.SentAt < effectiveBeforeSentAt.Value);
+        }
+
+        return await query
+            .OrderByDescending(m => m.SentAt)
+            .Take(limit)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Message?> GetLastMessageAsync(
         Guid roomId,
         CancellationToken cancellationToken = default)

@@ -92,7 +92,7 @@ public class MappingProfile : Profile
         // Message mappings
         CreateMap<Message, MessageDto>()
             .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.Sender != null ? src.Sender.FullName : null))
-            .ReverseMap();
+            .ForMember(dest => dest.IsRead, opt => opt.MapFrom(src => src.ReadAt.HasValue));
 
         // Notification mappings
         CreateMap<Notification, NotificationDto>()

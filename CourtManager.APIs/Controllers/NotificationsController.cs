@@ -39,7 +39,7 @@ public class NotificationsController : BaseApiController
     {
         var userId = CurrentUserId;
         _logger.LogInformation("Fetching notifications for user {UserId}", userId);
-        var result = await _mediator.Send(new GetNotificationsQuery(GetCurrentUserId(), unreadOnly, pageNumber, pageSize), cancellationToken);
+        var result = await _mediator.Send(new GetNotificationsQuery(CurrentUserId, unreadOnly, pageNumber, pageSize), cancellationToken);
         return Ok(result);
     }
 
@@ -54,7 +54,7 @@ public class NotificationsController : BaseApiController
     public async Task<ActionResult<NotificationDto>> GetNotificationById(Guid id, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Fetching notification {NotificationId}", id);
-        var result = await _mediator.Send(new GetNotificationByIdQuery(id, GetCurrentUserId()), cancellationToken);
+        var result = await _mediator.Send(new GetNotificationByIdQuery(id, CurrentUserId), cancellationToken);
         return Ok(result);
     }
 
@@ -68,7 +68,7 @@ public class NotificationsController : BaseApiController
     {
         var userId = CurrentUserId;
         _logger.LogInformation("Fetching unread notification count for user {UserId}", userId);
-        var result = await _mediator.Send(new GetUnreadNotificationCountQuery(GetCurrentUserId()), cancellationToken);
+        var result = await _mediator.Send(new GetUnreadNotificationCountQuery(CurrentUserId), cancellationToken);
         return Ok(result);
     }
 
@@ -84,7 +84,7 @@ public class NotificationsController : BaseApiController
     public async Task<IActionResult> MarkAsRead(Guid id, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Marking notification {NotificationId} as read", id);
-        var result = await _mediator.Send(new MarkNotificationAsReadCommand(id, GetCurrentUserId()), cancellationToken);
+        var result = await _mediator.Send(new MarkNotificationAsReadCommand(id, CurrentUserId), cancellationToken);
         return Ok(new { success = result });
     }
 
@@ -99,7 +99,7 @@ public class NotificationsController : BaseApiController
     {
         var userId = CurrentUserId;
         _logger.LogInformation("Marking all notifications as read for user {UserId}", userId);
-        var result = await _mediator.Send(new MarkAllNotificationsAsReadCommand(GetCurrentUserId()), cancellationToken);
+        var result = await _mediator.Send(new MarkAllNotificationsAsReadCommand(CurrentUserId), cancellationToken);
         return Ok(new { success = result });
     }
 
@@ -122,9 +122,5 @@ public class NotificationsController : BaseApiController
         return Ok(new { success = result, message = "Notification deleted successfully" });
     }
 
-    private Guid GetCurrentUserId()
-    {
-        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return Guid.TryParse(userIdString, out var userId) ? userId : Guid.Empty;
-    }
+
 }

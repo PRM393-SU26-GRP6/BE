@@ -147,59 +147,7 @@ public class BookingsController : BaseApiController
         });
     }
 
-    /// <summary>
-    /// Accepts/confirms a pending booking.
-    /// Changes booking status from "Pending" to "Confirmed".
-    /// </summary>
-    /// <param name="id">The booking ID</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Success status</returns>
-    [HttpPut("{id}/accept")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> AcceptBooking(
-        Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        _logger.LogInformation("Accepting booking with ID: {BookingId}", id);
 
-        var command = new AcceptBookingCommand(id);
-        var result = await _mediator.Send(command, cancellationToken);
-
-        _logger.LogInformation("Booking {BookingId} accepted successfully", id);
-
-        return Ok(new { success = result, message = "Booking accepted successfully" });
-    }
-
-    /// <summary>
-    /// Rejects a pending booking.
-    /// Changes booking status from "Pending" to "Rejected".
-    /// </summary>
-    /// <param name="id">The booking ID</param>
-    /// <param name="rejectionReason">Optional reason for rejection</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Success status</returns>
-    [HttpPut("{id}/reject")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> RejectBooking(
-        Guid id,
-        [FromQuery] string? rejectionReason = null,
-        CancellationToken cancellationToken = default)
-    {
-        _logger.LogInformation("Rejecting booking with ID: {BookingId}", id);
-
-        var command = new RejectBookingCommand(id, rejectionReason);
-        var result = await _mediator.Send(command, cancellationToken);
-
-        _logger.LogInformation("Booking {BookingId} rejected successfully", id);
-
-        return Ok(new { success = result, message = "Booking rejected successfully" });
-    }
 
     /// <summary>
     /// Cancels an existing booking.

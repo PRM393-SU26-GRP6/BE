@@ -13,7 +13,6 @@ public static class SampleDataSeeder
 {
     private const string DefaultPassword = "Password@123";
 
-    private static readonly Guid GuestRoleId = StableGuid("role:guest");
     private static readonly Guid UserRoleId = StableGuid("role:user");
     private static readonly Guid AdminRoleId = StableGuid("role:admin");
     private static readonly Guid OwnerRoleId = StableGuid("role:owner");
@@ -44,15 +43,6 @@ public static class SampleDataSeeder
     {
         var roles = new[]
         {
-            new Role
-            {
-                Id = GuestRoleId,
-                Name = "Guest",
-                NormalizedName = "GUEST",
-                Description = "Unauthenticated visitor role",
-                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                ConcurrencyStamp = GuestRoleId.ToString()
-            },
             new Role
             {
                 Id = UserRoleId,

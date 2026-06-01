@@ -45,9 +45,4 @@ public class ChatRoomDto
     /// Timestamp of the last message (optional).
     /// </summary>
     public DateTime? LastMessageTime { get; set; }
-
-    /// <summary>
-    /// Number of unread messages in this room for the current viewer.
-    /// </summary>
-    public int UnreadCount { get; set; }
 }

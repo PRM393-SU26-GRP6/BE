@@ -107,32 +107,6 @@ public class ChatsController : BaseApiController
     }
 
     /// <summary>
-    /// Gets chat messages using cursor pagination. Use this for infinite scroll in chat UI.
-    /// </summary>
-    /// <param name="roomId">The chat room ID</param>
-    /// <param name="beforeSentAt">Optional cursor timestamp. Returns messages older than this timestamp.</param>
-    /// <param name="beforeMessageId">Optional cursor message ID. Preferred when passing the nextCursor from the previous response.</param>
-    /// <param name="limit">Page size. Clamped to 1-50.</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Cursor-paginated messages ordered from oldest to newest for display.</returns>
-    [HttpGet("rooms/{roomId}/messages/cursor")]
-    [ProducesResponseType(typeof(CursorPagedResult<MessageDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CursorPagedResult<MessageDto>>> GetMessagesCursor(
-        Guid roomId,
-        [FromQuery] DateTime? beforeSentAt = null,
-        [FromQuery] Guid? beforeMessageId = null,
-        [FromQuery] int limit = 20,
-        CancellationToken cancellationToken = default)
-    {
-        _logger.LogInformation("Fetching cursor messages for room {RoomId}", roomId);
-        var result = await _mediator.Send(
-            new GetMessagesCursorQuery(GetCurrentUserId(), roomId, beforeSentAt, beforeMessageId, limit),
-            cancellationToken);
-        return Ok(result);
-    }
-
-    /// <summary>
     /// Sends a message in a chat room.
     /// </summary>
     /// <param name="roomId">The chat room ID</param>
@@ -202,8 +176,8 @@ public class ChatsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> MarkRoomAsRead(Guid roomId, CancellationToken cancellationToken = default)
     {
-        var unreadCount = await _mediator.Send(new MarkRoomAsReadCommand(GetCurrentUserId(), roomId), cancellationToken);
-        return Ok(new { unreadCount });
+        await _mediator.Send(new GetMessagesQuery(GetCurrentUserId(), roomId, 1, 1), cancellationToken);
+        return Ok(new { unreadCount = 0 });
     }
 
     private Guid GetCurrentUserId()

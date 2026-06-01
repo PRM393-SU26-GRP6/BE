@@ -9,12 +9,9 @@ using MediatR;
 namespace CourtManager.Application.Features.Chats;
 
 public record GetChatRoomsQuery(Guid UserId, int PageNumber, int PageSize) : IRequest<IEnumerable<ChatRoomDto>>;
-public record GetChatRoomForUserQuery(Guid UserId, Guid RoomId) : IRequest<ChatRoomDto>;
 public record GetOrCreateChatRoomQuery(Guid UserId, Guid OtherUserId) : IRequest<ChatRoomDto>;
 public record GetOrCreateVenueChatRoomQuery(Guid UserId, Guid VenueId) : IRequest<ChatRoomDto>;
 public record GetMessagesQuery(Guid UserId, Guid RoomId, int PageNumber, int PageSize) : IRequest<IEnumerable<MessageDto>>;
-public record GetMessagesCursorQuery(Guid UserId, Guid RoomId, DateTime? BeforeSentAt, Guid? BeforeMessageId, int Limit) : IRequest<CursorPagedResult<MessageDto>>;
-public record MarkRoomAsReadCommand(Guid UserId, Guid RoomId) : IRequest<int>;
 public record SendMessageCommand(Guid UserId, Guid RoomId, string MessageText) : IRequest<MessageDto>;
 
 public class GetChatRoomsQueryHandler : IRequestHandler<GetChatRoomsQuery, IEnumerable<ChatRoomDto>>
@@ -41,41 +38,10 @@ public class GetChatRoomsQueryHandler : IRequestHandler<GetChatRoomsQuery, IEnum
             var last = await _messageRepository.GetLastMessageAsync(room.RoomId, cancellationToken);
             dto.LastMessagePreview = last?.MessageText;
             dto.LastMessageTime = last?.SentAt ?? room.LastMessageAt;
-            dto.UnreadCount = await _messageRepository.GetUnreadCountForRoomAsync(room.RoomId, request.UserId, cancellationToken);
             result.Add(dto);
         }
 
         return result;
-    }
-}
-
-public class GetChatRoomForUserQueryHandler : IRequestHandler<GetChatRoomForUserQuery, ChatRoomDto>
-{
-    private readonly IChatRoomRepository _chatRoomRepository;
-    private readonly IMessageRepository _messageRepository;
-    private readonly IMapper _mapper;
-
-    public GetChatRoomForUserQueryHandler(IChatRoomRepository chatRoomRepository, IMessageRepository messageRepository, IMapper mapper)
-    {
-        _chatRoomRepository = chatRoomRepository;
-        _messageRepository = messageRepository;
-        _mapper = mapper;
-    }
-
-    public async Task<ChatRoomDto> Handle(GetChatRoomForUserQuery request, CancellationToken cancellationToken)
-    {
-        var room = await _chatRoomRepository.GetByIdAsync(request.RoomId, cancellationToken);
-        if (room == null)
-            throw new NotFoundException(nameof(ChatRoom), request.RoomId);
-        if (room.CustomerId != request.UserId && room.HostId != request.UserId)
-            throw new ForbiddenException("You are not a participant in this chat room.");
-
-        var dto = _mapper.Map<ChatRoomDto>(room);
-        var last = await _messageRepository.GetLastMessageAsync(room.RoomId, cancellationToken);
-        dto.LastMessagePreview = last?.MessageText;
-        dto.LastMessageTime = last?.SentAt ?? room.LastMessageAt;
-        dto.UnreadCount = await _messageRepository.GetUnreadCountForRoomAsync(room.RoomId, request.UserId, cancellationToken);
-        return dto;
     }
 }
 
@@ -142,87 +108,13 @@ public class GetMessagesQueryHandler : IRequestHandler<GetMessagesQuery, IEnumer
         if (room == null)
             throw new NotFoundException(nameof(ChatRoom), request.RoomId);
         if (room.CustomerId != request.UserId && room.HostId != request.UserId)
-            throw new ForbiddenException("You are not a participant in this chat room.");
-
-        var messages = await _messageRepository.GetMessagesByRoomIdAsync(request.RoomId, request.PageNumber, request.PageSize, cancellationToken);
-        return _mapper.Map<IEnumerable<MessageDto>>(messages.OrderBy(m => m.SentAt));
-    }
-}
-
-public class GetMessagesCursorQueryHandler : IRequestHandler<GetMessagesCursorQuery, CursorPagedResult<MessageDto>>
-{
-    private readonly IChatRoomRepository _chatRoomRepository;
-    private readonly IMessageRepository _messageRepository;
-    private readonly IMapper _mapper;
-
-    public GetMessagesCursorQueryHandler(IChatRoomRepository chatRoomRepository, IMessageRepository messageRepository, IMapper mapper)
-    {
-        _chatRoomRepository = chatRoomRepository;
-        _messageRepository = messageRepository;
-        _mapper = mapper;
-    }
-
-    public async Task<CursorPagedResult<MessageDto>> Handle(GetMessagesCursorQuery request, CancellationToken cancellationToken)
-    {
-        var room = await _chatRoomRepository.GetByIdAsync(request.RoomId, cancellationToken);
-        if (room == null)
-            throw new NotFoundException(nameof(ChatRoom), request.RoomId);
-        if (room.CustomerId != request.UserId && room.HostId != request.UserId)
-            throw new ForbiddenException("You are not a participant in this chat room.");
-
-        var limit = Math.Clamp(request.Limit, 1, 50);
-        var messages = (await _messageRepository.GetMessagesBeforeAsync(
-                request.RoomId,
-                request.BeforeSentAt,
-                request.BeforeMessageId,
-                limit + 1,
-                cancellationToken))
-            .ToList();
-
-        var hasMore = messages.Count > limit;
-        var pageMessages = messages.Take(limit).ToList();
-        var orderedForDisplay = pageMessages.OrderBy(m => m.SentAt).ToList();
-        var oldestMessage = pageMessages.LastOrDefault();
-
-        return new CursorPagedResult<MessageDto>
-        {
-            Items = _mapper.Map<IEnumerable<MessageDto>>(orderedForDisplay),
-            Limit = limit,
-            HasMore = hasMore,
-            NextCursor = hasMore && oldestMessage != null
-                ? new MessageCursorDto
-                {
-                    BeforeSentAt = oldestMessage.SentAt,
-                    BeforeMessageId = oldestMessage.MessageId
-                }
-                : null
-        };
-    }
-}
-
-public class MarkRoomAsReadCommandHandler : IRequestHandler<MarkRoomAsReadCommand, int>
-{
-    private readonly IChatRoomRepository _chatRoomRepository;
-    private readonly IMessageRepository _messageRepository;
-
-    public MarkRoomAsReadCommandHandler(IChatRoomRepository chatRoomRepository, IMessageRepository messageRepository)
-    {
-        _chatRoomRepository = chatRoomRepository;
-        _messageRepository = messageRepository;
-    }
-
-    public async Task<int> Handle(MarkRoomAsReadCommand request, CancellationToken cancellationToken)
-    {
-        var room = await _chatRoomRepository.GetByIdAsync(request.RoomId, cancellationToken);
-        if (room == null)
-            throw new NotFoundException(nameof(ChatRoom), request.RoomId);
-        if (room.CustomerId != request.UserId && room.HostId != request.UserId)
-            throw new ForbiddenException("You are not a participant in this chat room.");
+            throw new ValidationException("You are not a participant in this chat room.");
 
         await _messageRepository.MarkRoomMessagesAsReadAsync(request.RoomId, request.UserId, cancellationToken);
         await _messageRepository.SaveChangesAsync(cancellationToken);
 
-        return await _messageRepository.GetUnreadCountForRoomAsync(request.RoomId, request.UserId, cancellationToken);
+        var messages = await _messageRepository.GetMessagesByRoomIdAsync(request.RoomId, request.PageNumber, request.PageSize, cancellationToken);
+        return _mapper.Map<IEnumerable<MessageDto>>(messages.OrderBy(m => m.SentAt));
     }
 }
 
@@ -254,7 +146,7 @@ public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Mes
         if (room == null)
             throw new NotFoundException(nameof(ChatRoom), request.RoomId);
         if (room.CustomerId != request.UserId && room.HostId != request.UserId)
-            throw new ForbiddenException("You are not a participant in this chat room.");
+            throw new ValidationException("You are not a participant in this chat room.");
 
         var message = new Message
         {

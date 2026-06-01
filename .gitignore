@@ -6,8 +6,6 @@ bin/
 obj/
 scripts/
 artifacts/
-docs/
-node_modules/
 *.dll
 *.exe
 *.out

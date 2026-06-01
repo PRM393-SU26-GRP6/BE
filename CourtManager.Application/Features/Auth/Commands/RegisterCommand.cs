@@ -13,5 +13,4 @@ public class RegisterCommand : IRequest<AuthResponseDto>
     public string PhoneNumber { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string ConfirmPassword { get; set; } = string.Empty;
-    public string Role { get; set; } = "user";
 }

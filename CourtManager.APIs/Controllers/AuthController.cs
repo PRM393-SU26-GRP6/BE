@@ -53,10 +53,9 @@ public class AuthController : ControllerBase
         {
             FullName = request.FullName,
             Email = request.Email,
-            PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? request.Phone : request.PhoneNumber,
+            PhoneNumber = request.PhoneNumber,
             Password = request.Password,
-            ConfirmPassword = request.ConfirmPassword,
-            Role = request.Role
+            ConfirmPassword = request.ConfirmPassword
         };
 
         var result = await _mediator.Send(command);

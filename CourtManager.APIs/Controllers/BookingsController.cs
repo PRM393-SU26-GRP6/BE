@@ -47,8 +47,8 @@ public class BookingsController : BaseApiController
         command.UserId = currentUserId;
 
         _logger.LogInformation(
-            "Creating booking for User: {UserId}, Field: {FieldId}",
-            command.UserId, command.FieldId);
+            "Creating booking for User: {UserId} with {SlotCount} slots",
+            command.UserId, command.SlotIds.Length);
 
         var result = await _mediator.Send(command, cancellationToken);
 

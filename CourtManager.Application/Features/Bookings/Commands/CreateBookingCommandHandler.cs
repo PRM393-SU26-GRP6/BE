@@ -80,21 +80,7 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
                 slots.Add(slot);
             }
         }
-        else
-        {
-            // Backward-compatible path for older clients that post field/start/end.
-            var field = await _fieldRepository.GetByIdAsync(request.FieldId, cancellationToken);
-            if (field == null)
-                throw new NotFoundException(nameof(FootballField), request.FieldId);
 
-            var fieldSlots = await _timeSlotRepository.GetSlotsByFieldIdAsync(request.FieldId, cancellationToken);
-            slots = fieldSlots
-                .Where(s => s.StartTime == request.StartTime && s.EndTime == request.EndTime)
-                .ToList();
-
-            if (slots.Count == 0)
-                throw new ValidationException("No matching time slot exists for the requested field/time.");
-        }
 
         if (slots.Count == 0)
             throw new ValidationException("A booking must contain at least one slot.");

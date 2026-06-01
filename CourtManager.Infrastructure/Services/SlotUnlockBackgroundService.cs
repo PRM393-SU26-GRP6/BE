@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CourtManager.APIs.Services;
+namespace CourtManager.Infrastructure.Services;
 
 public class SlotUnlockBackgroundService : BackgroundService
 {

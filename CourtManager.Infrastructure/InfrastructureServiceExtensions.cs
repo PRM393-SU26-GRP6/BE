@@ -74,6 +74,9 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IStorageService, CloudflareR2StorageService>();
 
+        // Register Background Services
+        services.AddHostedService<SlotUnlockBackgroundService>();
+
         return services;
     }
 }

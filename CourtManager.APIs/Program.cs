@@ -34,9 +34,6 @@ builder.Services.AddJwtTokenService(
 // 4. Web API Layer (Controllers, Swagger, Auth Config, CORS)
 builder.Services.AddWebApiServices(builder.Configuration, jwtSettings);
 
-// 5. Background Services
-builder.Services.AddHostedService<CourtManager.APIs.Services.SlotUnlockBackgroundService>();
-
 // ============================================================================
 // LOGGING CONFIGURATION
 // ============================================================================

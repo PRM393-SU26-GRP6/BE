@@ -1,6 +1,7 @@
 using CourtManager.Application;
 using CourtManager.Infrastructure;
 using CourtManager.APIs.Configuration;
+using CourtManager.APIs.Hubs;
 using CourtManager.APIs.Middleware;
 using CourtManager.Infrastructure.Data;
 
@@ -81,6 +82,8 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers().RequireRateLimiting("GlobalPolicy");
+app.MapHub<ChatHub>("/hubs/chat");
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 
 // ============================================================================

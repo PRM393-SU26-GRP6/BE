@@ -9,6 +9,7 @@ namespace CourtManager.Application.Features.Notifications;
 public record GetNotificationsQuery(Guid UserId, bool UnreadOnly, int PageNumber, int PageSize) : IRequest<IEnumerable<NotificationDto>>;
 public record GetNotificationByIdQuery(Guid NotificationId, Guid UserId) : IRequest<NotificationDto>;
 public record GetUnreadNotificationCountQuery(Guid UserId) : IRequest<object>;
+public record GetUnreadNotificationCountValueQuery(Guid UserId) : IRequest<int>;
 public record MarkNotificationAsReadCommand(Guid NotificationId, Guid UserId) : IRequest<bool>;
 public record MarkAllNotificationsAsReadCommand(Guid UserId) : IRequest<bool>;
 
@@ -84,6 +85,21 @@ public class GetUnreadNotificationCountQueryHandler : IRequestHandler<GetUnreadN
     {
         var count = await _notificationRepository.GetUnreadCountAsync(request.UserId, cancellationToken);
         return new { unreadCount = count };
+    }
+}
+
+public class GetUnreadNotificationCountValueQueryHandler : IRequestHandler<GetUnreadNotificationCountValueQuery, int>
+{
+    private readonly INotificationRepository _notificationRepository;
+
+    public GetUnreadNotificationCountValueQueryHandler(INotificationRepository notificationRepository)
+    {
+        _notificationRepository = notificationRepository;
+    }
+
+    public async Task<int> Handle(GetUnreadNotificationCountValueQuery request, CancellationToken cancellationToken)
+    {
+        return await _notificationRepository.GetUnreadCountAsync(request.UserId, cancellationToken);
     }
 }
 

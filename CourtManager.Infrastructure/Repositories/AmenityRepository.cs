@@ -1,5 +1,5 @@
 using CourtManager.Domain.Entities;
-using CourtManager.Domain.Interfaces;
+using CourtManager.Application.Interfaces;
 using CourtManager.Infrastructure.Data;
 
 namespace CourtManager.Infrastructure.Repositories;

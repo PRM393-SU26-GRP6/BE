@@ -3,9 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using CourtManager.Domain.Entities;
-using CourtManager.Domain.Interfaces;
-using CourtManager.Infrastructure.Repositories;
 using CourtManager.Application.Interfaces;
+using CourtManager.Infrastructure.Repositories;
 using CourtManager.Infrastructure.Services;
 
 namespace CourtManager.Infrastructure;

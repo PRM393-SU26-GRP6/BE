@@ -1,6 +1,6 @@
 using CourtManager.Domain.Entities;
 
-namespace CourtManager.Domain.Interfaces;
+namespace CourtManager.Application.Interfaces;
 
 public interface IVenueAmenityRepository
 {

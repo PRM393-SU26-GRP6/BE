@@ -1,4 +1,4 @@
-namespace CourtManager.Domain.Interfaces;
+namespace CourtManager.Application.Interfaces;
 
 /// <summary>
 /// Base repository interface for common CRUD operations.

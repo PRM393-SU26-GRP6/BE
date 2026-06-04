@@ -3,7 +3,6 @@ using CourtManager.Infrastructure;
 using CourtManager.APIs.Configuration;
 using CourtManager.APIs.Hubs;
 using CourtManager.APIs.Middleware;
-using CourtManager.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,8 +45,6 @@ builder.Logging.ClearProviders().AddConsole().AddDebug();
 // ============================================================================
 
 var app = builder.Build();
-
-await app.SeedSampleDataAsync();
 
 // ============================================================================
 // MIDDLEWARE PIPELINE CONFIGURATION

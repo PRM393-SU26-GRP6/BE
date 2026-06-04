@@ -1,12 +1,16 @@
-using Microsoft.AspNetCore.Identity;
-
 namespace CourtManager.Domain.Entities;
 
 /// <summary>
 /// Represents a user in the system (user, owner, or admin).
+/// Pure domain POCO — no framework inheritance.
+/// Authentication concerns are handled by Infrastructure.Identity.ApplicationUser.
 /// </summary>
-public class User : IdentityUser<Guid>
+public class User
 {
+    public Guid Id { get; set; }
+    public string UserName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; }
     public string FullName { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public string? AvatarUrl { get; set; }

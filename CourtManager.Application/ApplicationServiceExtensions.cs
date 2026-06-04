@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using FluentValidation;
 using System.Reflection;
 using CourtManager.Application.Mappings;
-using CourtManager.Application.Services;
 
 namespace CourtManager.Application;
 
@@ -26,26 +25,6 @@ public static class ApplicationServiceExtensions
 
         // Register AutoMapper
         services.AddAutoMapper(config => config.AddProfile<MappingProfile>());
-
-        // Register Authentication Services
-        services.AddScoped<IPasswordHasherService, PasswordHasherService>();
-
-        return services;
-    }
-
-    /// <summary>
-    /// Adds JWT token service with configuration.
-    /// </summary>
-    public static IServiceCollection AddJwtTokenService(
-        this IServiceCollection services,
-        string secret,
-        string issuer,
-        string audience,
-        int accessTokenExpirationInMinutes = 60,
-        int refreshTokenExpirationInDays = 7)
-    {
-        services.AddScoped<IJwtTokenService>(provider =>
-            new JwtTokenService(secret, issuer, audience, accessTokenExpirationInMinutes, refreshTokenExpirationInDays));
 
         return services;
     }

@@ -1,8 +1,7 @@
 using System.Security.Claims;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using CourtManager.Application.DTOs;
-using CourtManager.Application.Services;
+using CourtManager.Application.Interfaces;
 using CourtManager.Domain.Entities;
 
 namespace CourtManager.Application.Features.Auth.Commands;
@@ -12,14 +11,14 @@ namespace CourtManager.Application.Features.Auth.Commands;
 /// </summary>
 public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, AuthResponseDto>
 {
-    private readonly UserManager<User> _userManager;
+    private readonly IUserAuthService _userAuthService;
     private readonly IJwtTokenService _jwtTokenService;
 
     public RefreshTokenCommandHandler(
-        UserManager<User> userManager,
+        IUserAuthService userAuthService,
         IJwtTokenService jwtTokenService)
     {
-        _userManager = userManager;
+        _userAuthService = userAuthService;
         _jwtTokenService = jwtTokenService;
     }
 
@@ -51,7 +50,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
         }
 
         // Find user
-        var user = await _userManager.FindByIdAsync(userId.ToString());
+        var user = await _userAuthService.FindByIdAsync(userId);
         if (user == null)
         {
             return new AuthResponseDto
@@ -82,7 +81,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
         }
 
         // Get roles
-        var roles = await _userManager.GetRolesAsync(user);
+        var roles = await _userAuthService.GetRolesAsync(user);
 
         // Generate tokens
         var newAccessToken = _jwtTokenService.GenerateAccessToken(user, roles);
@@ -94,7 +93,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
         user.RefreshTokenExpiryTime = newRefreshTokenExpiryTime;
         user.UpdatedAt = DateTime.UtcNow;
 
-        await _userManager.UpdateAsync(user);
+        await _userAuthService.UpdateAsync(user);
 
         return new AuthResponseDto
         {

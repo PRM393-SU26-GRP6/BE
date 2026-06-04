@@ -6,6 +6,7 @@ bin/
 obj/
 scripts/
 artifacts/
+docs1/
 *.dll
 *.exe
 *.out

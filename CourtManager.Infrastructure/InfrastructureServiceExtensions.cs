@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using CourtManager.Domain.Entities;
 using CourtManager.Domain.Interfaces;
+using CourtManager.Infrastructure.Identity;
 using CourtManager.Infrastructure.Repositories;
 using CourtManager.Application.Interfaces;
 using CourtManager.Infrastructure.Services;
@@ -29,8 +30,8 @@ public static class InfrastructureServiceExtensions
                 configuration.GetConnectionString("DefaultConnection"),
                 npgsqlOptions => npgsqlOptions.MigrationsAssembly("CourtManager.Infrastructure")));
 
-        // Register Identity
-        services.AddIdentityCore<User>(options =>
+        // Register Identity with ApplicationUser (Infrastructure) — NOT Domain User
+        services.AddIdentityCore<ApplicationUser>(options =>
         {
             options.Password.RequireDigit = true;
             options.Password.RequiredLength = 6;
@@ -39,7 +40,7 @@ public static class InfrastructureServiceExtensions
             options.Password.RequireLowercase = false;
             options.User.RequireUniqueEmail = true;
         })
-        .AddRoles<Role>()
+        .AddRoles<ApplicationRole>()
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
 
@@ -72,10 +73,29 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IAmenityRepository, AmenityRepository>();
         services.AddScoped<IVenueAmenityRepository, VenueAmenityRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IUserAuthService, UserAuthService>();
         services.AddScoped<IStorageService, CloudflareR2StorageService>();
+        services.AddScoped<IPasswordHasherService, PasswordHasherService>();
 
         // Register Background Services
         services.AddHostedService<SlotUnlockBackgroundService>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Adds JWT token service with configuration.
+    /// </summary>
+    public static IServiceCollection AddJwtTokenService(
+        this IServiceCollection services,
+        string secret,
+        string issuer,
+        string audience,
+        int accessTokenExpirationInMinutes = 60,
+        int refreshTokenExpirationInDays = 7)
+    {
+        services.AddScoped<IJwtTokenService>(_ =>
+            new JwtTokenService(secret, issuer, audience, accessTokenExpirationInMinutes, refreshTokenExpirationInDays));
 
         return services;
     }

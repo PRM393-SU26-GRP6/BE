@@ -1,10 +1,35 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using CourtManager.Application.Interfaces;
-using CourtManager.Domain.Entities;
 using Microsoft.IdentityModel.Tokens;
+using CourtManager.Domain.Entities;
 
-namespace CourtManager.Infrastructure.Services;
+namespace CourtManager.Application.Services;
+
+/// <summary>
+/// Service for generating and validating JWT tokens.
+/// </summary>
+public interface IJwtTokenService
+{
+    /// <summary>
+    /// Generates an access token for the specified user.
+    /// </summary>
+    string GenerateAccessToken(User user, IList<string> roles);
+
+    /// <summary>
+    /// Generates a JWT refresh token for the specified user.
+    /// </summary>
+    string GenerateRefreshTokenJwt(User user, IList<string> roles);
+
+    /// <summary>
+    /// Gets the expiry time for a refresh token based on configuration.
+    /// </summary>
+    DateTime GetRefreshTokenExpiryTime();
+
+    /// <summary>
+    /// Gets the principal from an expired access token.
+    /// </summary>
+    ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
+}
 
 public class JwtTokenService : IJwtTokenService
 {
@@ -28,6 +53,9 @@ public class JwtTokenService : IJwtTokenService
         _refreshTokenExpirationInDays = refreshTokenExpirationInDays;
     }
 
+    /// <summary>
+    /// Generates a JWT access token for the specified user.
+    /// </summary>
     public string GenerateAccessToken(User user, IList<string> roles)
     {
         var securityKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_secret));
@@ -35,15 +63,19 @@ public class JwtTokenService : IJwtTokenService
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Email, user.Email ?? string.Empty),
-            new(ClaimTypes.Name, user.FullName ?? string.Empty),
-            new("PhoneNumber", user.PhoneNumber ?? string.Empty)
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+            new Claim(ClaimTypes.Name, user.FullName ?? string.Empty),
+            new Claim("PhoneNumber", user.PhoneNumber ?? string.Empty)
         };
 
-        foreach (var role in roles)
+        // Add roles as claims
+        if (roles != null)
         {
-            claims.Add(new Claim(ClaimTypes.Role, role));
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
         }
 
         var token = new JwtSecurityToken(
@@ -51,11 +83,15 @@ public class JwtTokenService : IJwtTokenService
             audience: _audience,
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(_accessTokenExpirationInMinutes),
-            signingCredentials: credentials);
+            signingCredentials: credentials
+        );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    /// <summary>
+    /// Generates a JWT refresh token for the specified user.
+    /// </summary>
     public string GenerateRefreshTokenJwt(User user, IList<string> roles)
     {
         var securityKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_secret));
@@ -63,15 +99,18 @@ public class JwtTokenService : IJwtTokenService
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Email, user.Email ?? string.Empty),
-            new(ClaimTypes.Name, user.FullName ?? string.Empty),
-            new("token_type", "refresh")
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+            new Claim(ClaimTypes.Name, user.FullName ?? string.Empty),
+            new Claim("token_type", "refresh")
         };
 
-        foreach (var role in roles)
+        if (roles != null)
         {
-            claims.Add(new Claim(ClaimTypes.Role, role));
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
         }
 
         var token = new JwtSecurityToken(
@@ -79,16 +118,23 @@ public class JwtTokenService : IJwtTokenService
             audience: _audience,
             claims: claims,
             expires: DateTime.UtcNow.AddDays(_refreshTokenExpirationInDays),
-            signingCredentials: credentials);
+            signingCredentials: credentials
+        );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    /// <summary>
+    /// Gets the expiry time for a refresh token.
+    /// </summary>
     public DateTime GetRefreshTokenExpiryTime()
     {
         return DateTime.UtcNow.AddDays(_refreshTokenExpirationInDays);
     }
 
+    /// <summary>
+    /// Extracts the principal from an expired access token for refresh token validation.
+    /// </summary>
     public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
     {
         try
@@ -99,7 +145,7 @@ public class JwtTokenService : IJwtTokenService
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
-                ValidateLifetime = false,
+                ValidateLifetime = false, // We want to read an expired token
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = _issuer,
                 ValidAudience = _audience,
@@ -108,9 +154,9 @@ public class JwtTokenService : IJwtTokenService
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
 
-            if (securityToken is not JwtSecurityToken jwtSecurityToken ||
+            if (!(securityToken is JwtSecurityToken jwtSecurityToken) ||
                 !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
             {
                 return null;

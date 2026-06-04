@@ -3,21 +3,22 @@ using CourtManager.Application.DTOs;
 using CourtManager.Application.Interfaces;
 using CourtManager.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 
 namespace CourtManager.Application.Features.Auth.Commands;
 
 public class UpdateProfileCommandHandler : IRequestHandler<UpdateProfileCommand, UserDto>
 {
-    private readonly IUserAuthService _userAuthService;
+    private readonly UserManager<User> _userManager;
     private readonly IMapper _mapper;
     private readonly ICurrentUserService _currentUserService;
 
     public UpdateProfileCommandHandler(
-        IUserAuthService userAuthService,
+        UserManager<User> userManager,
         IMapper mapper,
         ICurrentUserService currentUserService)
     {
-        _userAuthService = userAuthService;
+        _userManager = userManager;
         _mapper = mapper;
         _currentUserService = currentUserService;
     }
@@ -30,7 +31,7 @@ public class UpdateProfileCommandHandler : IRequestHandler<UpdateProfileCommand,
             throw new UnauthorizedAccessException("Invalid token claims or user is not authenticated.");
         }
 
-        var user = await _userAuthService.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null || !user.IsActive)
         {
             throw new UnauthorizedAccessException("User not found or inactive.");
@@ -42,11 +43,11 @@ public class UpdateProfileCommandHandler : IRequestHandler<UpdateProfileCommand,
         user.AvatarUrl = request.AvatarUrl;
         user.UpdatedAt = DateTime.UtcNow;
 
-        var (succeeded, errors) = await _userAuthService.UpdateAsync(user);
-        if (!succeeded)
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
         {
             throw new InvalidOperationException(
-                "Failed to update profile: " + string.Join(", ", errors));
+                "Failed to update profile: " + string.Join(", ", result.Errors.Select(e => e.Description)));
         }
 
         return _mapper.Map<UserDto>(user);

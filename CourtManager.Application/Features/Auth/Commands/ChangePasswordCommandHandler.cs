@@ -1,17 +1,18 @@
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using CourtManager.Application.DTOs;
-using CourtManager.Application.Interfaces;
+using CourtManager.Domain.Entities;
 
 namespace CourtManager.Application.Features.Auth.Commands;
 
 public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordCommand, AuthResponseDto>
 {
-    private readonly IUserAuthService _userAuthService;
-    private readonly ICurrentUserService _currentUserService;
+    private readonly UserManager<User> _userManager;
+    private readonly CourtManager.Application.Interfaces.ICurrentUserService _currentUserService;
 
-    public ChangePasswordCommandHandler(IUserAuthService userAuthService, ICurrentUserService currentUserService)
+    public ChangePasswordCommandHandler(UserManager<User> userManager, CourtManager.Application.Interfaces.ICurrentUserService currentUserService)
     {
-        _userAuthService = userAuthService;
+        _userManager = userManager;
         _currentUserService = currentUserService;
     }
 
@@ -23,20 +24,20 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
             return new AuthResponseDto { Success = false, Message = "Invalid user token" };
         }
 
-        var user = await _userAuthService.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null)
         {
             return new AuthResponseDto { Success = false, Message = "User not found" };
         }
 
-        var (succeeded, errors) = await _userAuthService.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+        var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
 
-        if (!succeeded)
+        if (!result.Succeeded)
         {
-            return new AuthResponseDto
-            {
-                Success = false,
-                Message = "Failed to change password: " + string.Join(", ", errors)
+            return new AuthResponseDto 
+            { 
+                Success = false, 
+                Message = "Failed to change password: " + string.Join(", ", result.Errors.Select(e => e.Description)) 
             };
         }
 

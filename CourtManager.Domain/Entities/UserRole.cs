@@ -1,13 +1,12 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace CourtManager.Domain.Entities;
 
 /// <summary>
 /// Join entity for User and Role (many-to-many relationship).
-/// Pure domain POCO — no framework inheritance.
 /// </summary>
-public class UserRole
+public class UserRole : IdentityUserRole<Guid>
 {
-    public Guid UserId { get; set; }
-    public Guid RoleId { get; set; }
     public DateTime AssignedAt { get; set; }
 
     // Navigation properties

@@ -1,6 +1,7 @@
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using CourtManager.Application.DTOs;
-using CourtManager.Application.Interfaces;
+using CourtManager.Application.Services;
 using CourtManager.Domain.Entities;
 
 namespace CourtManager.Application.Features.Auth.Commands;
@@ -10,14 +11,14 @@ namespace CourtManager.Application.Features.Auth.Commands;
 /// </summary>
 public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto>
 {
-    private readonly IUserAuthService _userAuthService;
+    private readonly UserManager<User> _userManager;
     private readonly IJwtTokenService _jwtTokenService;
 
     public LoginCommandHandler(
-        IUserAuthService userAuthService,
+        UserManager<User> userManager,
         IJwtTokenService jwtTokenService)
     {
-        _userAuthService = userAuthService;
+        _userManager = userManager;
         _jwtTokenService = jwtTokenService;
     }
 
@@ -27,7 +28,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto
     public async Task<AuthResponseDto> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         // Find user by email
-        var user = await _userAuthService.FindByEmailAsync(request.Email);
+        var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
         {
             return new AuthResponseDto
@@ -48,7 +49,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto
         }
 
         // Verify password
-        if (!await _userAuthService.CheckPasswordAsync(user, request.Password))
+        if (!await _userManager.CheckPasswordAsync(user, request.Password))
         {
             return new AuthResponseDto
             {
@@ -58,7 +59,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto
         }
 
         // Get roles
-        var roles = await _userAuthService.GetRolesAsync(user);
+        var roles = await _userManager.GetRolesAsync(user);
 
         // Generate tokens
         var accessToken = _jwtTokenService.GenerateAccessToken(user, roles);
@@ -70,7 +71,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponseDto
         user.RefreshTokenExpiryTime = refreshTokenExpiryTime;
         user.UpdatedAt = DateTime.UtcNow;
 
-        await _userAuthService.UpdateAsync(user);
+        await _userManager.UpdateAsync(user);
 
         return new AuthResponseDto
         {

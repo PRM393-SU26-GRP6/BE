@@ -1,11 +1,11 @@
 using AutoMapper;
 using CourtManager.Application.DTOs;
 using CourtManager.Application.Exceptions;
-using CourtManager.Application.Interfaces;
 using CourtManager.Domain.Entities;
 using CourtManager.Domain.Enums;
 using CourtManager.Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 
 namespace CourtManager.Application.Features.Admin;
 
@@ -17,16 +17,16 @@ public record BroadcastNotificationCommand(Guid SenderId, BroadcastNotificationD
 
 public class GetAdminUsersQueryHandler : IRequestHandler<GetAdminUsersQuery, IEnumerable<AdminUserDto>>
 {
-    private readonly IUserAuthService _userAuthService;
+    private readonly UserManager<User> _userManager;
 
-    public GetAdminUsersQueryHandler(IUserAuthService userAuthService)
+    public GetAdminUsersQueryHandler(UserManager<User> userManager)
     {
-        _userAuthService = userAuthService;
+        _userManager = userManager;
     }
 
     public Task<IEnumerable<AdminUserDto>> Handle(GetAdminUsersQuery request, CancellationToken cancellationToken)
     {
-        var users = _userAuthService.Users
+        var users = _userManager.Users
             .OrderBy(u => u.Email)
             .Select(u => new AdminUserDto
             {
@@ -45,16 +45,16 @@ public class GetAdminUsersQueryHandler : IRequestHandler<GetAdminUsersQuery, IEn
 
 public class UpdateAdminUserRoleCommandHandler : IRequestHandler<UpdateAdminUserRoleCommand, UserRoleResultDto>
 {
-    private readonly IUserAuthService _userAuthService;
+    private readonly UserManager<User> _userManager;
 
-    public UpdateAdminUserRoleCommandHandler(IUserAuthService userAuthService)
+    public UpdateAdminUserRoleCommandHandler(UserManager<User> userManager)
     {
-        _userAuthService = userAuthService;
+        _userManager = userManager;
     }
 
     public async Task<UserRoleResultDto> Handle(UpdateAdminUserRoleCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userAuthService.FindByIdAsync(request.UserId);
+        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
         if (user == null)
         {
             throw new NotFoundException(nameof(User), request.UserId);
@@ -74,17 +74,17 @@ public class UpdateAdminUserRoleCommandHandler : IRequestHandler<UpdateAdminUser
             throw new ValidationException("Invalid role.");
         }
 
-        var currentRoles = await _userAuthService.GetRolesAsync(user);
-        var (removeSucceeded, removeErrors) = await _userAuthService.RemoveFromRolesAsync(user, currentRoles);
-        if (!removeSucceeded)
+        var currentRoles = await _userManager.GetRolesAsync(user);
+        var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+        if (!removeResult.Succeeded)
         {
-            throw new ValidationException(string.Join("; ", removeErrors));
+            throw new ValidationException(string.Join("; ", removeResult.Errors.Select(e => e.Description)));
         }
 
-        var (addSucceeded, addErrors) = await _userAuthService.AddToRoleAsync(user, role);
-        if (!addSucceeded)
+        var addResult = await _userManager.AddToRoleAsync(user, role);
+        if (!addResult.Succeeded)
         {
-            throw new ValidationException(string.Join("; ", addErrors));
+            throw new ValidationException(string.Join("; ", addResult.Errors.Select(e => e.Description)));
         }
 
         return new UserRoleResultDto { UserId = request.UserId, Role = role };
@@ -137,18 +137,18 @@ public class UpdateAdminVenueStatusCommandHandler : IRequestHandler<UpdateAdminV
 
 public class BroadcastNotificationCommandHandler : IRequestHandler<BroadcastNotificationCommand, BroadcastNotificationResultDto>
 {
-    private readonly IUserAuthService _userAuthService;
+    private readonly UserManager<User> _userManager;
     private readonly INotificationRepository _notificationRepository;
 
-    public BroadcastNotificationCommandHandler(IUserAuthService userAuthService, INotificationRepository notificationRepository)
+    public BroadcastNotificationCommandHandler(UserManager<User> userManager, INotificationRepository notificationRepository)
     {
-        _userAuthService = userAuthService;
+        _userManager = userManager;
         _notificationRepository = notificationRepository;
     }
 
     public async Task<BroadcastNotificationResultDto> Handle(BroadcastNotificationCommand request, CancellationToken cancellationToken)
     {
-        var users = _userAuthService.Users
+        var users = _userManager.Users
             .Where(u => u.IsActive)
             .Select(u => u.Id)
             .ToList();

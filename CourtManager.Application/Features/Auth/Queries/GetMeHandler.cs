@@ -1,26 +1,26 @@
-
+﻿
 using AutoMapper;
 using CourtManager.Application.DTOs;
 using CourtManager.Application.Exceptions;
-using CourtManager.Application.Interfaces;
 using CourtManager.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace CourtManager.Application.Features.Auth.Queries
 {
     public class GetMeHandler : IRequestHandler<GetMeQueries, UserDto>
     {
-        private readonly IUserAuthService _userAuthService;
+        private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
-        public GetMeHandler(IUserAuthService userAuthService, IMapper mapper)
+        public GetMeHandler(UserManager<User> userManager, IMapper mapper)
         {
-            _userAuthService = userAuthService;
+            _userManager = userManager;
             _mapper = mapper;
         }
         public async Task<UserDto> Handle(GetMeQueries request, CancellationToken cancellationToken)
         {
-            var user = await _userAuthService.FindByIdAsync(request.UserId);
+            var user = await _userManager.FindByIdAsync(request.UserId.ToString());
             if (user == null || !user.IsActive)
             {
                 throw new NotFoundException("User not found or inactive.");

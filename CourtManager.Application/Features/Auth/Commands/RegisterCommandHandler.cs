@@ -1,7 +1,9 @@
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using CourtManager.Application.DTOs;
-using CourtManager.Application.Interfaces;
+using CourtManager.Application.Services;
 using CourtManager.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CourtManager.Application.Features.Auth.Commands;
 
@@ -10,14 +12,14 @@ namespace CourtManager.Application.Features.Auth.Commands;
 /// </summary>
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthResponseDto>
 {
-    private readonly IUserAuthService _userAuthService;
+    private readonly UserManager<User> _userManager;
     private readonly IJwtTokenService _jwtTokenService;
 
     public RegisterCommandHandler(
-        IUserAuthService userAuthService,
+        UserManager<User> userManager,
         IJwtTokenService jwtTokenService)
     {
-        _userAuthService = userAuthService;
+        _userManager = userManager;
         _jwtTokenService = jwtTokenService;
     }
 
@@ -27,7 +29,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
     public async Task<AuthResponseDto> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         // Check if user already exists
-        var existingUser = await _userAuthService.FindByEmailAsync(request.Email);
+        var existingUser = await _userManager.FindByEmailAsync(request.Email);
         if (existingUser != null)
         {
             return new AuthResponseDto
@@ -38,8 +40,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
         }
 
         // Check if phone number already exists
-        var phoneExists = _userAuthService.Users
-            .Any(u => u.PhoneNumber == request.PhoneNumber);
+        var phoneExists = await _userManager.Users.AnyAsync(u => u.PhoneNumber == request.PhoneNumber, cancellationToken);
         if (phoneExists)
         {
             return new AuthResponseDto
@@ -62,22 +63,22 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
         };
 
         // Save user to database
-        var (succeeded, errors) = await _userAuthService.CreateAsync(user, request.Password);
-
-        if (!succeeded)
+        var result = await _userManager.CreateAsync(user, request.Password);
+        
+        if (!result.Succeeded)
         {
             return new AuthResponseDto
             {
                 Success = false,
-                Message = "Failed to register user: " + string.Join(", ", errors)
+                Message = "Failed to register user: " + string.Join(", ", result.Errors.Select(e => e.Description))
             };
         }
 
         // Add default role "User"
-        await _userAuthService.AddToRoleAsync(user, "User");
+        await _userManager.AddToRoleAsync(user, "User");
 
         // Get user roles
-        var roles = await _userAuthService.GetRolesAsync(user);
+        var roles = await _userManager.GetRolesAsync(user);
 
         // Generate tokens
         var accessToken = _jwtTokenService.GenerateAccessToken(user, roles);
@@ -87,7 +88,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = refreshTokenExpiryTime;
 
-        await _userAuthService.UpdateAsync(user);
+        await _userManager.UpdateAsync(user);
 
         return new AuthResponseDto
         {

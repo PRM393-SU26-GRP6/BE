@@ -1,34 +1,35 @@
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using CourtManager.Application.DTOs;
-using CourtManager.Application.Interfaces;
+using CourtManager.Domain.Entities;
 
 namespace CourtManager.Application.Features.Auth.Commands;
 
 public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, AuthResponseDto>
 {
-    private readonly IUserAuthService _userAuthService;
+    private readonly UserManager<User> _userManager;
 
-    public ResetPasswordCommandHandler(IUserAuthService userAuthService)
+    public ResetPasswordCommandHandler(UserManager<User> userManager)
     {
-        _userAuthService = userAuthService;
+        _userManager = userManager;
     }
 
     public async Task<AuthResponseDto> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userAuthService.FindByEmailAsync(request.Email);
+        var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
         {
             return new AuthResponseDto { Success = false, Message = "Invalid email or token." };
         }
 
-        var (succeeded, errors) = await _userAuthService.ResetPasswordAsync(user, request.Token, request.NewPassword);
+        var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
 
-        if (!succeeded)
+        if (!result.Succeeded)
         {
-            return new AuthResponseDto
-            {
-                Success = false,
-                Message = "Failed to reset password: " + string.Join(", ", errors)
+            return new AuthResponseDto 
+            { 
+                Success = false, 
+                Message = "Failed to reset password: " + string.Join(", ", result.Errors.Select(e => e.Description)) 
             };
         }
 

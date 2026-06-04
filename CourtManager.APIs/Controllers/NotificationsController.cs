@@ -1,10 +1,10 @@
 using CourtManager.Application.DTOs;
 using CourtManager.Application.Features.Notifications;
 using CourtManager.Application.Features.Notifications.Commands;
-using CourtManager.APIs.Services.Realtime;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CourtManager.APIs.Controllers;
 
@@ -18,13 +18,11 @@ namespace CourtManager.APIs.Controllers;
 public class NotificationsController : BaseApiController
 {
     private readonly IMediator _mediator;
-    private readonly IRealtimeEventPublisher _realtimePublisher;
     private readonly ILogger<NotificationsController> _logger;
 
-    public NotificationsController(IMediator mediator, IRealtimeEventPublisher realtimePublisher, ILogger<NotificationsController> logger)
+    public NotificationsController(IMediator mediator, ILogger<NotificationsController> logger)
     {
         _mediator = mediator;
-        _realtimePublisher = realtimePublisher;
         _logger = logger;
     }
 
@@ -85,15 +83,8 @@ public class NotificationsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> MarkAsRead(Guid id, CancellationToken cancellationToken = default)
     {
-        var userId = CurrentUserId;
-        var readAt = DateTime.UtcNow;
         _logger.LogInformation("Marking notification {NotificationId} as read", id);
-        var result = await _mediator.Send(new MarkNotificationAsReadCommand(id, userId), cancellationToken);
-        var unreadCount = await _mediator.Send(new GetUnreadNotificationCountValueQuery(userId), cancellationToken);
-
-        await _realtimePublisher.PublishNotificationReadAsync(userId, id, readAt, unreadCount, cancellationToken);
-        await _realtimePublisher.PublishNotificationUnreadCountChangedAsync(userId, unreadCount, cancellationToken);
-
+        var result = await _mediator.Send(new MarkNotificationAsReadCommand(id, CurrentUserId), cancellationToken);
         return Ok(new { success = result });
     }
 
@@ -107,14 +98,8 @@ public class NotificationsController : BaseApiController
     public async Task<IActionResult> MarkAllAsRead(CancellationToken cancellationToken = default)
     {
         var userId = CurrentUserId;
-        var readAt = DateTime.UtcNow;
         _logger.LogInformation("Marking all notifications as read for user {UserId}", userId);
-        var result = await _mediator.Send(new MarkAllNotificationsAsReadCommand(userId), cancellationToken);
-        var unreadCount = await _mediator.Send(new GetUnreadNotificationCountValueQuery(userId), cancellationToken);
-
-        await _realtimePublisher.PublishNotificationReadAllAsync(userId, readAt, unreadCount, cancellationToken);
-        await _realtimePublisher.PublishNotificationUnreadCountChangedAsync(userId, unreadCount, cancellationToken);
-
+        var result = await _mediator.Send(new MarkAllNotificationsAsReadCommand(CurrentUserId), cancellationToken);
         return Ok(new { success = result });
     }
 

@@ -5,8 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace CourtManager.Infrastructure.Repositories;
 
 /// <summary>
-/// Repository for managing Domain Role and UserRole entities.
-/// Uses DomainRoles / DomainUserRoles DbSets (not Identity's AspNetRoles).
+/// Repository for managing Role entities.
 /// </summary>
 public class RoleRepository : Repository<Role>, IRoleRepository
 {
@@ -22,7 +21,7 @@ public class RoleRepository : Repository<Role>, IRoleRepository
     /// </summary>
     public async Task<Role?> GetByNameAsync(string name)
     {
-        return await _appContext.DomainRoles
+        return await _appContext.Roles
             .FirstOrDefaultAsync(r => r.Name == name);
     }
 
@@ -38,7 +37,7 @@ public class RoleRepository : Repository<Role>, IRoleRepository
             AssignedAt = DateTime.UtcNow
         };
 
-        _appContext.DomainUserRoles.Add(userRole);
+        _appContext.UserRoles.Add(userRole);
         await _appContext.SaveChangesAsync();
     }
 
@@ -47,12 +46,12 @@ public class RoleRepository : Repository<Role>, IRoleRepository
     /// </summary>
     public async Task RemoveRoleFromUserAsync(Guid userId, Guid roleId)
     {
-        var userRole = await _appContext.DomainUserRoles
+        var userRole = await _appContext.UserRoles
             .FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == roleId);
 
         if (userRole != null)
         {
-            _appContext.DomainUserRoles.Remove(userRole);
+            _appContext.UserRoles.Remove(userRole);
             await _appContext.SaveChangesAsync();
         }
     }

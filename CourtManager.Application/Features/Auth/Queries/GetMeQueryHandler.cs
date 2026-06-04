@@ -1,22 +1,24 @@
 using AutoMapper;
 using CourtManager.Application.DTOs;
 using CourtManager.Application.Interfaces;
+using CourtManager.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 
 namespace CourtManager.Application.Features.Auth.Queries;
 
 public class GetMeQueryHandler : IRequestHandler<GetMeQuery, UserDto>
 {
-    private readonly IUserAuthService _userAuthService;
+    private readonly UserManager<User> _userManager;
     private readonly IMapper _mapper;
     private readonly ICurrentUserService _currentUserService;
 
     public GetMeQueryHandler(
-        IUserAuthService userAuthService,
+        UserManager<User> userManager,
         IMapper mapper,
         ICurrentUserService currentUserService)
     {
-        _userAuthService = userAuthService;
+        _userManager = userManager;
         _mapper = mapper;
         _currentUserService = currentUserService;
     }
@@ -30,7 +32,7 @@ public class GetMeQueryHandler : IRequestHandler<GetMeQuery, UserDto>
             throw new UnauthorizedAccessException("Invalid token claims or user is not authenticated.");
         }
 
-        var user = await _userAuthService.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
 
         if (user == null || !user.IsActive)
         {

@@ -106,16 +106,26 @@ public class GetUnreadNotificationCountValueQueryHandler : IRequestHandler<GetUn
 public class MarkNotificationAsReadCommandHandler : IRequestHandler<MarkNotificationAsReadCommand, bool>
 {
     private readonly INotificationRepository _notificationRepository;
+    private readonly IRealtimeEventPublisher _realtimePublisher;
 
-    public MarkNotificationAsReadCommandHandler(INotificationRepository notificationRepository)
+    public MarkNotificationAsReadCommandHandler(
+        INotificationRepository notificationRepository,
+        IRealtimeEventPublisher realtimePublisher)
     {
         _notificationRepository = notificationRepository;
+        _realtimePublisher = realtimePublisher;
     }
 
     public async Task<bool> Handle(MarkNotificationAsReadCommand request, CancellationToken cancellationToken)
     {
+        var readAt = DateTime.UtcNow;
         await _notificationRepository.MarkAsReadAsync(request.NotificationId, request.UserId, cancellationToken);
         await _notificationRepository.SaveChangesAsync(cancellationToken);
+        var unreadCount = await _notificationRepository.GetUnreadCountAsync(request.UserId, cancellationToken);
+
+        await _realtimePublisher.PublishNotificationReadAsync(request.UserId, request.NotificationId, readAt, unreadCount, cancellationToken);
+        await _realtimePublisher.PublishNotificationUnreadCountChangedAsync(request.UserId, unreadCount, cancellationToken);
+
         return true;
     }
 }
@@ -123,16 +133,26 @@ public class MarkNotificationAsReadCommandHandler : IRequestHandler<MarkNotifica
 public class MarkAllNotificationsAsReadCommandHandler : IRequestHandler<MarkAllNotificationsAsReadCommand, bool>
 {
     private readonly INotificationRepository _notificationRepository;
+    private readonly IRealtimeEventPublisher _realtimePublisher;
 
-    public MarkAllNotificationsAsReadCommandHandler(INotificationRepository notificationRepository)
+    public MarkAllNotificationsAsReadCommandHandler(
+        INotificationRepository notificationRepository,
+        IRealtimeEventPublisher realtimePublisher)
     {
         _notificationRepository = notificationRepository;
+        _realtimePublisher = realtimePublisher;
     }
 
     public async Task<bool> Handle(MarkAllNotificationsAsReadCommand request, CancellationToken cancellationToken)
     {
+        var readAt = DateTime.UtcNow;
         await _notificationRepository.MarkAllAsReadAsync(request.UserId, cancellationToken);
         await _notificationRepository.SaveChangesAsync(cancellationToken);
+        var unreadCount = await _notificationRepository.GetUnreadCountAsync(request.UserId, cancellationToken);
+
+        await _realtimePublisher.PublishNotificationReadAllAsync(request.UserId, readAt, unreadCount, cancellationToken);
+        await _realtimePublisher.PublishNotificationUnreadCountChangedAsync(request.UserId, unreadCount, cancellationToken);
+
         return true;
     }
 }

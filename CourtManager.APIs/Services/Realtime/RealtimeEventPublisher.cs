@@ -1,5 +1,6 @@
 using CourtManager.APIs.Hubs;
 using CourtManager.Application.DTOs;
+using CourtManager.Application.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 
 namespace CourtManager.APIs.Services.Realtime;

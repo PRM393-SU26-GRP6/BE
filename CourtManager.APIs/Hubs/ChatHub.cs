@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using CourtManager.APIs.Services.Realtime;
 using CourtManager.Application.Features.Chats;
-using CourtManager.Application.Features.Notifications;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -12,13 +11,11 @@ namespace CourtManager.APIs.Hubs;
 public class ChatHub : Hub
 {
     private readonly IMediator _mediator;
-    private readonly IRealtimeEventPublisher _publisher;
     private readonly ILogger<ChatHub> _logger;
 
-    public ChatHub(IMediator mediator, IRealtimeEventPublisher publisher, ILogger<ChatHub> logger)
+    public ChatHub(IMediator mediator, ILogger<ChatHub> logger)
     {
         _mediator = mediator;
-        _publisher = publisher;
         _logger = logger;
     }
 
@@ -64,14 +61,7 @@ public class ChatHub : Hub
         try
         {
             var userId = GetCurrentUserId();
-            var message = await _mediator.Send(new SendMessageCommand(userId, roomId, messageText), Context.ConnectionAborted);
-            var room = await _mediator.Send(new GetChatRoomByIdQuery(userId, roomId), Context.ConnectionAborted);
-            var recipientId = room.CustomerId == userId ? room.HostId : room.CustomerId;
-            var unreadCount = await _mediator.Send(new GetUnreadNotificationCountValueQuery(recipientId), Context.ConnectionAborted);
-
-            await _publisher.PublishChatMessageCreatedAsync(message, Context.ConnectionAborted);
-            await _publisher.PublishChatRoomUpdatedAsync(room, Context.ConnectionAborted);
-            await _publisher.PublishNotificationUnreadCountChangedAsync(recipientId, unreadCount, Context.ConnectionAborted);
+            await _mediator.Send(new SendMessageCommand(userId, roomId, messageText), Context.ConnectionAborted);
         }
         catch (Exception ex)
         {
@@ -85,9 +75,7 @@ public class ChatHub : Hub
         try
         {
             var userId = GetCurrentUserId();
-            var readAt = DateTime.UtcNow;
-            var unreadCount = await _mediator.Send(new MarkRoomAsReadCommand(userId, roomId), Context.ConnectionAborted);
-            await _publisher.PublishChatMessagesReadAsync(roomId, userId, readAt, unreadCount, Context.ConnectionAborted);
+            await _mediator.Send(new MarkRoomAsReadCommand(userId, roomId), Context.ConnectionAborted);
         }
         catch (Exception ex)
         {

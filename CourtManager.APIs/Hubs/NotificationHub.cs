@@ -11,13 +11,11 @@ namespace CourtManager.APIs.Hubs;
 public class NotificationHub : Hub
 {
     private readonly IMediator _mediator;
-    private readonly IRealtimeEventPublisher _publisher;
     private readonly ILogger<NotificationHub> _logger;
 
-    public NotificationHub(IMediator mediator, IRealtimeEventPublisher publisher, ILogger<NotificationHub> logger)
+    public NotificationHub(IMediator mediator, ILogger<NotificationHub> logger)
     {
         _mediator = mediator;
-        _publisher = publisher;
         _logger = logger;
     }
 
@@ -48,12 +46,7 @@ public class NotificationHub : Hub
         try
         {
             var userId = GetCurrentUserId();
-            var readAt = DateTime.UtcNow;
             await _mediator.Send(new MarkNotificationAsReadCommand(notificationId, userId), Context.ConnectionAborted);
-            var unreadCount = await _mediator.Send(new GetUnreadNotificationCountValueQuery(userId), Context.ConnectionAborted);
-
-            await _publisher.PublishNotificationReadAsync(userId, notificationId, readAt, unreadCount, Context.ConnectionAborted);
-            await _publisher.PublishNotificationUnreadCountChangedAsync(userId, unreadCount, Context.ConnectionAborted);
         }
         catch (Exception ex)
         {
@@ -67,12 +60,7 @@ public class NotificationHub : Hub
         try
         {
             var userId = GetCurrentUserId();
-            var readAt = DateTime.UtcNow;
             await _mediator.Send(new MarkAllNotificationsAsReadCommand(userId), Context.ConnectionAborted);
-            var unreadCount = await _mediator.Send(new GetUnreadNotificationCountValueQuery(userId), Context.ConnectionAborted);
-
-            await _publisher.PublishNotificationReadAllAsync(userId, readAt, unreadCount, Context.ConnectionAborted);
-            await _publisher.PublishNotificationUnreadCountChangedAsync(userId, unreadCount, Context.ConnectionAborted);
         }
         catch (Exception ex)
         {

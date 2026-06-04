@@ -1,8 +1,6 @@
 using CourtManager.Application.DTOs;
 using CourtManager.Application.Features.Chats;
 using CourtManager.Application.Features.Chats.Commands;
-using CourtManager.Application.Features.Notifications;
-using CourtManager.APIs.Services.Realtime;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,13 +17,11 @@ namespace CourtManager.APIs.Controllers;
 public class ChatsController : BaseApiController
 {
     private readonly IMediator _mediator;
-    private readonly IRealtimeEventPublisher _realtimePublisher;
     private readonly ILogger<ChatsController> _logger;
 
-    public ChatsController(IMediator mediator, IRealtimeEventPublisher realtimePublisher, ILogger<ChatsController> logger)
+    public ChatsController(IMediator mediator, ILogger<ChatsController> logger)
     {
         _mediator = mediator;
-        _realtimePublisher = realtimePublisher;
         _logger = logger;
     }
 
@@ -125,13 +121,6 @@ public class ChatsController : BaseApiController
         var userId = CurrentUserId;
         _logger.LogInformation("Sending message to room {RoomId} from user {UserId}", roomId, userId);
         var result = await _mediator.Send(new SendMessageCommand(userId, roomId, message.MessageText), cancellationToken);
-        var room = await _mediator.Send(new GetChatRoomByIdQuery(userId, roomId), cancellationToken);
-        var recipientId = room.CustomerId == userId ? room.HostId : room.CustomerId;
-        var unreadCount = await _mediator.Send(new GetUnreadNotificationCountValueQuery(recipientId), cancellationToken);
-
-        await _realtimePublisher.PublishChatMessageCreatedAsync(result, cancellationToken);
-        await _realtimePublisher.PublishChatRoomUpdatedAsync(room, cancellationToken);
-        await _realtimePublisher.PublishNotificationUnreadCountChangedAsync(recipientId, unreadCount, cancellationToken);
 
         return CreatedAtAction(nameof(GetMessages), new { roomId }, result);
     }
@@ -188,9 +177,7 @@ public class ChatsController : BaseApiController
     public async Task<IActionResult> MarkRoomAsRead(Guid roomId, CancellationToken cancellationToken = default)
     {
         var userId = CurrentUserId;
-        var readAt = DateTime.UtcNow;
         var unreadCount = await _mediator.Send(new MarkRoomAsReadCommand(userId, roomId), cancellationToken);
-        await _realtimePublisher.PublishChatMessagesReadAsync(roomId, userId, readAt, unreadCount, cancellationToken);
         return Ok(new { unreadCount });
     }
 

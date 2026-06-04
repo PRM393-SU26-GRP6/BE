@@ -1,6 +1,6 @@
 using CourtManager.Application.DTOs;
 
-namespace CourtManager.APIs.Services.Realtime;
+namespace CourtManager.Application.Interfaces;
 
 public interface IRealtimeEventPublisher
 {

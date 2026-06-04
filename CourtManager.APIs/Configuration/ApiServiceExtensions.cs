@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using CourtManager.APIs.Services.Realtime;
+using CourtManager.Application.Interfaces;
 
 namespace CourtManager.APIs.Configuration;
 
@@ -23,7 +24,7 @@ public static class ApiServiceExtensions
         services.AddSignalR();
         
         services.AddHttpContextAccessor();
-        services.AddScoped<CourtManager.Application.Interfaces.ICurrentUserService, CourtManager.APIs.Services.CurrentUserService>();
+        services.AddScoped<ICurrentUserService, CourtManager.APIs.Services.CurrentUserService>();
         services.AddScoped<IRealtimeEventPublisher, RealtimeEventPublisher>();
 
         // SePay Configuration

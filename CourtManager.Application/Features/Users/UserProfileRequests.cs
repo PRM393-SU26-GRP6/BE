@@ -1,8 +1,8 @@
 using CourtManager.Application.DTOs;
 using CourtManager.Application.Exceptions;
+using CourtManager.Application.Interfaces;
 using CourtManager.Domain.Entities;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 
 namespace CourtManager.Application.Features.Users;
 
@@ -11,20 +11,20 @@ public record UpdateUserProfileCommand(Guid UserId, UpdateUserProfileDto Profile
 
 public class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery, UserDto>
 {
-    private readonly UserManager<User> _userManager;
+    private readonly IUserAuthService _userAuthService;
 
-    public GetUserProfileQueryHandler(UserManager<User> userManager)
+    public GetUserProfileQueryHandler(IUserAuthService userAuthService)
     {
-        _userManager = userManager;
+        _userAuthService = userAuthService;
     }
 
     public async Task<UserDto> Handle(GetUserProfileQuery request, CancellationToken cancellationToken)
     {
-        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+        var user = await _userAuthService.FindByIdAsync(request.UserId);
         if (user == null)
             throw new NotFoundException(nameof(User), request.UserId);
 
-        var roles = await _userManager.GetRolesAsync(user);
+        var roles = await _userAuthService.GetRolesAsync(user);
         return ToDto(user, roles);
     }
 
@@ -46,16 +46,16 @@ public class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery, U
 
 public class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfileCommand, UserDto>
 {
-    private readonly UserManager<User> _userManager;
+    private readonly IUserAuthService _userAuthService;
 
-    public UpdateUserProfileCommandHandler(UserManager<User> userManager)
+    public UpdateUserProfileCommandHandler(IUserAuthService userAuthService)
     {
-        _userManager = userManager;
+        _userAuthService = userAuthService;
     }
 
     public async Task<UserDto> Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+        var user = await _userAuthService.FindByIdAsync(request.UserId);
         if (user == null)
             throw new NotFoundException(nameof(User), request.UserId);
 
@@ -68,11 +68,11 @@ public class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfile
         user.AvatarUrl = request.Profile.AvatarUrl;
         user.UpdatedAt = DateTime.UtcNow;
 
-        var result = await _userManager.UpdateAsync(user);
-        if (!result.Succeeded)
-            throw new ValidationException(string.Join(", ", result.Errors.Select(e => e.Description)));
+        var (succeeded, errors) = await _userAuthService.UpdateAsync(user);
+        if (!succeeded)
+            throw new ValidationException(string.Join(", ", errors));
 
-        var roles = await _userManager.GetRolesAsync(user);
+        var roles = await _userAuthService.GetRolesAsync(user);
         return GetUserProfileQueryHandler.ToDto(user, roles);
     }
 }

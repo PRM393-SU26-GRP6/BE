@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using CourtManager.Domain.Entities;
 using CourtManager.Domain.Enums;
 using CourtManager.Infrastructure.Data;
+using CourtManager.Infrastructure.Identity;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -11,12 +12,18 @@ namespace CourtManager.Infrastructure;
 
 /// <summary>
 /// Application DbContext for Code First approach with Entity Framework Core.
-/// Configures entities, relationships, and database mappings using Fluent API.
+/// Identity tables use ApplicationUser/ApplicationRole (Infrastructure layer).
+/// Business entities use Domain POCOs (User, Role, UserRole, etc.).
 /// </summary>
-public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid, IdentityUserClaim<Guid>, ApplicationUserRole, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options) { }
+
+    // Domain entity DbSets
+    public DbSet<User> DomainUsers => Set<User>();
+    public DbSet<Role> DomainRoles => Set<Role>();
+    public DbSet<UserRole> DomainUserRoles => Set<UserRole>();
 
     // DbSets for entities
     public DbSet<Venue> Venues => Set<Venue>();
@@ -44,16 +51,25 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<User>().ToTable("Users");
-        modelBuilder.Entity<Role>().ToTable("Roles");
-        modelBuilder.Entity<UserRole>().ToTable("UserRoles");
+        // Identity tables (ApplicationUser / ApplicationRole / ApplicationUserRole)
+        modelBuilder.Entity<ApplicationUser>().ToTable("AspNetUsers");
+        modelBuilder.Entity<ApplicationRole>().ToTable("AspNetRoles");
+        modelBuilder.Entity<ApplicationUserRole>().ToTable("AspNetUserRoles");
         modelBuilder.Entity<IdentityUserClaim<Guid>>().ToTable("UserClaims");
         modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLogins");
         modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
         modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");
 
+        // Domain entity tables
+        modelBuilder.Entity<User>().ToTable("Users");
+        modelBuilder.Entity<Role>().ToTable("Roles");
+        modelBuilder.Entity<UserRole>().ToTable("UserRoles");
+
         // Apply all entity configurations
+        modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.ApplyConfiguration(new RoleConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
         modelBuilder.ApplyConfiguration(new FootballFieldConfiguration());
         modelBuilder.ApplyConfiguration(new VenueImageConfiguration());
         modelBuilder.ApplyConfiguration(new TimeSlotConfiguration());
@@ -64,8 +80,6 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
         modelBuilder.ApplyConfiguration(new MessageConfiguration());
         modelBuilder.ApplyConfiguration(new NotificationConfiguration());
         modelBuilder.ApplyConfiguration(new ReviewConfiguration());
-        modelBuilder.ApplyConfiguration(new RoleConfiguration());
-        modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
         modelBuilder.ApplyConfiguration(new DiscountConfiguration());
         modelBuilder.ApplyConfiguration(new UserDeviceConfiguration());
 
@@ -73,7 +87,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
         modelBuilder.Entity<VenueAmenity>().HasKey(va => new { va.VenueId, va.AmenityId });
         modelBuilder.Entity<NotificationRecipient>().HasKey(nr => nr.RecipientId);
 
-        // Seed initial data (optional)
+        // Seed initial data
         SeedData(modelBuilder);
     }
 
@@ -113,26 +127,52 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
             ["User"] = StableGuid("role:user")
         };
 
-        var sampleUserEntities = sampleUsers.Select(spec => new User
+        // --- Identity auth seed (ApplicationUser) ---
+        var identityUsers = sampleUsers.Select(spec => new ApplicationUser
         {
             Id = spec.Id,
-            FullName = spec.FullName,
-            Phone = spec.Phone,
             UserName = spec.Email,
             NormalizedUserName = spec.Email.ToUpperInvariant(),
             Email = spec.Email,
             NormalizedEmail = spec.Email.ToUpperInvariant(),
-            PhoneNumber = spec.Phone,
             EmailConfirmed = true,
+            PhoneNumber = spec.Phone,
             PhoneNumberConfirmed = true,
             PasswordHash = defaultPasswordHash,
-            CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, DateTimeKind.Utc),
-            IsActive = true,
-            LoyaltyPoints = spec.Role == "User" ? 120 : 0,
             SecurityStamp = spec.Id.ToString(),
             ConcurrencyStamp = spec.Id.ToString()
         }).ToArray();
 
+        // Identity roles (ApplicationRole) — same IDs as Domain roles
+        var identityRoles = new[]
+        {
+            new ApplicationRole { Id = roleIds["Admin"], Name = "Admin", NormalizedName = "ADMIN", ConcurrencyStamp = roleIds["Admin"].ToString() },
+            new ApplicationRole { Id = roleIds["Owner"], Name = "Owner", NormalizedName = "OWNER", ConcurrencyStamp = roleIds["Owner"].ToString() },
+            new ApplicationRole { Id = roleIds["User"],  Name = "User",  NormalizedName = "USER",  ConcurrencyStamp = roleIds["User"].ToString()  }
+        };
+
+        // Identity user-role assignments (ApplicationUserRole)
+        var identityUserRoles = sampleUsers.Select(spec => new ApplicationUserRole
+        {
+            UserId = spec.Id,
+            RoleId = roleIds[spec.Role]
+        }).ToArray();
+
+        // --- Domain business seed (User POCO) ---
+        var sampleUserEntities = sampleUsers.Select(spec => new User
+        {
+            Id = spec.Id,
+            UserName = spec.Email,
+            Email = spec.Email,
+            PhoneNumber = spec.Phone,
+            FullName = spec.FullName,
+            Phone = spec.Phone,
+            CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, DateTimeKind.Utc),
+            IsActive = true,
+            LoyaltyPoints = spec.Role == "User" ? 120 : 0
+        }).ToArray();
+
+        // Domain user-role assignments (UserRole POCO)
         var sampleUserRoles = sampleUsers.Select(spec => new UserRole
         {
             UserId = spec.Id,
@@ -345,6 +385,12 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
             new VenueAmenity { VenueId = venue.VenueId, AmenityId = amenities[(index + 6) % amenities.Length].AmenityId }
         }).ToArray();
 
+        // Seed Identity auth entities
+        modelBuilder.Entity<ApplicationUser>().HasData(identityUsers);
+        modelBuilder.Entity<ApplicationRole>().HasData(identityRoles);
+        modelBuilder.Entity<ApplicationUserRole>().HasData(identityUserRoles);
+
+        // Seed Domain business entities
         modelBuilder.Entity<User>().HasData(sampleUserEntities);
         modelBuilder.Entity<UserRole>().HasData(sampleUserRoles);
         modelBuilder.Entity<Amenity>().HasData(amenities);

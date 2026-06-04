@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CourtManager.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialDatabaseSchema : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,37 +30,24 @@ namespace CourtManager.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Roles",
+                name: "AspNetRoles",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Roles", x => x.Id);
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "AspNetUsers",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    FullName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    AvatarUrl = table.Column<string>(type: "text", nullable: true),
-                    LoyaltyPoints = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
-                    RefreshToken = table.Column<string>(type: "text", nullable: true),
-                    RefreshTokenExpiryTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -75,6 +62,46 @@ namespace CourtManager.Infrastructure.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
                     AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Roles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Roles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    FullName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    AvatarUrl = table.Column<string>(type: "text", nullable: true),
+                    LoyaltyPoints = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    RefreshToken = table.Column<string>(type: "text", nullable: true),
+                    RefreshTokenExpiryTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -95,9 +122,94 @@ namespace CourtManager.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_RoleClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RoleClaims_Roles_RoleId",
+                        name: "FK_RoleClaims_AspNetRoles_RoleId",
                         column: x => x.RoleId,
-                        principalTable: "Roles",
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserClaims_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserLogins",
+                columns: table => new
+                {
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    ProviderKey = table.Column<string>(type: "text", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.ForeignKey(
+                        name: "FK_UserLogins_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.ForeignKey(
+                        name: "FK_UserTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -157,27 +269,6 @@ namespace CourtManager.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserClaims",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClaimType = table.Column<string>(type: "text", nullable: true),
-                    ClaimValue = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserClaims", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserClaims_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserDevices",
                 columns: table => new
                 {
@@ -193,26 +284,6 @@ namespace CourtManager.Infrastructure.Migrations
                     table.PrimaryKey("PK_UserDevices", x => x.DeviceId);
                     table.ForeignKey(
                         name: "FK_UserDevices_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserLogins",
-                columns: table => new
-                {
-                    LoginProvider = table.Column<string>(type: "text", nullable: false),
-                    ProviderKey = table.Column<string>(type: "text", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserLogins", x => new { x.LoginProvider, x.ProviderKey });
-                    table.ForeignKey(
-                        name: "FK_UserLogins_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -238,26 +309,6 @@ namespace CourtManager.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserRoles_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserTokens",
-                columns: table => new
-                {
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    LoginProvider = table.Column<string>(type: "text", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Value = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
-                    table.ForeignKey(
-                        name: "FK_UserTokens_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -672,6 +723,35 @@ namespace CourtManager.Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"), "07371171-eec1-3255-b1b2-1d8e8e81ede7", "Owner", "OWNER" },
+                    { new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"), "76075424-3dac-6259-a0f7-00a4c6c20191", "User", "USER" },
+                    { new Guid("b5abbaf1-931c-5353-b9ab-1f38eb30b8b8"), "b5abbaf1-931c-5353-b9ab-1f38eb30b8b8", "Admin", "ADMIN" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[,]
+                {
+                    { new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"), 0, "28d446ef-917b-8b59-a814-da2a00b0b76f", "andang.football@gmail.com", true, false, null, "ANDANG.FOOTBALL@GMAIL.COM", "ANDANG.FOOTBALL@GMAIL.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311007", true, "28d446ef-917b-8b59-a814-da2a00b0b76f", false, "andang.football@gmail.com" },
+                    { new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"), 0, "2f958e63-14a1-ee5f-b359-e923bbd70ece", "hanh.le@saigonfields.vn", true, false, null, "HANH.LE@SAIGONFIELDS.VN", "HANH.LE@SAIGONFIELDS.VN", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311004", true, "2f958e63-14a1-ee5f-b359-e923bbd70ece", false, "hanh.le@saigonfields.vn" },
+                    { new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"), 0, "49f942ec-d197-7c5c-a011-6454ca64ec2c", "bao.hoang@cityarena.vn", true, false, null, "BAO.HOANG@CITYARENA.VN", "BAO.HOANG@CITYARENA.VN", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311006", true, "49f942ec-d197-7c5c-a011-6454ca64ec2c", false, "bao.hoang@cityarena.vn" },
+                    { new Guid("81d10681-e36e-595b-972a-f441c8237537"), 0, "81d10681-e36e-595b-972a-f441c8237537", "linhhuynh.club@gmail.com", true, false, null, "LINHHUYNH.CLUB@GMAIL.COM", "LINHHUYNH.CLUB@GMAIL.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311012", true, "81d10681-e36e-595b-972a-f441c8237537", false, "linhhuynh.club@gmail.com" },
+                    { new Guid("b41aae5d-9596-9a5d-b8e5-0f8b199a8135"), 0, "b41aae5d-9596-9a5d-b8e5-0f8b199a8135", "lan.nguyen@courtmanager.vn", true, false, null, "LAN.NGUYEN@COURTMANAGER.VN", "LAN.NGUYEN@COURTMANAGER.VN", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311001", true, "b41aae5d-9596-9a5d-b8e5-0f8b199a8135", false, "lan.nguyen@courtmanager.vn" },
+                    { new Guid("b53af497-39fc-6351-a424-0a0063d43116"), 0, "b53af497-39fc-6351-a424-0a0063d43116", "mypham.saigon@gmail.com", true, false, null, "MYPHAM.SAIGON@GMAIL.COM", "MYPHAM.SAIGON@GMAIL.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311008", true, "b53af497-39fc-6351-a424-0a0063d43116", false, "mypham.saigon@gmail.com" },
+                    { new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"), 0, "cbfe125b-7a8c-335c-aa61-df49f35c448f", "khoabui.runner@outlook.com", true, false, null, "KHOABUI.RUNNER@OUTLOOK.COM", "KHOABUI.RUNNER@OUTLOOK.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311009", true, "cbfe125b-7a8c-335c-aa61-df49f35c448f", false, "khoabui.runner@outlook.com" },
+                    { new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e"), 0, "de68f3de-ceab-c85f-b54a-645613f6a13e", "thaodo.booking@gmail.com", true, false, null, "THAODO.BOOKING@GMAIL.COM", "THAODO.BOOKING@GMAIL.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311010", true, "de68f3de-ceab-c85f-b54a-645613f6a13e", false, "thaodo.booking@gmail.com" },
+                    { new Guid("e3266388-5d3f-c459-beef-1edc2d465a3e"), 0, "e3266388-5d3f-c459-beef-1edc2d465a3e", "minh.tran@courtmanager.vn", true, false, null, "MINH.TRAN@COURTMANAGER.VN", "MINH.TRAN@COURTMANAGER.VN", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311002", true, "e3266388-5d3f-c459-beef-1edc2d465a3e", false, "minh.tran@courtmanager.vn" },
+                    { new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"), 0, "ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc", "duy.pham@sporthub.vn", true, false, null, "DUY.PHAM@SPORTHUB.VN", "DUY.PHAM@SPORTHUB.VN", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311003", true, "ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc", false, "duy.pham@sporthub.vn" },
+                    { new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"), 0, "eff1cca4-9f7a-0f53-a3e0-115f934fc55b", "tuanmai.sports@yahoo.com", true, false, null, "TUANMAI.SPORTS@YAHOO.COM", "TUANMAI.SPORTS@YAHOO.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311011", true, "eff1cca4-9f7a-0f53-a3e0-115f934fc55b", false, "tuanmai.sports@yahoo.com" },
+                    { new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"), 0, "ff182b52-5005-895d-a90a-224ef11c5e61", "quang.vo@greenpitch.vn", true, false, null, "QUANG.VO@GREENPITCH.VN", "QUANG.VO@GREENPITCH.VN", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311005", true, "ff182b52-5005-895d-a90a-224ef11c5e61", false, "quang.vo@greenpitch.vn" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Notifications",
                 columns: new[] { "NotificationId", "CreatedAt", "DeletedAt", "IsDeleted", "Message", "RefId", "SenderId", "Title", "Type", "UserId" },
                 values: new object[,]
@@ -692,66 +772,85 @@ namespace CourtManager.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "Roles",
-                columns: new[] { "Id", "ConcurrencyStamp", "CreatedAt", "Description", "Name", "NormalizedName" },
+                columns: new[] { "Id", "CreatedAt", "Description", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"), "07371171-eec1-3255-b1b2-1d8e8e81ede7", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Venue and field owner", "Owner", "OWNER" },
-                    { new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"), "76075424-3dac-6259-a0f7-00a4c6c20191", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Regular booking user", "User", "USER" },
-                    { new Guid("b5abbaf1-931c-5353-b9ab-1f38eb30b8b8"), "b5abbaf1-931c-5353-b9ab-1f38eb30b8b8", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Administrator with full access", "Admin", "ADMIN" }
+                    { new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Venue and field owner", "Owner", "OWNER" },
+                    { new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Regular booking user", "User", "USER" },
+                    { new Guid("b5abbaf1-931c-5353-b9ab-1f38eb30b8b8"), new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Administrator with full access", "Admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "AccessFailedCount", "AvatarUrl", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FullName", "IsActive", "IsDeleted", "LockoutEnabled", "LockoutEnd", "LoyaltyPoints", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "Phone", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "RefreshTokenExpiryTime", "SecurityStamp", "TwoFactorEnabled", "UpdatedAt", "UserName" },
-                values: new object[] { new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"), 0, null, "28d446ef-917b-8b59-a814-da2a00b0b76f", new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "andang.football@gmail.com", true, "An Dang", true, false, false, null, 120, "ANDANG.FOOTBALL@GMAIL.COM", "ANDANG.FOOTBALL@GMAIL.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311007", "0902311007", true, null, null, "28d446ef-917b-8b59-a814-da2a00b0b76f", false, null, "andang.football@gmail.com" });
+                columns: new[] { "Id", "AvatarUrl", "CreatedAt", "DeletedAt", "Email", "FullName", "IsActive", "IsDeleted", "LoyaltyPoints", "Phone", "PhoneNumber", "RefreshToken", "RefreshTokenExpiryTime", "UpdatedAt", "UserName" },
+                values: new object[] { new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"), null, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "andang.football@gmail.com", "An Dang", true, false, 120, "0902311007", "0902311007", null, null, null, "andang.football@gmail.com" });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "AccessFailedCount", "AvatarUrl", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FullName", "IsActive", "IsDeleted", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "Phone", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "RefreshTokenExpiryTime", "SecurityStamp", "TwoFactorEnabled", "UpdatedAt", "UserName" },
+                columns: new[] { "Id", "AvatarUrl", "CreatedAt", "DeletedAt", "Email", "FullName", "IsActive", "IsDeleted", "Phone", "PhoneNumber", "RefreshToken", "RefreshTokenExpiryTime", "UpdatedAt", "UserName" },
                 values: new object[,]
                 {
-                    { new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"), 0, null, "2f958e63-14a1-ee5f-b359-e923bbd70ece", new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "hanh.le@saigonfields.vn", true, "Hanh Le", true, false, false, null, "HANH.LE@SAIGONFIELDS.VN", "HANH.LE@SAIGONFIELDS.VN", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311004", "0902311004", true, null, null, "2f958e63-14a1-ee5f-b359-e923bbd70ece", false, null, "hanh.le@saigonfields.vn" },
-                    { new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"), 0, null, "49f942ec-d197-7c5c-a011-6454ca64ec2c", new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "bao.hoang@cityarena.vn", true, "Bao Hoang", true, false, false, null, "BAO.HOANG@CITYARENA.VN", "BAO.HOANG@CITYARENA.VN", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311006", "0902311006", true, null, null, "49f942ec-d197-7c5c-a011-6454ca64ec2c", false, null, "bao.hoang@cityarena.vn" }
+                    { new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"), null, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "hanh.le@saigonfields.vn", "Hanh Le", true, false, "0902311004", "0902311004", null, null, null, "hanh.le@saigonfields.vn" },
+                    { new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"), null, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "bao.hoang@cityarena.vn", "Bao Hoang", true, false, "0902311006", "0902311006", null, null, null, "bao.hoang@cityarena.vn" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "AccessFailedCount", "AvatarUrl", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FullName", "IsActive", "IsDeleted", "LockoutEnabled", "LockoutEnd", "LoyaltyPoints", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "Phone", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "RefreshTokenExpiryTime", "SecurityStamp", "TwoFactorEnabled", "UpdatedAt", "UserName" },
-                values: new object[] { new Guid("81d10681-e36e-595b-972a-f441c8237537"), 0, null, "81d10681-e36e-595b-972a-f441c8237537", new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "linhhuynh.club@gmail.com", true, "Linh Huynh", true, false, false, null, 120, "LINHHUYNH.CLUB@GMAIL.COM", "LINHHUYNH.CLUB@GMAIL.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311012", "0902311012", true, null, null, "81d10681-e36e-595b-972a-f441c8237537", false, null, "linhhuynh.club@gmail.com" });
+                columns: new[] { "Id", "AvatarUrl", "CreatedAt", "DeletedAt", "Email", "FullName", "IsActive", "IsDeleted", "LoyaltyPoints", "Phone", "PhoneNumber", "RefreshToken", "RefreshTokenExpiryTime", "UpdatedAt", "UserName" },
+                values: new object[] { new Guid("81d10681-e36e-595b-972a-f441c8237537"), null, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "linhhuynh.club@gmail.com", "Linh Huynh", true, false, 120, "0902311012", "0902311012", null, null, null, "linhhuynh.club@gmail.com" });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "AccessFailedCount", "AvatarUrl", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FullName", "IsActive", "IsDeleted", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "Phone", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "RefreshTokenExpiryTime", "SecurityStamp", "TwoFactorEnabled", "UpdatedAt", "UserName" },
-                values: new object[] { new Guid("b41aae5d-9596-9a5d-b8e5-0f8b199a8135"), 0, null, "b41aae5d-9596-9a5d-b8e5-0f8b199a8135", new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "lan.nguyen@courtmanager.vn", true, "Lan Nguyen", true, false, false, null, "LAN.NGUYEN@COURTMANAGER.VN", "LAN.NGUYEN@COURTMANAGER.VN", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311001", "0902311001", true, null, null, "b41aae5d-9596-9a5d-b8e5-0f8b199a8135", false, null, "lan.nguyen@courtmanager.vn" });
+                columns: new[] { "Id", "AvatarUrl", "CreatedAt", "DeletedAt", "Email", "FullName", "IsActive", "IsDeleted", "Phone", "PhoneNumber", "RefreshToken", "RefreshTokenExpiryTime", "UpdatedAt", "UserName" },
+                values: new object[] { new Guid("b41aae5d-9596-9a5d-b8e5-0f8b199a8135"), null, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "lan.nguyen@courtmanager.vn", "Lan Nguyen", true, false, "0902311001", "0902311001", null, null, null, "lan.nguyen@courtmanager.vn" });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "AccessFailedCount", "AvatarUrl", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FullName", "IsActive", "IsDeleted", "LockoutEnabled", "LockoutEnd", "LoyaltyPoints", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "Phone", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "RefreshTokenExpiryTime", "SecurityStamp", "TwoFactorEnabled", "UpdatedAt", "UserName" },
+                columns: new[] { "Id", "AvatarUrl", "CreatedAt", "DeletedAt", "Email", "FullName", "IsActive", "IsDeleted", "LoyaltyPoints", "Phone", "PhoneNumber", "RefreshToken", "RefreshTokenExpiryTime", "UpdatedAt", "UserName" },
                 values: new object[,]
                 {
-                    { new Guid("b53af497-39fc-6351-a424-0a0063d43116"), 0, null, "b53af497-39fc-6351-a424-0a0063d43116", new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "mypham.saigon@gmail.com", true, "My Pham", true, false, false, null, 120, "MYPHAM.SAIGON@GMAIL.COM", "MYPHAM.SAIGON@GMAIL.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311008", "0902311008", true, null, null, "b53af497-39fc-6351-a424-0a0063d43116", false, null, "mypham.saigon@gmail.com" },
-                    { new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"), 0, null, "cbfe125b-7a8c-335c-aa61-df49f35c448f", new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "khoabui.runner@outlook.com", true, "Khoa Bui", true, false, false, null, 120, "KHOABUI.RUNNER@OUTLOOK.COM", "KHOABUI.RUNNER@OUTLOOK.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311009", "0902311009", true, null, null, "cbfe125b-7a8c-335c-aa61-df49f35c448f", false, null, "khoabui.runner@outlook.com" },
-                    { new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e"), 0, null, "de68f3de-ceab-c85f-b54a-645613f6a13e", new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "thaodo.booking@gmail.com", true, "Thao Do", true, false, false, null, 120, "THAODO.BOOKING@GMAIL.COM", "THAODO.BOOKING@GMAIL.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311010", "0902311010", true, null, null, "de68f3de-ceab-c85f-b54a-645613f6a13e", false, null, "thaodo.booking@gmail.com" }
+                    { new Guid("b53af497-39fc-6351-a424-0a0063d43116"), null, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "mypham.saigon@gmail.com", "My Pham", true, false, 120, "0902311008", "0902311008", null, null, null, "mypham.saigon@gmail.com" },
+                    { new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"), null, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "khoabui.runner@outlook.com", "Khoa Bui", true, false, 120, "0902311009", "0902311009", null, null, null, "khoabui.runner@outlook.com" },
+                    { new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e"), null, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "thaodo.booking@gmail.com", "Thao Do", true, false, 120, "0902311010", "0902311010", null, null, null, "thaodo.booking@gmail.com" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "AccessFailedCount", "AvatarUrl", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FullName", "IsActive", "IsDeleted", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "Phone", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "RefreshTokenExpiryTime", "SecurityStamp", "TwoFactorEnabled", "UpdatedAt", "UserName" },
+                columns: new[] { "Id", "AvatarUrl", "CreatedAt", "DeletedAt", "Email", "FullName", "IsActive", "IsDeleted", "Phone", "PhoneNumber", "RefreshToken", "RefreshTokenExpiryTime", "UpdatedAt", "UserName" },
                 values: new object[,]
                 {
-                    { new Guid("e3266388-5d3f-c459-beef-1edc2d465a3e"), 0, null, "e3266388-5d3f-c459-beef-1edc2d465a3e", new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "minh.tran@courtmanager.vn", true, "Minh Tran", true, false, false, null, "MINH.TRAN@COURTMANAGER.VN", "MINH.TRAN@COURTMANAGER.VN", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311002", "0902311002", true, null, null, "e3266388-5d3f-c459-beef-1edc2d465a3e", false, null, "minh.tran@courtmanager.vn" },
-                    { new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"), 0, null, "ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc", new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "duy.pham@sporthub.vn", true, "Duy Pham", true, false, false, null, "DUY.PHAM@SPORTHUB.VN", "DUY.PHAM@SPORTHUB.VN", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311003", "0902311003", true, null, null, "ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc", false, null, "duy.pham@sporthub.vn" }
+                    { new Guid("e3266388-5d3f-c459-beef-1edc2d465a3e"), null, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "minh.tran@courtmanager.vn", "Minh Tran", true, false, "0902311002", "0902311002", null, null, null, "minh.tran@courtmanager.vn" },
+                    { new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"), null, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "duy.pham@sporthub.vn", "Duy Pham", true, false, "0902311003", "0902311003", null, null, null, "duy.pham@sporthub.vn" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "AccessFailedCount", "AvatarUrl", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FullName", "IsActive", "IsDeleted", "LockoutEnabled", "LockoutEnd", "LoyaltyPoints", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "Phone", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "RefreshTokenExpiryTime", "SecurityStamp", "TwoFactorEnabled", "UpdatedAt", "UserName" },
-                values: new object[] { new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"), 0, null, "eff1cca4-9f7a-0f53-a3e0-115f934fc55b", new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "tuanmai.sports@yahoo.com", true, "Tuan Mai", true, false, false, null, 120, "TUANMAI.SPORTS@YAHOO.COM", "TUANMAI.SPORTS@YAHOO.COM", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311011", "0902311011", true, null, null, "eff1cca4-9f7a-0f53-a3e0-115f934fc55b", false, null, "tuanmai.sports@yahoo.com" });
+                columns: new[] { "Id", "AvatarUrl", "CreatedAt", "DeletedAt", "Email", "FullName", "IsActive", "IsDeleted", "LoyaltyPoints", "Phone", "PhoneNumber", "RefreshToken", "RefreshTokenExpiryTime", "UpdatedAt", "UserName" },
+                values: new object[] { new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"), null, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "tuanmai.sports@yahoo.com", "Tuan Mai", true, false, 120, "0902311011", "0902311011", null, null, null, "tuanmai.sports@yahoo.com" });
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "AccessFailedCount", "AvatarUrl", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FullName", "IsActive", "IsDeleted", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "Phone", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "RefreshTokenExpiryTime", "SecurityStamp", "TwoFactorEnabled", "UpdatedAt", "UserName" },
-                values: new object[] { new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"), 0, null, "ff182b52-5005-895d-a90a-224ef11c5e61", new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "quang.vo@greenpitch.vn", true, "Quang Vo", true, false, false, null, "QUANG.VO@GREENPITCH.VN", "QUANG.VO@GREENPITCH.VN", "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==", "0902311005", "0902311005", true, null, null, "ff182b52-5005-895d-a90a-224ef11c5e61", false, null, "quang.vo@greenpitch.vn" });
+                columns: new[] { "Id", "AvatarUrl", "CreatedAt", "DeletedAt", "Email", "FullName", "IsActive", "IsDeleted", "Phone", "PhoneNumber", "RefreshToken", "RefreshTokenExpiryTime", "UpdatedAt", "UserName" },
+                values: new object[] { new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"), null, new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc), null, "quang.vo@greenpitch.vn", "Quang Vo", true, false, "0902311005", "0902311005", null, null, null, "quang.vo@greenpitch.vn" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[,]
+                {
+                    { new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"), new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f") },
+                    { new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"), new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece") },
+                    { new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"), new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c") },
+                    { new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"), new Guid("81d10681-e36e-595b-972a-f441c8237537") },
+                    { new Guid("b5abbaf1-931c-5353-b9ab-1f38eb30b8b8"), new Guid("b41aae5d-9596-9a5d-b8e5-0f8b199a8135") },
+                    { new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"), new Guid("b53af497-39fc-6351-a424-0a0063d43116") },
+                    { new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"), new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f") },
+                    { new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"), new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e") },
+                    { new Guid("b5abbaf1-931c-5353-b9ab-1f38eb30b8b8"), new Guid("e3266388-5d3f-c459-beef-1edc2d465a3e") },
+                    { new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"), new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc") },
+                    { new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"), new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b") },
+                    { new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"), new Guid("ff182b52-5005-895d-a90a-224ef11c5e61") }
+                });
 
             migrationBuilder.InsertData(
                 table: "Bookings",
@@ -1257,6 +1356,28 @@ namespace CourtManager.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_RoleId",
+                table: "AspNetUserRoles",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "EmailIndex",
+                table: "AspNetUsers",
+                column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "UserNameIndex",
+                table: "AspNetUsers",
+                column: "NormalizedUserName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BookingDiscounts_DiscountId",
                 table: "BookingDiscounts",
                 column: "DiscountId");
@@ -1383,12 +1504,6 @@ namespace CourtManager.Infrastructure.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "RoleNameIndex",
-                table: "Roles",
-                column: "NormalizedName",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_TimeSlots_FieldId_StartTime",
                 table: "TimeSlots",
                 columns: new[] { "FieldId", "StartTime" });
@@ -1425,14 +1540,9 @@ namespace CourtManager.Infrastructure.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "EmailIndex",
+                name: "IX_Users_Email",
                 table: "Users",
-                column: "NormalizedEmail");
-
-            migrationBuilder.CreateIndex(
-                name: "UserNameIndex",
-                table: "Users",
-                column: "NormalizedUserName",
+                column: "Email",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -1454,6 +1564,9 @@ namespace CourtManager.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AspNetUserRoles");
+
             migrationBuilder.DropTable(
                 name: "BookingDiscounts");
 
@@ -1512,7 +1625,13 @@ namespace CourtManager.Infrastructure.Migrations
                 name: "Bookings");
 
             migrationBuilder.DropTable(
+                name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
                 name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Amenities");

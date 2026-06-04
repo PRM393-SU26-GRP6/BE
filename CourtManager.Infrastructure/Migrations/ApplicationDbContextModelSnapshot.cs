@@ -2217,12 +2217,7 @@ namespace CourtManager.Infrastructure.Migrations
             modelBuilder.Entity("CourtManager.Domain.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -2235,6 +2230,7 @@ namespace CourtManager.Infrastructure.Migrations
                         .HasColumnType("character varying(500)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -2244,17 +2240,12 @@ namespace CourtManager.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
-
                     b.ToTable("Roles", (string)null);
 
                     b.HasData(
                         new
                         {
                             Id = new Guid("b5abbaf1-931c-5353-b9ab-1f38eb30b8b8"),
-                            ConcurrencyStamp = "b5abbaf1-931c-5353-b9ab-1f38eb30b8b8",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Administrator with full access",
                             Name = "Admin",
@@ -2263,7 +2254,6 @@ namespace CourtManager.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"),
-                            ConcurrencyStamp = "07371171-eec1-3255-b1b2-1d8e8e81ede7",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Venue and field owner",
                             Name = "Owner",
@@ -2272,7 +2262,6 @@ namespace CourtManager.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"),
-                            ConcurrencyStamp = "76075424-3dac-6259-a0f7-00a4c6c20191",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Regular booking user",
                             Name = "User",
@@ -2873,17 +2862,9 @@ namespace CourtManager.Infrastructure.Migrations
             modelBuilder.Entity("CourtManager.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer");
-
                     b.Property<string>("AvatarUrl")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
@@ -2895,11 +2876,9 @@ namespace CourtManager.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -2914,27 +2893,10 @@ namespace CourtManager.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int>("LoyaltyPoints")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(0);
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("text");
 
                     b.Property<string>("Phone")
                         .IsRequired()
@@ -2942,10 +2904,8 @@ namespace CourtManager.Infrastructure.Migrations
                         .HasColumnType("character varying(20)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("boolean");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("RefreshToken")
                         .HasColumnType("text");
@@ -2953,27 +2913,18 @@ namespace CourtManager.Infrastructure.Migrations
                     b.Property<DateTime?>("RefreshTokenExpiryTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("boolean");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Users", (string)null);
 
@@ -2981,277 +2932,157 @@ namespace CourtManager.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("b41aae5d-9596-9a5d-b8e5-0f8b199a8135"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "b41aae5d-9596-9a5d-b8e5-0f8b199a8135",
                             CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "lan.nguyen@courtmanager.vn",
-                            EmailConfirmed = true,
                             FullName = "Lan Nguyen",
                             IsActive = true,
                             IsDeleted = false,
-                            LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "LAN.NGUYEN@COURTMANAGER.VN",
-                            NormalizedUserName = "LAN.NGUYEN@COURTMANAGER.VN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0902311001",
                             PhoneNumber = "0902311001",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "b41aae5d-9596-9a5d-b8e5-0f8b199a8135",
-                            TwoFactorEnabled = false,
                             UserName = "lan.nguyen@courtmanager.vn"
                         },
                         new
                         {
                             Id = new Guid("e3266388-5d3f-c459-beef-1edc2d465a3e"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "e3266388-5d3f-c459-beef-1edc2d465a3e",
                             CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "minh.tran@courtmanager.vn",
-                            EmailConfirmed = true,
                             FullName = "Minh Tran",
                             IsActive = true,
                             IsDeleted = false,
-                            LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "MINH.TRAN@COURTMANAGER.VN",
-                            NormalizedUserName = "MINH.TRAN@COURTMANAGER.VN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0902311002",
                             PhoneNumber = "0902311002",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "e3266388-5d3f-c459-beef-1edc2d465a3e",
-                            TwoFactorEnabled = false,
                             UserName = "minh.tran@courtmanager.vn"
                         },
                         new
                         {
                             Id = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc",
                             CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "duy.pham@sporthub.vn",
-                            EmailConfirmed = true,
                             FullName = "Duy Pham",
                             IsActive = true,
                             IsDeleted = false,
-                            LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "DUY.PHAM@SPORTHUB.VN",
-                            NormalizedUserName = "DUY.PHAM@SPORTHUB.VN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0902311003",
                             PhoneNumber = "0902311003",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc",
-                            TwoFactorEnabled = false,
                             UserName = "duy.pham@sporthub.vn"
                         },
                         new
                         {
                             Id = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "2f958e63-14a1-ee5f-b359-e923bbd70ece",
                             CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "hanh.le@saigonfields.vn",
-                            EmailConfirmed = true,
                             FullName = "Hanh Le",
                             IsActive = true,
                             IsDeleted = false,
-                            LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "HANH.LE@SAIGONFIELDS.VN",
-                            NormalizedUserName = "HANH.LE@SAIGONFIELDS.VN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0902311004",
                             PhoneNumber = "0902311004",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "2f958e63-14a1-ee5f-b359-e923bbd70ece",
-                            TwoFactorEnabled = false,
                             UserName = "hanh.le@saigonfields.vn"
                         },
                         new
                         {
                             Id = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "ff182b52-5005-895d-a90a-224ef11c5e61",
                             CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "quang.vo@greenpitch.vn",
-                            EmailConfirmed = true,
                             FullName = "Quang Vo",
                             IsActive = true,
                             IsDeleted = false,
-                            LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "QUANG.VO@GREENPITCH.VN",
-                            NormalizedUserName = "QUANG.VO@GREENPITCH.VN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0902311005",
                             PhoneNumber = "0902311005",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "ff182b52-5005-895d-a90a-224ef11c5e61",
-                            TwoFactorEnabled = false,
                             UserName = "quang.vo@greenpitch.vn"
                         },
                         new
                         {
                             Id = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "49f942ec-d197-7c5c-a011-6454ca64ec2c",
                             CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "bao.hoang@cityarena.vn",
-                            EmailConfirmed = true,
                             FullName = "Bao Hoang",
                             IsActive = true,
                             IsDeleted = false,
-                            LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "BAO.HOANG@CITYARENA.VN",
-                            NormalizedUserName = "BAO.HOANG@CITYARENA.VN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0902311006",
                             PhoneNumber = "0902311006",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "49f942ec-d197-7c5c-a011-6454ca64ec2c",
-                            TwoFactorEnabled = false,
                             UserName = "bao.hoang@cityarena.vn"
                         },
                         new
                         {
                             Id = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "28d446ef-917b-8b59-a814-da2a00b0b76f",
                             CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "andang.football@gmail.com",
-                            EmailConfirmed = true,
                             FullName = "An Dang",
                             IsActive = true,
                             IsDeleted = false,
-                            LockoutEnabled = false,
                             LoyaltyPoints = 120,
-                            NormalizedEmail = "ANDANG.FOOTBALL@GMAIL.COM",
-                            NormalizedUserName = "ANDANG.FOOTBALL@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0902311007",
                             PhoneNumber = "0902311007",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "28d446ef-917b-8b59-a814-da2a00b0b76f",
-                            TwoFactorEnabled = false,
                             UserName = "andang.football@gmail.com"
                         },
                         new
                         {
                             Id = new Guid("b53af497-39fc-6351-a424-0a0063d43116"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "b53af497-39fc-6351-a424-0a0063d43116",
                             CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "mypham.saigon@gmail.com",
-                            EmailConfirmed = true,
                             FullName = "My Pham",
                             IsActive = true,
                             IsDeleted = false,
-                            LockoutEnabled = false,
                             LoyaltyPoints = 120,
-                            NormalizedEmail = "MYPHAM.SAIGON@GMAIL.COM",
-                            NormalizedUserName = "MYPHAM.SAIGON@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0902311008",
                             PhoneNumber = "0902311008",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "b53af497-39fc-6351-a424-0a0063d43116",
-                            TwoFactorEnabled = false,
                             UserName = "mypham.saigon@gmail.com"
                         },
                         new
                         {
                             Id = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "cbfe125b-7a8c-335c-aa61-df49f35c448f",
                             CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "khoabui.runner@outlook.com",
-                            EmailConfirmed = true,
                             FullName = "Khoa Bui",
                             IsActive = true,
                             IsDeleted = false,
-                            LockoutEnabled = false,
                             LoyaltyPoints = 120,
-                            NormalizedEmail = "KHOABUI.RUNNER@OUTLOOK.COM",
-                            NormalizedUserName = "KHOABUI.RUNNER@OUTLOOK.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0902311009",
                             PhoneNumber = "0902311009",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "cbfe125b-7a8c-335c-aa61-df49f35c448f",
-                            TwoFactorEnabled = false,
                             UserName = "khoabui.runner@outlook.com"
                         },
                         new
                         {
                             Id = new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "de68f3de-ceab-c85f-b54a-645613f6a13e",
                             CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "thaodo.booking@gmail.com",
-                            EmailConfirmed = true,
                             FullName = "Thao Do",
                             IsActive = true,
                             IsDeleted = false,
-                            LockoutEnabled = false,
                             LoyaltyPoints = 120,
-                            NormalizedEmail = "THAODO.BOOKING@GMAIL.COM",
-                            NormalizedUserName = "THAODO.BOOKING@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0902311010",
                             PhoneNumber = "0902311010",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "de68f3de-ceab-c85f-b54a-645613f6a13e",
-                            TwoFactorEnabled = false,
                             UserName = "thaodo.booking@gmail.com"
                         },
                         new
                         {
                             Id = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "eff1cca4-9f7a-0f53-a3e0-115f934fc55b",
                             CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "tuanmai.sports@yahoo.com",
-                            EmailConfirmed = true,
                             FullName = "Tuan Mai",
                             IsActive = true,
                             IsDeleted = false,
-                            LockoutEnabled = false,
                             LoyaltyPoints = 120,
-                            NormalizedEmail = "TUANMAI.SPORTS@YAHOO.COM",
-                            NormalizedUserName = "TUANMAI.SPORTS@YAHOO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0902311011",
                             PhoneNumber = "0902311011",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "eff1cca4-9f7a-0f53-a3e0-115f934fc55b",
-                            TwoFactorEnabled = false,
                             UserName = "tuanmai.sports@yahoo.com"
                         },
                         new
                         {
                             Id = new Guid("81d10681-e36e-595b-972a-f441c8237537"),
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "81d10681-e36e-595b-972a-f441c8237537",
                             CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "linhhuynh.club@gmail.com",
-                            EmailConfirmed = true,
                             FullName = "Linh Huynh",
                             IsActive = true,
                             IsDeleted = false,
-                            LockoutEnabled = false,
                             LoyaltyPoints = 120,
-                            NormalizedEmail = "LINHHUYNH.CLUB@GMAIL.COM",
-                            NormalizedUserName = "LINHHUYNH.CLUB@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
                             Phone = "0902311012",
                             PhoneNumber = "0902311012",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "81d10681-e36e-595b-972a-f441c8237537",
-                            TwoFactorEnabled = false,
                             UserName = "linhhuynh.club@gmail.com"
                         });
                 });
@@ -4047,6 +3878,404 @@ namespace CourtManager.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("CourtManager.Infrastructure.Identity.ApplicationRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b5abbaf1-931c-5353-b9ab-1f38eb30b8b8"),
+                            ConcurrencyStamp = "b5abbaf1-931c-5353-b9ab-1f38eb30b8b8",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"),
+                            ConcurrencyStamp = "07371171-eec1-3255-b1b2-1d8e8e81ede7",
+                            Name = "Owner",
+                            NormalizedName = "OWNER"
+                        },
+                        new
+                        {
+                            Id = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"),
+                            ConcurrencyStamp = "76075424-3dac-6259-a0f7-00a4c6c20191",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
+                });
+
+            modelBuilder.Entity("CourtManager.Infrastructure.Identity.ApplicationUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b41aae5d-9596-9a5d-b8e5-0f8b199a8135"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "b41aae5d-9596-9a5d-b8e5-0f8b199a8135",
+                            Email = "lan.nguyen@courtmanager.vn",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "LAN.NGUYEN@COURTMANAGER.VN",
+                            NormalizedUserName = "LAN.NGUYEN@COURTMANAGER.VN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            PhoneNumber = "0902311001",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "b41aae5d-9596-9a5d-b8e5-0f8b199a8135",
+                            TwoFactorEnabled = false,
+                            UserName = "lan.nguyen@courtmanager.vn"
+                        },
+                        new
+                        {
+                            Id = new Guid("e3266388-5d3f-c459-beef-1edc2d465a3e"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "e3266388-5d3f-c459-beef-1edc2d465a3e",
+                            Email = "minh.tran@courtmanager.vn",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "MINH.TRAN@COURTMANAGER.VN",
+                            NormalizedUserName = "MINH.TRAN@COURTMANAGER.VN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            PhoneNumber = "0902311002",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "e3266388-5d3f-c459-beef-1edc2d465a3e",
+                            TwoFactorEnabled = false,
+                            UserName = "minh.tran@courtmanager.vn"
+                        },
+                        new
+                        {
+                            Id = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc",
+                            Email = "duy.pham@sporthub.vn",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "DUY.PHAM@SPORTHUB.VN",
+                            NormalizedUserName = "DUY.PHAM@SPORTHUB.VN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            PhoneNumber = "0902311003",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc",
+                            TwoFactorEnabled = false,
+                            UserName = "duy.pham@sporthub.vn"
+                        },
+                        new
+                        {
+                            Id = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "2f958e63-14a1-ee5f-b359-e923bbd70ece",
+                            Email = "hanh.le@saigonfields.vn",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "HANH.LE@SAIGONFIELDS.VN",
+                            NormalizedUserName = "HANH.LE@SAIGONFIELDS.VN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            PhoneNumber = "0902311004",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "2f958e63-14a1-ee5f-b359-e923bbd70ece",
+                            TwoFactorEnabled = false,
+                            UserName = "hanh.le@saigonfields.vn"
+                        },
+                        new
+                        {
+                            Id = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "ff182b52-5005-895d-a90a-224ef11c5e61",
+                            Email = "quang.vo@greenpitch.vn",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "QUANG.VO@GREENPITCH.VN",
+                            NormalizedUserName = "QUANG.VO@GREENPITCH.VN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            PhoneNumber = "0902311005",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "ff182b52-5005-895d-a90a-224ef11c5e61",
+                            TwoFactorEnabled = false,
+                            UserName = "quang.vo@greenpitch.vn"
+                        },
+                        new
+                        {
+                            Id = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "49f942ec-d197-7c5c-a011-6454ca64ec2c",
+                            Email = "bao.hoang@cityarena.vn",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "BAO.HOANG@CITYARENA.VN",
+                            NormalizedUserName = "BAO.HOANG@CITYARENA.VN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            PhoneNumber = "0902311006",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "49f942ec-d197-7c5c-a011-6454ca64ec2c",
+                            TwoFactorEnabled = false,
+                            UserName = "bao.hoang@cityarena.vn"
+                        },
+                        new
+                        {
+                            Id = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "28d446ef-917b-8b59-a814-da2a00b0b76f",
+                            Email = "andang.football@gmail.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ANDANG.FOOTBALL@GMAIL.COM",
+                            NormalizedUserName = "ANDANG.FOOTBALL@GMAIL.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            PhoneNumber = "0902311007",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "28d446ef-917b-8b59-a814-da2a00b0b76f",
+                            TwoFactorEnabled = false,
+                            UserName = "andang.football@gmail.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("b53af497-39fc-6351-a424-0a0063d43116"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "b53af497-39fc-6351-a424-0a0063d43116",
+                            Email = "mypham.saigon@gmail.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "MYPHAM.SAIGON@GMAIL.COM",
+                            NormalizedUserName = "MYPHAM.SAIGON@GMAIL.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            PhoneNumber = "0902311008",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "b53af497-39fc-6351-a424-0a0063d43116",
+                            TwoFactorEnabled = false,
+                            UserName = "mypham.saigon@gmail.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "cbfe125b-7a8c-335c-aa61-df49f35c448f",
+                            Email = "khoabui.runner@outlook.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "KHOABUI.RUNNER@OUTLOOK.COM",
+                            NormalizedUserName = "KHOABUI.RUNNER@OUTLOOK.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            PhoneNumber = "0902311009",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "cbfe125b-7a8c-335c-aa61-df49f35c448f",
+                            TwoFactorEnabled = false,
+                            UserName = "khoabui.runner@outlook.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "de68f3de-ceab-c85f-b54a-645613f6a13e",
+                            Email = "thaodo.booking@gmail.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "THAODO.BOOKING@GMAIL.COM",
+                            NormalizedUserName = "THAODO.BOOKING@GMAIL.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            PhoneNumber = "0902311010",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "de68f3de-ceab-c85f-b54a-645613f6a13e",
+                            TwoFactorEnabled = false,
+                            UserName = "thaodo.booking@gmail.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "eff1cca4-9f7a-0f53-a3e0-115f934fc55b",
+                            Email = "tuanmai.sports@yahoo.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "TUANMAI.SPORTS@YAHOO.COM",
+                            NormalizedUserName = "TUANMAI.SPORTS@YAHOO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            PhoneNumber = "0902311011",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "eff1cca4-9f7a-0f53-a3e0-115f934fc55b",
+                            TwoFactorEnabled = false,
+                            UserName = "tuanmai.sports@yahoo.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("81d10681-e36e-595b-972a-f441c8237537"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "81d10681-e36e-595b-972a-f441c8237537",
+                            Email = "linhhuynh.club@gmail.com",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "LINHHUYNH.CLUB@GMAIL.COM",
+                            NormalizedUserName = "LINHHUYNH.CLUB@GMAIL.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            PhoneNumber = "0902311012",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "81d10681-e36e-595b-972a-f441c8237537",
+                            TwoFactorEnabled = false,
+                            UserName = "linhhuynh.club@gmail.com"
+                        });
+                });
+
+            modelBuilder.Entity("CourtManager.Infrastructure.Identity.ApplicationUserRole", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("b41aae5d-9596-9a5d-b8e5-0f8b199a8135"),
+                            RoleId = new Guid("b5abbaf1-931c-5353-b9ab-1f38eb30b8b8")
+                        },
+                        new
+                        {
+                            UserId = new Guid("e3266388-5d3f-c459-beef-1edc2d465a3e"),
+                            RoleId = new Guid("b5abbaf1-931c-5353-b9ab-1f38eb30b8b8")
+                        },
+                        new
+                        {
+                            UserId = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
+                            RoleId = new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7")
+                        },
+                        new
+                        {
+                            UserId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            RoleId = new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7")
+                        },
+                        new
+                        {
+                            UserId = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
+                            RoleId = new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7")
+                        },
+                        new
+                        {
+                            UserId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            RoleId = new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7")
+                        },
+                        new
+                        {
+                            UserId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"),
+                            RoleId = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191")
+                        },
+                        new
+                        {
+                            UserId = new Guid("b53af497-39fc-6351-a424-0a0063d43116"),
+                            RoleId = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191")
+                        },
+                        new
+                        {
+                            UserId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"),
+                            RoleId = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191")
+                        },
+                        new
+                        {
+                            UserId = new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e"),
+                            RoleId = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191")
+                        },
+                        new
+                        {
+                            UserId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"),
+                            RoleId = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191")
+                        },
+                        new
+                        {
+                            UserId = new Guid("81d10681-e36e-595b-972a-f441c8237537"),
+                            RoleId = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191")
+                        });
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
@@ -4408,9 +4637,24 @@ namespace CourtManager.Infrastructure.Migrations
                     b.Navigation("Venue");
                 });
 
+            modelBuilder.Entity("CourtManager.Infrastructure.Identity.ApplicationUserRole", b =>
+                {
+                    b.HasOne("CourtManager.Infrastructure.Identity.ApplicationRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CourtManager.Infrastructure.Identity.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("CourtManager.Domain.Entities.Role", null)
+                    b.HasOne("CourtManager.Infrastructure.Identity.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4419,7 +4663,7 @@ namespace CourtManager.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("CourtManager.Domain.Entities.User", null)
+                    b.HasOne("CourtManager.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4428,7 +4672,7 @@ namespace CourtManager.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("CourtManager.Domain.Entities.User", null)
+                    b.HasOne("CourtManager.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4437,7 +4681,7 @@ namespace CourtManager.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("CourtManager.Domain.Entities.User", null)
+                    b.HasOne("CourtManager.Infrastructure.Identity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

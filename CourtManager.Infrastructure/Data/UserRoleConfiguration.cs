@@ -1,6 +1,6 @@
+using CourtManager.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using CourtManager.Domain.Entities;
 
 namespace CourtManager.Infrastructure.Data;
 
@@ -11,6 +11,9 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
 {
     public void Configure(EntityTypeBuilder<UserRole> builder)
     {
+        // Composite PK — must be declared explicitly since UserRole no longer inherits IdentityUserRole
+        builder.HasKey(ur => new { ur.UserId, ur.RoleId });
+
         builder.HasOne(ur => ur.User)
             .WithMany(u => u.UserRoles)
             .HasForeignKey(ur => ur.UserId)

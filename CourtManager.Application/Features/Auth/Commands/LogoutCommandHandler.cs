@@ -1,18 +1,17 @@
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using CourtManager.Application.DTOs;
-using CourtManager.Domain.Entities;
+using CourtManager.Application.Interfaces;
 
 namespace CourtManager.Application.Features.Auth.Commands;
 
 public class LogoutCommandHandler : IRequestHandler<LogoutCommand, AuthResponseDto>
 {
-    private readonly UserManager<User> _userManager;
-    private readonly CourtManager.Application.Interfaces.ICurrentUserService _currentUserService;
+    private readonly IUserAuthService _userAuthService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public LogoutCommandHandler(UserManager<User> userManager, CourtManager.Application.Interfaces.ICurrentUserService currentUserService)
+    public LogoutCommandHandler(IUserAuthService userAuthService, ICurrentUserService currentUserService)
     {
-        _userManager = userManager;
+        _userAuthService = userAuthService;
         _currentUserService = currentUserService;
     }
 
@@ -24,7 +23,7 @@ public class LogoutCommandHandler : IRequestHandler<LogoutCommand, AuthResponseD
             return new AuthResponseDto { Success = false, Message = "Invalid user token" };
         }
 
-        var user = await _userManager.FindByIdAsync(userId.ToString());
+        var user = await _userAuthService.FindByIdAsync(userId);
         if (user == null)
         {
             return new AuthResponseDto
@@ -36,7 +35,7 @@ public class LogoutCommandHandler : IRequestHandler<LogoutCommand, AuthResponseD
 
         user.RefreshToken = null;
         user.RefreshTokenExpiryTime = null;
-        await _userManager.UpdateAsync(user);
+        await _userAuthService.UpdateAsync(user);
 
         return new AuthResponseDto
         {

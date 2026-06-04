@@ -2,7 +2,7 @@ using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using CourtManager.Application.DTOs;
-using CourtManager.Application.Services;
+using CourtManager.Application.Interfaces;
 using CourtManager.Domain.Entities;
 
 namespace CourtManager.Application.Features.Auth.Commands;

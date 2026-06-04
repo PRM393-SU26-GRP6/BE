@@ -59,6 +59,16 @@ public class ChatHub : Hub
         }
     }
 
+    public async Task StartTyping(Guid roomId)
+    {
+        await PublishTypingAsync(roomId, RealtimeConstants.Events.ChatTypingStarted);
+    }
+
+    public async Task StopTyping(Guid roomId)
+    {
+        await PublishTypingAsync(roomId, RealtimeConstants.Events.ChatTypingStopped);
+    }
+
     public async Task SendMessage(Guid roomId, string messageText)
     {
         try
@@ -110,5 +120,28 @@ public class ChatHub : Hub
     private Task SendChatErrorAsync(string message)
     {
         return Clients.Caller.SendAsync(RealtimeConstants.Events.ChatError, new { message }, Context.ConnectionAborted);
+    }
+
+    private async Task PublishTypingAsync(Guid roomId, string eventName)
+    {
+        try
+        {
+            var userId = GetCurrentUserId();
+            await _mediator.Send(new GetChatRoomByIdQuery(userId, roomId), Context.ConnectionAborted);
+
+            await Clients.OthersInGroup(RealtimeConstants.Groups.ChatRoom(roomId))
+                .SendAsync(eventName, new
+                {
+                    roomId,
+                    userId,
+                    connectionId = Context.ConnectionId,
+                    at = DateTime.UtcNow
+                }, Context.ConnectionAborted);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to publish typing event {EventName} for room {RoomId}", eventName, roomId);
+            await SendChatErrorAsync(ex.Message);
+        }
     }
 }

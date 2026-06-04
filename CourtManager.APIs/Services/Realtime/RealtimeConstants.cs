@@ -8,6 +8,8 @@ public static class RealtimeConstants
         public const string ChatMessageCreated = "chat.messageCreated";
         public const string ChatRoomUpdated = "chat.roomUpdated";
         public const string ChatMessagesRead = "chat.messagesRead";
+        public const string ChatTypingStarted = "chat.typingStarted";
+        public const string ChatTypingStopped = "chat.typingStopped";
         public const string ChatError = "chat.error";
 
         public const string NotificationCreated = "notification.created";

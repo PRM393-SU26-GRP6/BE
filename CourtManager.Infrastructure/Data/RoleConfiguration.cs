@@ -22,30 +22,30 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         builder.HasData(
             new Role
             {
-                Id = new Guid("10000000-0000-0000-0000-000000000001"),
+                Id = new Guid("b5abbaf1-931c-5353-b9ab-1f38eb30b8b8"),
                 Name = "Admin",
                 NormalizedName = "ADMIN",
                 Description = "Administrator with full access",
                 CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                ConcurrencyStamp = "10000000-0000-0000-0000-000000000001"
+                ConcurrencyStamp = "b5abbaf1-931c-5353-b9ab-1f38eb30b8b8"
             },
             new Role
             {
-                Id = new Guid("10000000-0000-0000-0000-000000000002"),
+                Id = new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"),
                 Name = "Owner",
                 NormalizedName = "OWNER",
-                Description = "Court owner",
+                Description = "Venue and field owner",
                 CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                ConcurrencyStamp = "10000000-0000-0000-0000-000000000002"
+                ConcurrencyStamp = "07371171-eec1-3255-b1b2-1d8e8e81ede7"
             },
             new Role
             {
-                Id = new Guid("10000000-0000-0000-0000-000000000003"),
+                Id = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"),
                 Name = "User",
                 NormalizedName = "USER",
-                Description = "Regular user",
+                Description = "Regular booking user",
                 CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                ConcurrencyStamp = "10000000-0000-0000-0000-000000000003"
+                ConcurrencyStamp = "76075424-3dac-6259-a0f7-00a4c6c20191"
             }
         );
     }

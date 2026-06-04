@@ -73,9 +73,27 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IVenueAmenityRepository, VenueAmenityRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IStorageService, CloudflareR2StorageService>();
+        services.AddScoped<IPasswordHasherService, PasswordHasherService>();
 
         // Register Background Services
         services.AddHostedService<SlotUnlockBackgroundService>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Adds JWT token service with configuration.
+    /// </summary>
+    public static IServiceCollection AddJwtTokenService(
+        this IServiceCollection services,
+        string secret,
+        string issuer,
+        string audience,
+        int accessTokenExpirationInMinutes = 60,
+        int refreshTokenExpirationInDays = 7)
+    {
+        services.AddScoped<IJwtTokenService>(_ =>
+            new JwtTokenService(secret, issuer, audience, accessTokenExpirationInMinutes, refreshTokenExpirationInDays));
 
         return services;
     }

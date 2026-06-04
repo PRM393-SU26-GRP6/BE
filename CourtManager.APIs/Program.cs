@@ -3,7 +3,6 @@ using CourtManager.Infrastructure;
 using CourtManager.APIs.Configuration;
 using CourtManager.APIs.Hubs;
 using CourtManager.APIs.Middleware;
-using CourtManager.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,8 +46,6 @@ builder.Logging.ClearProviders().AddConsole().AddDebug();
 
 var app = builder.Build();
 
-await app.SeedSampleDataAsync();
-
 // ============================================================================
 // MIDDLEWARE PIPELINE CONFIGURATION
 // ============================================================================
@@ -65,10 +62,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Court Manager API v1.0.0");
-        options.RoutePrefix = string.Empty; 
-        
+        options.RoutePrefix = string.Empty;
+
         // Inject Custom Cyberpunk Swagger Theme
-        options.InjectStylesheet("/swagger-cyberpunk.css"); 
+        options.InjectStylesheet("/swagger-cyberpunk.css");
     });
 }
 

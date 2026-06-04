@@ -4,9 +4,6 @@
 # Compiled outputs
 bin/
 obj/
-scripts/
-artifacts/
-docs/
 *.dll
 *.exe
 *.out

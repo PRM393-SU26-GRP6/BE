@@ -2,6 +2,7 @@ using CourtManager.Application;
 using CourtManager.Infrastructure;
 using CourtManager.APIs.Configuration;
 using CourtManager.APIs.Middleware;
+using CourtManager.APIs.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,10 +62,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Court Manager API v1.0.0");
-        options.RoutePrefix = string.Empty; 
-        
+        options.RoutePrefix = string.Empty;
+
         // Inject Custom Cyberpunk Swagger Theme
-        options.InjectStylesheet("/swagger-cyberpunk.css"); 
+        options.InjectStylesheet("/swagger-cyberpunk.css");
     });
 }
 
@@ -78,6 +79,8 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers().RequireRateLimiting("GlobalPolicy");
+app.MapHub<ChatHub>("/hubs/chat");
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 
 // ============================================================================

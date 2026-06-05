@@ -68,7 +68,7 @@ public class NotificationsController : BaseApiController
         var userId = CurrentUserId;
         _logger.LogInformation("Fetching unread notification count for user {UserId}", userId);
         var result = await _mediator.Send(new GetUnreadNotificationCountQuery(CurrentUserId), cancellationToken);
-        return Ok(result);
+        return Ok(new { unreadCount = result });
     }
 
     /// <summary>

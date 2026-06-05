@@ -206,7 +206,7 @@ public class ReviewsController : BaseApiController
         {
             return NotFound(new { success = false, message = ex.Message });
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedAccessException)
         {
             return Forbid();
         }

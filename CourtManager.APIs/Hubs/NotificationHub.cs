@@ -31,7 +31,7 @@ public class NotificationHub : Hub
         try
         {
             var userId = GetCurrentUserId();
-            var unreadCount = await _mediator.Send(new GetUnreadNotificationCountValueQuery(userId), Context.ConnectionAborted);
+            var unreadCount = await _mediator.Send(new GetUnreadNotificationCountQuery(userId), Context.ConnectionAborted);
             await Clients.Caller.SendAsync(RealtimeConstants.Events.NotificationUnreadCountChanged, new { unreadCount }, Context.ConnectionAborted);
         }
         catch (Exception ex)

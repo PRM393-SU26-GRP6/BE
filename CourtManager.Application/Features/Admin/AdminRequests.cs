@@ -3,7 +3,7 @@ using CourtManager.Application.DTOs;
 using CourtManager.Application.Exceptions;
 using CourtManager.Domain.Entities;
 using CourtManager.Domain.Enums;
-using CourtManager.Domain.Interfaces;
+using CourtManager.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 

@@ -1,36 +1,14 @@
+using CourtManager.Application.Interfaces;
+using CourtManager.Domain.Entities;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using CourtManager.Domain.Entities;
 
-namespace CourtManager.Application.Services;
+namespace CourtManager.Infrastructure.Services;
 
 /// <summary>
-/// Service for generating and validating JWT tokens.
+/// Generates and validates JWT tokens.
 /// </summary>
-public interface IJwtTokenService
-{
-    /// <summary>
-    /// Generates an access token for the specified user.
-    /// </summary>
-    string GenerateAccessToken(User user, IList<string> roles);
-
-    /// <summary>
-    /// Generates a JWT refresh token for the specified user.
-    /// </summary>
-    string GenerateRefreshTokenJwt(User user, IList<string> roles);
-
-    /// <summary>
-    /// Gets the expiry time for a refresh token based on configuration.
-    /// </summary>
-    DateTime GetRefreshTokenExpiryTime();
-
-    /// <summary>
-    /// Gets the principal from an expired access token.
-    /// </summary>
-    ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
-}
-
 public class JwtTokenService : IJwtTokenService
 {
     private readonly string _secret;
@@ -53,9 +31,6 @@ public class JwtTokenService : IJwtTokenService
         _refreshTokenExpirationInDays = refreshTokenExpirationInDays;
     }
 
-    /// <summary>
-    /// Generates a JWT access token for the specified user.
-    /// </summary>
     public string GenerateAccessToken(User user, IList<string> roles)
     {
         var securityKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_secret));
@@ -63,19 +38,15 @@ public class JwtTokenService : IJwtTokenService
 
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
-            new Claim(ClaimTypes.Name, user.FullName ?? string.Empty),
-            new Claim("PhoneNumber", user.PhoneNumber ?? string.Empty)
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Email, user.Email ?? string.Empty),
+            new(ClaimTypes.Name, user.FullName ?? string.Empty),
+            new("PhoneNumber", user.PhoneNumber ?? string.Empty)
         };
 
-        // Add roles as claims
-        if (roles != null)
+        foreach (var role in roles)
         {
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
         var token = new JwtSecurityToken(
@@ -83,15 +54,11 @@ public class JwtTokenService : IJwtTokenService
             audience: _audience,
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(_accessTokenExpirationInMinutes),
-            signingCredentials: credentials
-        );
+            signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    /// <summary>
-    /// Generates a JWT refresh token for the specified user.
-    /// </summary>
     public string GenerateRefreshTokenJwt(User user, IList<string> roles)
     {
         var securityKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_secret));
@@ -99,18 +66,15 @@ public class JwtTokenService : IJwtTokenService
 
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
-            new Claim(ClaimTypes.Name, user.FullName ?? string.Empty),
-            new Claim("token_type", "refresh")
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Email, user.Email ?? string.Empty),
+            new(ClaimTypes.Name, user.FullName ?? string.Empty),
+            new("token_type", "refresh")
         };
 
-        if (roles != null)
+        foreach (var role in roles)
         {
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
         var token = new JwtSecurityToken(
@@ -118,23 +82,16 @@ public class JwtTokenService : IJwtTokenService
             audience: _audience,
             claims: claims,
             expires: DateTime.UtcNow.AddDays(_refreshTokenExpirationInDays),
-            signingCredentials: credentials
-        );
+            signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    /// <summary>
-    /// Gets the expiry time for a refresh token.
-    /// </summary>
     public DateTime GetRefreshTokenExpiryTime()
     {
         return DateTime.UtcNow.AddDays(_refreshTokenExpirationInDays);
     }
 
-    /// <summary>
-    /// Extracts the principal from an expired access token for refresh token validation.
-    /// </summary>
     public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
     {
         try
@@ -145,7 +102,7 @@ public class JwtTokenService : IJwtTokenService
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
-                ValidateLifetime = false, // We want to read an expired token
+                ValidateLifetime = false,
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = _issuer,
                 ValidAudience = _audience,
@@ -154,9 +111,9 @@ public class JwtTokenService : IJwtTokenService
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
 
-            if (!(securityToken is JwtSecurityToken jwtSecurityToken) ||
+            if (securityToken is not JwtSecurityToken jwtSecurityToken ||
                 !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
             {
                 return null;

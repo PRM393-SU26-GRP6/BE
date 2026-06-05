@@ -1,6 +1,5 @@
 using CourtManager.Application.Interfaces;
 using CourtManager.Domain.Entities;
-using CourtManager.Domain.Interfaces;
 using MediatR;
 
 namespace CourtManager.Application.Features.Venues.Commands;

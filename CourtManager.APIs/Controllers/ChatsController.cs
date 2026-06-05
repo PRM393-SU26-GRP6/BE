@@ -4,7 +4,6 @@ using CourtManager.Application.Features.Chats.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace CourtManager.APIs.Controllers;
 
@@ -121,7 +120,8 @@ public class ChatsController : BaseApiController
     {
         var userId = CurrentUserId;
         _logger.LogInformation("Sending message to room {RoomId} from user {UserId}", roomId, userId);
-        var result = await _mediator.Send(new SendMessageCommand(CurrentUserId, roomId, message.MessageText), cancellationToken);
+        var result = await _mediator.Send(new SendMessageCommand(userId, roomId, message.MessageText), cancellationToken);
+
         return CreatedAtAction(nameof(GetMessages), new { roomId }, result);
     }
 
@@ -176,8 +176,9 @@ public class ChatsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> MarkRoomAsRead(Guid roomId, CancellationToken cancellationToken = default)
     {
-        await _mediator.Send(new GetMessagesQuery(CurrentUserId, roomId, 1, 1), cancellationToken);
-        return Ok(new { unreadCount = 0 });
+        var userId = CurrentUserId;
+        var unreadCount = await _mediator.Send(new MarkRoomAsReadCommand(userId, roomId), cancellationToken);
+        return Ok(new { unreadCount });
     }
 
 

@@ -3,16 +3,19 @@ using CourtManager.Application.DTOs;
 using CourtManager.Application.Exceptions;
 using CourtManager.Domain.Entities;
 using CourtManager.Domain.Enums;
-using CourtManager.Domain.Interfaces;
+using CourtManager.Application.Interfaces;
+using CourtManager.Application.Features.Notifications;
 using MediatR;
 
 namespace CourtManager.Application.Features.Chats;
 
 public record GetChatRoomsQuery(Guid UserId, int PageNumber, int PageSize) : IRequest<IEnumerable<ChatRoomDto>>;
+public record GetChatRoomByIdQuery(Guid UserId, Guid RoomId) : IRequest<ChatRoomDto>;
 public record GetOrCreateChatRoomQuery(Guid UserId, Guid OtherUserId) : IRequest<ChatRoomDto>;
 public record GetOrCreateVenueChatRoomQuery(Guid UserId, Guid VenueId) : IRequest<ChatRoomDto>;
 public record GetMessagesQuery(Guid UserId, Guid RoomId, int PageNumber, int PageSize) : IRequest<IEnumerable<MessageDto>>;
 public record SendMessageCommand(Guid UserId, Guid RoomId, string MessageText) : IRequest<MessageDto>;
+public record MarkRoomAsReadCommand(Guid UserId, Guid RoomId) : IRequest<int>;
 
 public class GetChatRoomsQueryHandler : IRequestHandler<GetChatRoomsQuery, IEnumerable<ChatRoomDto>>
 {
@@ -61,6 +64,35 @@ public class GetOrCreateChatRoomQueryHandler : IRequestHandler<GetOrCreateChatRo
         var room = await _chatRoomRepository.GetOrCreateChatRoomAsync(request.UserId, request.OtherUserId, cancellationToken);
         await _chatRoomRepository.SaveChangesAsync(cancellationToken);
         return _mapper.Map<ChatRoomDto>(room);
+    }
+}
+
+public class GetChatRoomByIdQueryHandler : IRequestHandler<GetChatRoomByIdQuery, ChatRoomDto>
+{
+    private readonly IChatRoomRepository _chatRoomRepository;
+    private readonly IMessageRepository _messageRepository;
+    private readonly IMapper _mapper;
+
+    public GetChatRoomByIdQueryHandler(IChatRoomRepository chatRoomRepository, IMessageRepository messageRepository, IMapper mapper)
+    {
+        _chatRoomRepository = chatRoomRepository;
+        _messageRepository = messageRepository;
+        _mapper = mapper;
+    }
+
+    public async Task<ChatRoomDto> Handle(GetChatRoomByIdQuery request, CancellationToken cancellationToken)
+    {
+        var room = await _chatRoomRepository.GetByIdAsync(request.RoomId, cancellationToken);
+        if (room == null)
+            throw new NotFoundException(nameof(ChatRoom), request.RoomId);
+        if (room.CustomerId != request.UserId && room.HostId != request.UserId)
+            throw new ValidationException("You are not a participant in this chat room.");
+
+        var dto = _mapper.Map<ChatRoomDto>(room);
+        var last = await _messageRepository.GetLastMessageAsync(room.RoomId, cancellationToken);
+        dto.LastMessagePreview = last?.MessageText;
+        dto.LastMessageTime = last?.SentAt ?? room.LastMessageAt;
+        return dto;
     }
 }
 
@@ -123,17 +155,20 @@ public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Mes
     private readonly IChatRoomRepository _chatRoomRepository;
     private readonly IMessageRepository _messageRepository;
     private readonly INotificationRepository _notificationRepository;
+    private readonly IRealtimeEventPublisher _realtimePublisher;
     private readonly IMapper _mapper;
 
     public SendMessageCommandHandler(
         IChatRoomRepository chatRoomRepository,
         IMessageRepository messageRepository,
         INotificationRepository notificationRepository,
+        IRealtimeEventPublisher realtimePublisher,
         IMapper mapper)
     {
         _chatRoomRepository = chatRoomRepository;
         _messageRepository = messageRepository;
         _notificationRepository = notificationRepository;
+        _realtimePublisher = realtimePublisher;
         _mapper = mapper;
     }
 
@@ -184,6 +219,51 @@ public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Mes
         await _messageRepository.SaveChangesAsync(cancellationToken);
 
         var loaded = await _messageRepository.GetByIdAsync(message.MessageId, cancellationToken) ?? message;
-        return _mapper.Map<MessageDto>(loaded);
+        var messageDto = _mapper.Map<MessageDto>(loaded);
+        var roomDto = _mapper.Map<ChatRoomDto>(room);
+        roomDto.LastMessagePreview = message.MessageText;
+        roomDto.LastMessageTime = message.SentAt;
+
+        var notificationDto = GetNotificationsQueryHandler.ToDto(notification, recipientId);
+        var unreadCount = await _notificationRepository.GetUnreadCountAsync(recipientId, cancellationToken);
+
+        await _realtimePublisher.PublishChatMessageCreatedAsync(messageDto, cancellationToken);
+        await _realtimePublisher.PublishChatRoomUpdatedAsync(roomDto, cancellationToken);
+        await _realtimePublisher.PublishNotificationCreatedAsync(recipientId, notificationDto, cancellationToken);
+        await _realtimePublisher.PublishNotificationUnreadCountChangedAsync(recipientId, unreadCount, cancellationToken);
+
+        return messageDto;
+    }
+}
+
+public class MarkRoomAsReadCommandHandler : IRequestHandler<MarkRoomAsReadCommand, int>
+{
+    private readonly IChatRoomRepository _chatRoomRepository;
+    private readonly IMessageRepository _messageRepository;
+    private readonly IRealtimeEventPublisher _realtimePublisher;
+
+    public MarkRoomAsReadCommandHandler(
+        IChatRoomRepository chatRoomRepository,
+        IMessageRepository messageRepository,
+        IRealtimeEventPublisher realtimePublisher)
+    {
+        _chatRoomRepository = chatRoomRepository;
+        _messageRepository = messageRepository;
+        _realtimePublisher = realtimePublisher;
+    }
+
+    public async Task<int> Handle(MarkRoomAsReadCommand request, CancellationToken cancellationToken)
+    {
+        var room = await _chatRoomRepository.GetByIdAsync(request.RoomId, cancellationToken);
+        if (room == null)
+            throw new NotFoundException(nameof(ChatRoom), request.RoomId);
+        if (room.CustomerId != request.UserId && room.HostId != request.UserId)
+            throw new ValidationException("You are not a participant in this chat room.");
+
+        await _messageRepository.MarkRoomMessagesAsReadAsync(request.RoomId, request.UserId, cancellationToken);
+        await _messageRepository.SaveChangesAsync(cancellationToken);
+        var unreadCount = await _messageRepository.GetUnreadCountForRoomAsync(request.RoomId, request.UserId, cancellationToken);
+        await _realtimePublisher.PublishChatMessagesReadAsync(request.RoomId, request.UserId, DateTime.UtcNow, unreadCount, cancellationToken);
+        return unreadCount;
     }
 }

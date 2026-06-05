@@ -1,6 +1,5 @@
 using CourtManager.Application.Exceptions;
 using CourtManager.Application.Interfaces;
-using CourtManager.Domain.Interfaces;
 using MediatR;
 
 namespace CourtManager.Application.Features.Venues.Commands;

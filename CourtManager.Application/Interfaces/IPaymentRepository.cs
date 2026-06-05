@@ -1,6 +1,6 @@
 using CourtManager.Domain.Entities;
 
-namespace CourtManager.Domain.Interfaces;
+namespace CourtManager.Application.Interfaces;
 
 /// <summary>
 /// Repository interface for Payment entity with specific queries.

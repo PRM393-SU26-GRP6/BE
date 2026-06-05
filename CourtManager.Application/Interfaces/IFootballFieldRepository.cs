@@ -1,6 +1,6 @@
 using CourtManager.Domain.Entities;
 
-namespace CourtManager.Domain.Interfaces;
+namespace CourtManager.Application.Interfaces;
 
 /// <summary>
 /// Repository interface for FootballField entity with specific queries.

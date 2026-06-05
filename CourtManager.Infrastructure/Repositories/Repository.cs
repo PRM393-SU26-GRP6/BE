@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using CourtManager.Domain.Interfaces;
+using CourtManager.Application.Interfaces;
 
 namespace CourtManager.Infrastructure.Repositories;
 

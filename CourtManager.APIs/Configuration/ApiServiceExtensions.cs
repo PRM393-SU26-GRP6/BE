@@ -4,6 +4,8 @@ using Microsoft.OpenApi;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
+using CourtManager.APIs.Services.Realtime;
+using CourtManager.Application.Interfaces;
 
 namespace CourtManager.APIs.Configuration;
 
@@ -19,9 +21,11 @@ public static class ApiServiceExtensions
         });
         services.AddEndpointsApiExplorer();
         services.AddHttpClient();
+        services.AddSignalR();
         
         services.AddHttpContextAccessor();
-        services.AddScoped<CourtManager.Application.Interfaces.ICurrentUserService, CourtManager.APIs.Services.CurrentUserService>();
+        services.AddScoped<ICurrentUserService, CourtManager.APIs.Services.CurrentUserService>();
+        services.AddScoped<IRealtimeEventPublisher, RealtimeEventPublisher>();
 
         // SePay Configuration
         services.Configure<SePaySettings>(configuration.GetSection("SePay"));
@@ -81,6 +85,18 @@ public static class ApiServiceExtensions
 
                 options.Events = new JwtBearerEvents
                 {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    },
                     OnAuthenticationFailed = context =>
                     {
                         if (context.Exception is SecurityTokenExpiredException)

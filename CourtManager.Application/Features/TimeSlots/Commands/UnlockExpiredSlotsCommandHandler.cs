@@ -1,4 +1,4 @@
-using CourtManager.Domain.Interfaces;
+using CourtManager.Application.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 

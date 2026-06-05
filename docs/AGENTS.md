@@ -11,7 +11,7 @@ Main capabilities:
 - SignalR chat hub for realtime room messaging at `/hubs/chat`.
 - SignalR notification hub at `/hubs/notifications`.
 - Cloudflare R2 compatible object storage through AWS S3 SDK.
-- Static internal API flow tester at `CourtManager.APIs/wwwroot/api-flow-tester.html`.
+
 
 ## Repo Layout
 
@@ -54,8 +54,6 @@ dotnet ef database update --project CourtManager.Infrastructure --startup-projec
 dotnet run --project CourtManager.APIs
 ```
 
-After the API is running, open the static tester at `/api-flow-tester.html`, for example `http://localhost:5234/api-flow-tester.html`.
-
 ## Coding Conventions
 
 - Keep layer direction strict:
@@ -86,7 +84,7 @@ Typical path:
 5. Add or update API endpoint in the relevant controller.
 6. Update AutoMapper profile when mapping entities to DTOs.
 7. Add EF migration if schema changes.
-8. Run build and the relevant smoke/e2e flow.
+
 
 ## Auth And Authorization
 
@@ -137,6 +135,6 @@ Prefer throwing the existing Application exceptions from handlers instead of bui
 ## Before Finishing Work
 
 - Run at least `dotnet build CourtManager.slnx` for code changes.
-- If API behavior changes, verify with Swagger and/or `wwwroot/api-flow-tester.html`.
+- If API behavior changes, verify with Swagger
 - Do not edit generated `bin/` or `obj/` files.
 - Do not commit secrets from `appsettings.json`.

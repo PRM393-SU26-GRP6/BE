@@ -19,7 +19,7 @@ CourtManager.Infrastructure
   -> CourtManager.Application
 
 CourtManager.Domain
-  -> no project references (Pure .NET BCL, zero framework dependencies)
+  -> Microsoft.AspNetCore.Identity.EntityFrameworkCore
 ```
 
 ## Runtime Startup
@@ -34,8 +34,14 @@ Startup flow:
 4. Register JWT token service.
 5. Register API services through `AddWebApiServices(configuration, jwtSettings)`.
 6. Build app.
-7. Seed sample data with `SeedSampleDataAsync()`.
-8. Add global exception middleware, static files, Swagger in development, routing, rate limiting, CORS, authentication, authorization, and controllers.
+7. Add global exception middleware, static files, Swagger in development, routing, rate limiting, CORS, authentication, authorization, controllers, and SignalR hubs.
+
+Current `Program.cs` maps:
+- REST controllers through `app.MapControllers().RequireRateLimiting("GlobalPolicy")`.
+- Chat hub through `app.MapHub<ChatHub>("/hubs/chat")`.
+- Notification hub through `app.MapHub<NotificationHub>("/hubs/notifications")`.
+
+Sample data is configured through EF Core model seeding in `ApplicationDbContext.SeedData(...)`; there is no current startup call to `SeedSampleDataAsync()`.
 
 ## Layer Responsibilities
 
@@ -48,9 +54,10 @@ Responsibilities:
 - Authentication/authorization attributes and role checks.
 - Current-user extraction for request context.
 - Swagger/OpenAPI, CORS, rate limiting.
-- SignalR hub endpoint for realtime chat.
+- SignalR hub endpoints for realtime chat and notifications.
 - Global exception response mapping.
 - Web-specific models for external callbacks such as SePay webhooks.
+- Static assets under `wwwroot`, including the internal API flow tester.
 
 Key files:
 - `Program.cs`
@@ -59,6 +66,9 @@ Key files:
 - `Middleware/GlobalExceptionHandlingMiddleware.cs`
 - `Services/CurrentUserService.cs`
 - `Hubs/ChatHub.cs`
+- `Hubs/NotificationHub.cs`
+- `Services/Realtime/RealtimeEventPublisher.cs`
+- `Services/Realtime/RealtimeConstants.cs`
 
 Controllers generally dispatch to MediatR and should stay thin.
 
@@ -73,7 +83,7 @@ Responsibilities:
 - AutoMapper profiles.
 - Application-specific exceptions.
 - Interfaces for external concerns needed by use cases, such as current user and storage.
-- Auth helper services such as JWT token creation and password hashing.
+- Interfaces for auth/realtime helpers such as `IJwtTokenService`, `IPasswordHasherService`, and `IRealtimeEventPublisher`.
 
 Key folders:
 - `Features/<Feature>/Commands`
@@ -82,24 +92,21 @@ Key folders:
 - `Exceptions`
 - `Interfaces`
 - `Mappings`
-- `Services`
 
 Main libraries:
 - MediatR
 - FluentValidation
 - AutoMapper
-- BCrypt.Net
-- System.IdentityModel.Tokens.Jwt
 
 ### Domain Layer
 
 Project: `CourtManager.Domain`
 
 Responsibilities:
-    - Core entities (Pure POCOs, completely decoupled from Entity Framework and ASP.NET Identity).
+- Core entities and enums.
+- Current `User`, `Role`, and `UserRole` entities inherit ASP.NET Core Identity base types.
 - Enums.
-- Repository interfaces (Note: Under strict Clean Architecture, these ports should eventually move to the Application layer).
-- Domain model shape independent of web and persistence details.
+- Domain model shape is independent of controllers/web transport, but not currently independent of ASP.NET Core Identity.
 
 Key folders:
 - `Entities`
@@ -124,17 +131,21 @@ Responsibilities:
 - Entity type configurations.
 - Migrations.
 - Repository implementations.
-- ASP.NET Core Identity EF stores using separate `ApplicationUser` and `ApplicationRole` entities that map to ASP.NET Identity tables (e.g., `AspNetUsers`), allowing Domain `User` and `Role` to remain pure business models.
+- ASP.NET Core Identity EF stores using `Domain.Entities.User`, `Role`, and `UserRole`.
+- JWT token service, password hasher service, and slot unlock background service.
 - Cloudflare R2 storage service via AWS S3 compatible client.
 
 Key files/folders:
 - `ApplicationDbContext.cs`
 - `InfrastructureServiceExtensions.cs`
 - `Data/*Configuration.cs`
-- `Data/SampleDataSeeder.cs`
 - `Migrations`
 - `Repositories`
 - `Services/CloudflareR2StorageService.cs`
+- `Services/JwtTokenService.cs`
+- `Services/PasswordHasherService.cs`
+- `Services/SlotUnlockBackgroundService.cs`
+- `ApplicationDbContext.SeedData(...)`
 
 Runtime database provider:
 - PostgreSQL through `Npgsql.EntityFrameworkCore.PostgreSQL`.
@@ -164,8 +175,6 @@ Application registrations:
 - MediatR handlers from the Application assembly.
 - FluentValidation validators from the Application assembly.
 - AutoMapper `MappingProfile`.
-- `IPasswordHasherService`.
-- JWT token service via `AddJwtTokenService(...)`.
 
 Infrastructure registrations:
 - `ApplicationDbContext` with PostgreSQL.
@@ -173,11 +182,16 @@ Infrastructure registrations:
 - AWS S3 compatible client for Cloudflare R2.
 - Repository interfaces to concrete repositories.
 - `IStorageService` to `CloudflareR2StorageService`.
+- `IPasswordHasherService` to `PasswordHasherService`.
+- `IJwtTokenService` through `AddJwtTokenService(...)`.
+- `SlotUnlockBackgroundService` as hosted service.
 
 API registrations:
 - Controllers with JSON enum strings and cycle ignoring.
 - Swagger with JWT bearer security and SePay API key security definition.
 - `ICurrentUserService` to `CurrentUserService`.
+- `IRealtimeEventPublisher` to `RealtimeEventPublisher`.
+- SignalR.
 - SePay settings binding.
 - CORS policy `AllowAll`.
 - Fixed-window rate limiters `GlobalPolicy` and `AuthPolicy`.
@@ -187,11 +201,11 @@ API registrations:
 `ApplicationDbContext` inherits:
 
 ```text
-IdentityDbContext<ApplicationUser, ApplicationRole, Guid, IdentityUserClaim<Guid>, ApplicationUserRole,
+IdentityDbContext<User, Role, Guid, IdentityUserClaim<Guid>, UserRole,
 IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
 ```
 
-This ensures a strict separation between Authentication concerns (`AspNetUsers`) and Business Domain concerns (`Users`).
+Identity-backed tables are mapped to project table names in `OnModelCreating`: `Users`, `Roles`, `UserRoles`, `UserClaims`, `UserLogins`, `RoleClaims`, and `UserTokens`.
 
 Domain DbSets include:
 - Venues, venue images, amenities, venue amenities.
@@ -204,7 +218,7 @@ Domain DbSets include:
 - User devices.
 
 Entity configuration is split into `CourtManager.Infrastructure/Data`.
-Some seed data is configured in `ApplicationDbContext.SeedData`, and broader sample data is seeded at startup by `SampleDataSeeder`.
+Seed data is configured in `ApplicationDbContext.SeedData`.
 
 ## Major Workflows
 
@@ -212,9 +226,7 @@ Some seed data is configured in `ApplicationDbContext.SeedData`, and broader sam
 
 - `AuthController` exposes register, login, refresh-token, and logout.
 - Login/register are rate-limited with `AuthPolicy`.
-- **Identity Decoupling:** Registration (`UserAuthService.CreateAsync`) writes to two places simultaneously:
-  1. `UserManager` creates an `ApplicationUser` in the `AspNetUsers` table to handle authentication concerns (passwords, tokens).
-  2. `ApplicationDbContext` creates a pure `User` POCO in the `Users` table using the identical `Guid` to handle business relationships.
+- Registration uses `UserManager<User>` to create a single `User` record in the mapped `Users` table, adds the default `User` role, generates access/refresh JWTs, and stores the refresh token on the user.
 - JWT bearer validation uses issuer, audience, signing key, and zero clock skew.
 - Current user id is expected in `ClaimTypes.NameIdentifier`.
 
@@ -233,25 +245,28 @@ Some seed data is configured in `ApplicationDbContext.SeedData`, and broader sam
 - SePay webhook validates `X-API-Key` before dispatching.
 - SePay QR endpoint returns bank info and QR URL data for a payment.
 
-### Realtime Chat
+### Realtime Chat And Notifications
 
 - REST chat endpoints remain the source of truth for room creation, room list, message history, and read state.
-- Message history supports cursor pagination at `GET /api/v1/chats/rooms/{roomId}/messages/cursor`.
 - SignalR hub route is `/hubs/chat`.
-- JWT Bearer reads `access_token` from the query string only for `/hubs/chat`.
+- Notification hub route is `/hubs/notifications`.
+- JWT Bearer reads `access_token` from the query string for paths starting with `/hubs`.
 - On connect, `ChatHub` adds the connection to `user:{userId}`.
-- `JoinRoom(roomId)` verifies room membership before adding the connection to `chatroom:{roomId}`.
-- `SendMessage` calls `SendMessageCommand`, waits for DB save, then emits `chat.messageCreated` and `chat.roomUpdated`.
-- `MarkRoomAsRead` calls `MarkRoomAsReadCommand`, then emits `chat.messageRead` and `chat.roomUpdated`.
+- `NotificationHub` also adds the connection to `user:{userId}`.
+- `JoinRoom(roomId)` verifies room membership by loading the room through `GetChatRoomByIdQuery` before adding the connection to `chat-room:{roomId}`.
+- `SendMessage` calls `SendMessageCommand`; application handlers persist the message and publish realtime events through `IRealtimeEventPublisher`.
+- `MarkRoomAsRead` calls `MarkRoomAsReadCommand` and publishes `chat.messagesRead`.
+- `NotificationHub` exposes `GetUnreadCount`, `MarkNotificationAsRead`, and `MarkAllNotificationsAsRead`.
+- Realtime event names are centralized in `RealtimeConstants`.
 
 Recommended Flutter flow:
 
 ```text
 Open chat screen
-  -> GET /messages/cursor?limit=20
+  -> GET /api/v1/chats/rooms/{roomId}/messages?pageNumber=1&pageSize=20
   -> JoinRoom(roomId)
   -> append new SignalR chat.messageCreated events
-  -> load older history with nextCursor.beforeMessageId when scrolling up
+  -> use pageNumber/pageSize for older history
 ```
 
 ### Venue Discovery And Owner Management
@@ -292,6 +307,7 @@ Most routes follow `api/v1/<resource>`.
 ## Known Gaps To Verify Before Larger Changes
 
 - No test project is currently present in the solution.
-- Node smoke scripts exist, but `scripts/` is ignored by `.gitignore`.
+- No `scripts/` smoke-test folder is currently present in the workspace; use Swagger or `wwwroot/api-flow-tester.html` for manual API flow checks.
 - Some auth-related controller methods are marked `[NonAction]`, so they are not exposed despite having implementation.
-- README seeded account details may differ from current EF seed data; verify against `ApplicationDbContext` and `SampleDataSeeder`.
+- README seeded account details may differ from current EF seed data; verify against `ApplicationDbContext.SeedData(...)`.
+- The docs may mention cursor-based chat history from an earlier design; the currently exposed controller uses page/pageSize history.

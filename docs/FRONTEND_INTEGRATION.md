@@ -97,6 +97,106 @@ API liên quan:
 - `GET /api/v1/Venues/search`
 - `GET /api/v1/Venues/map/nearby`
 
+Chi tiết triển khai frontend theo từng bước:
+
+1. Khởi tạo màn hình danh sách sân.
+   - Frontend tạo state ban đầu: `page = 1`, `pageSize = 10`, `q = ""`, `sort = ""`, `filters = {}`.
+   - Nếu người dùng chưa đăng nhập, vẫn cho vào màn hình này vì venue, field, slot và review public đều cho đọc không cần Bearer token.
+   - Hiển thị loading skeleton hoặc spinner cho khu vực danh sách venue.
+
+2. Gọi danh sách venue lần đầu.
+   - Gọi `GET /api/v1/Venues?Page=1&PageSize=10`.
+   - Đọc response theo wrapper: `data.items`, `data.page`, `data.pageSize`, `data.totalItems`, `data.totalPages`.
+   - Nếu `data.items` rỗng, hiển thị empty state như "Chưa có sân phù hợp".
+   - Nếu có dữ liệu, render mỗi venue thành card.
+
+3. Render card venue.
+   - Mỗi card dùng các field chính: `venueId`, `venueName`, `address`, `averageRating`, `totalReviews`, `minPrice`, `maxPrice`, `openingHours`, `phoneContact`.
+   - Nếu card cần ảnh đại diện nhưng list venue không có image, frontend hiển thị placeholder trước hoặc chỉ gọi image khi mở detail.
+   - Card cần lưu `venueId` để điều hướng sang detail.
+
+4. Phân trang hoặc infinite scroll.
+   - Khi user bấm trang tiếp theo hoặc scroll tới cuối, tăng `Page`.
+   - Gọi lại `GET /api/v1/Venues?Page=<nextPage>&PageSize=<pageSize>`.
+   - Với pagination thường: thay danh sách hiện tại bằng page mới.
+   - Với infinite scroll: append `data.items` vào danh sách hiện tại.
+   - Dừng gọi thêm khi `data.page >= data.totalPages`.
+
+5. Tìm kiếm nhanh theo từ khóa.
+   - Khi user nhập từ khóa, frontend debounce khoảng 300-500ms.
+   - Gọi `GET /api/v1/Venues/search?q=<keyword>&page=1&pageSize=10`.
+   - Reset page về 1 khi keyword thay đổi.
+   - Render lại danh sách từ `data.items`.
+   - Nếu keyword bị xóa rỗng, quay lại gọi `GET /api/v1/Venues?Page=1&PageSize=10`.
+
+6. Lọc nâng cao trên danh sách venue.
+   - Nếu UI có filter theo loại sân, tiện ích, rating, giá, sort, frontend gọi `GET /api/v1/Venues` với query tương ứng.
+   - Ví dụ: `GET /api/v1/Venues?Q=saigon&FieldType=FiveASide&MinRating=4&PriceMin=100000&PriceMax=300000&Page=1&PageSize=10`.
+   - Mỗi lần đổi filter nên reset `Page = 1`.
+   - Nên lưu filter vào URL query của frontend để reload trang không mất filter.
+
+7. Xem venue gần vị trí hiện tại.
+   - Khi user bấm tab/map view, frontend xin quyền lấy vị trí hoặc cho user chọn điểm trên map.
+   - Gọi `GET /api/v1/Venues/map/nearby?lat=<lat>&lng=<lng>&radius=<radiusKm>`.
+   - Response là wrapper có `data` dạng danh sách `VenueDto`.
+   - Render marker bằng `latitude`, `longitude`, label bằng `venueName`, phụ đề bằng `distance` nếu backend trả.
+   - Khi user bấm marker, mở preview card hoặc điều hướng tới detail venue.
+
+8. Mở chi tiết venue.
+   - Khi user bấm card/marker, frontend điều hướng tới `/venues/{venueId}`.
+   - Gọi song song các API public:
+     - `GET /api/v1/Venues/{id}`
+     - `GET /api/v1/Venues/{id}/fields`
+     - `GET /api/v1/Venues/{id}/amenities`
+     - `GET /api/v1/Venues/{id}/images`
+     - `GET /api/v1/reviews/venue/{id}?page=1&pageSize=10`
+   - Venue detail dùng `data` từ `GET /api/v1/Venues/{id}`.
+   - Fields, amenities, images đọc từ `data` của từng wrapper.
+   - Review section đọc từ `data.reviews`, `data.averageRating`, `data.totalCount`, `data.page`, `data.pageSize`.
+
+9. Render chi tiết venue.
+   - Header: `venueName`, `address`, `averageRating`, `totalReviews`.
+   - Body: `description`, `openingHours`, `phoneContact`, gallery images, amenities.
+   - Field list: render từng field với `id`, `fieldName`, `fieldType`, `pricePerHour`, `isActive`.
+   - Field inactive nên disable nút chọn slot hoặc hiển thị trạng thái không nhận đặt.
+
+10. Xem slot của field.
+    - Khi user chọn field và chọn ngày, gọi một trong hai endpoint:
+      - `GET /api/v1/fields/{fieldId}/slots?date=<YYYY-MM-DD>`
+      - hoặc `GET /api/v1/slots/available?fieldId=<fieldId>&date=<YYYY-MM-DD>`
+    - Response wrapper chứa danh sách `TimeSlotDto`.
+    - Render slot theo `slotStatus`: `Available` cho chọn, `Locked` hiển thị đang được giữ, `Booked` hiển thị đã đặt.
+    - Với khách chưa đăng nhập, vẫn cho xem slot nhưng khi bấm chọn slot thì chuyển sang login trước khi lock.
+
+11. Xem field detail riêng nếu cần.
+    - Nếu UI có màn hình field detail riêng, gọi `GET /api/v1/fields/{id}`.
+    - Dùng response `data` để render `fieldName`, `fieldType`, `pricePerHour`, `description`, `isActive`.
+    - Sau đó gọi slot endpoint theo ngày như bước 10.
+
+12. Xem review venue.
+    - Review có thể load cùng lúc với detail venue hoặc lazy-load khi user mở tab Review.
+    - Gọi `GET /api/v1/reviews/venue/{venueId}?page=1&pageSize=10`.
+    - Render `reviews`, `averageRating`, `totalCount`.
+    - Nếu hỗ trợ phân trang review, tăng `page` và gọi lại endpoint này.
+
+13. Điều hướng tiếp theo từ màn hình public.
+    - Bấm "Chọn sân/Đặt lịch": nếu đã chọn field và slot thì chuyển sang checkout; nếu chưa login thì chuyển sang login rồi quay lại màn hình slot.
+    - Bấm "Chat với chủ sân": nếu chưa login thì chuyển sang login; nếu đã login thì gọi flow chat `POST /api/v1/chats/rooms`.
+    - Bấm "Xem review": scroll tới section review hoặc mở tab review.
+
+14. Xử lý lỗi trên màn hình public.
+    - `404` ở `GET /api/v1/Venues/{id}`: hiển thị trang không tìm thấy venue.
+    - `400` ở nearby/search/filter: hiển thị lỗi filter hoặc vị trí không hợp lệ.
+    - Network/server error: giữ lại filter hiện tại, cho user bấm thử lại.
+    - Các API public không cần Bearer token; nếu frontend lỡ gửi token hết hạn và gặp 401, có thể retry request public không kèm token.
+
+15. Kết quả mong đợi sau flow.
+    - Guest xem được danh sách venue.
+    - Guest tìm kiếm/lọc/xem map được venue.
+    - Guest mở được venue detail, xem fields, amenities, images, reviews.
+    - Guest xem được slot theo ngày và biết slot nào có thể chọn.
+    - Khi cần lock slot, booking hoặc chat, frontend chuyển người dùng sang login vì các hành động đó cần Bearer token.
+
 ### 2. Khách tìm kiếm, lọc và xem venue gần vị trí hiện tại
 
 Mục tiêu: người dùng lọc venue theo từ khóa, loại sân, tiện ích, rating, giá hoặc vị trí.

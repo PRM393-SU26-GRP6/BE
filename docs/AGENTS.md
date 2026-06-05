@@ -1,8 +1,3 @@
-# Agent Guide
-
-This file is the quick-start context for future AI/code agents working in this repo.
-Read this before scanning the whole codebase.
-
 ## Project Snapshot
 
 CourtManager is an ASP.NET Core backend for football field booking management.
@@ -14,15 +9,17 @@ Main capabilities:
 - Owner/admin/customer flows.
 - SePay payment/webhook support.
 - SignalR chat hub for realtime room messaging at `/hubs/chat`.
+- SignalR notification hub at `/hubs/notifications`.
 - Cloudflare R2 compatible object storage through AWS S3 SDK.
+- Static internal API flow tester at `CourtManager.APIs/wwwroot/api-flow-tester.html`.
 
 ## Repo Layout
 
 - `CourtManager.slnx` - solution file.
 - `CourtManager.APIs/` - ASP.NET Core Web API entry point, controllers, middleware, web config.
-- `CourtManager.Application/` - DTOs, MediatR commands/queries/handlers, validators, mappings, application services.
-- `CourtManager.Domain/` - entities (pure POCOs, decoupled from Identity/EF Core), enums, repository interfaces.
-- `CourtManager.Infrastructure/` - EF Core DbContext, entity configurations, Identity models (`ApplicationUser`), migrations, repositories, storage service.
+- `CourtManager.Application/` - DTOs, MediatR commands/queries/handlers, validators, mappings, application exceptions, and interfaces/ports.
+- `CourtManager.Domain/` - entities, enums, and repository-facing model types. Current `User`, `Role`, and `UserRole` inherit ASP.NET Core Identity types.
+- `CourtManager.Infrastructure/` - EF Core DbContext, entity configurations, migrations, repositories, JWT/password services, storage service, and background services.
 - `README.md` - broad project overview and ERD. Treat it as useful but verify against source.
 
 Generated outputs such as `bin/` and `obj/` may exist locally. Ignore them for code review and edits.
@@ -34,14 +31,17 @@ Generated outputs such as `bin/` and `obj/` may exist locally. Ignore them for c
 - `CourtManager.APIs/appsettings.json` exists locally and contains credentials/secrets. Do not quote or leak those values in responses or docs. Prefer user secrets or environment variables for real deployments.
 - Swagger is served at the app root in development because `RoutePrefix = string.Empty`.
 - Launch profile URLs are `http://localhost:5234` and `https://localhost:7193`.
-- `Program.cs` calls `await app.SeedSampleDataAsync();` at startup.
+- Runtime seed data is configured through EF Core model seeding in `ApplicationDbContext.SeedData(...)`; there is no current startup call to `SeedSampleDataAsync()`.
+- Current seeded slots are dated `2026-01-07`; when testing booking flows after that date, create future slots first.
 
 ## Identity and Database Decoupling
-To strictly adhere to Clean Architecture, ASP.NET Core Identity has been completely decoupled from the `Domain` layer:
-- **Domain layer** contains only pure POCOs (`User`, `Role`, `UserRole`) representing business logic, with NO references to `Microsoft.AspNetCore.Identity` or Entity Framework Core.
-- **Infrastructure layer** introduces `ApplicationUser`, `ApplicationRole`, and `ApplicationUserRole` which inherit from Identity framework classes (e.g., `IdentityUser<Guid>`).
-- **Database mapping:** The system maintains a dual-table structure for users. Authentication concerns (passwords, claims, lockout) map to the `AspNetUsers` table via `ApplicationUser`. Business profile details (full name, avatar, bookings) map to the `Users` table via the `User` POCO.
-- **Synchronization:** During registration, `UserAuthService` creates records in both tables simultaneously using the same `Guid` to link the authentication model with the business domain model.
+Current source does not fully decouple ASP.NET Core Identity from the `Domain` layer:
+- `CourtManager.Domain.Entities.User` inherits `IdentityUser<Guid>`.
+- `CourtManager.Domain.Entities.Role` inherits `IdentityRole<Guid>`.
+- `CourtManager.Domain.Entities.UserRole` inherits `IdentityUserRole<Guid>`.
+- `ApplicationDbContext` inherits `IdentityDbContext<User, Role, Guid, IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>`.
+- Identity tables are renamed to project table names: `Users`, `Roles`, `UserRoles`, `UserClaims`, `UserLogins`, `RoleClaims`, and `UserTokens`.
+- There is no separate `ApplicationUser`/`AspNetUsers` dual-table synchronization model in the current codebase.
 
 ## Common Commands
 
@@ -54,13 +54,7 @@ dotnet ef database update --project CourtManager.Infrastructure --startup-projec
 dotnet run --project CourtManager.APIs
 ```
 
-Smoke test after the API is running:
-
-```powershell
-node scripts/smoke-test.js
-```
-
-The smoke script expects the API around `http://localhost:5234`.
+After the API is running, open the static tester at `/api-flow-tester.html`, for example `http://localhost:5234/api-flow-tester.html`.
 
 ## Coding Conventions
 
@@ -68,7 +62,7 @@ The smoke script expects the API around `http://localhost:5234`.
   - API references Application, Domain, Infrastructure.
   - Application references Domain.
   - Infrastructure references Domain and Application.
-  - Domain should stay independent.
+  - Domain currently has ASP.NET Core Identity references for `User`, `Role`, and `UserRole`; do not describe it as framework-free unless this is refactored.
 - Controllers should be thin. They usually:
   - define route/auth attributes,
   - get `CurrentUserId` when needed,
@@ -123,24 +117,26 @@ Prefer throwing the existing Application exceptions from handlers instead of bui
 
 ## Booking Notes
 
-- `CreateBookingCommandHandler` supports modern `SlotIds` booking and a backward-compatible field/start/end path.
+- `CreateBookingCommandHandler` creates bookings from `SlotIds`; frontend should not send `UserId`.
 - Slots are locked for 15 minutes when a booking is created.
 - All slots in a booking must belong to one venue.
 - Deposit is currently calculated as 50% of discounted total.
 
-## SignalR Chat Notes
+## SignalR Realtime Notes
 
-- SignalR is scoped to realtime chat only; REST remains the source of truth for rooms/history/read state.
-- Preferred history endpoint for Flutter: `GET /api/v1/chats/rooms/{roomId}/messages/cursor?limit=20`.
+- SignalR is used for chat and notifications; REST remains the source of truth for rooms/history/read state and notification lists.
 - Hub route: `/hubs/chat`.
+- Notification hub route: `/hubs/notifications`.
 - Flutter/clients should connect with `access_token` query token or equivalent SignalR access token factory.
-- Hub methods: `JoinRoom`, `LeaveRoom`, `SendMessage`, `Typing`, `MarkRoomAsRead`.
-- Events: `chat.messageCreated`, `chat.roomUpdated`, `chat.typing`, `chat.messageRead`, `chat.error`.
-- Test script: `scripts/chat-signalr-test.js` after installing `@microsoft/signalr`.
+- Chat hub methods: `JoinRoom`, `LeaveRoom`, `SendMessage`, `MarkRoomAsRead`.
+- Chat events: `chat.roomJoined`, `chat.messageCreated`, `chat.roomUpdated`, `chat.messagesRead`, `chat.error`.
+- Notification hub methods: `GetUnreadCount`, `MarkNotificationAsRead`, `MarkAllNotificationsAsRead`.
+- Notification events: `notification.created`, `notification.read`, `notification.readAll`, `notification.unreadCountChanged`, `notification.error`.
+- History endpoint currently exposed: `GET /api/v1/chats/rooms/{roomId}/messages?pageNumber=1&pageSize=20`.
 
 ## Before Finishing Work
 
 - Run at least `dotnet build CourtManager.slnx` for code changes.
-- If API behavior changes, run or update `scripts/smoke-test.js`.
+- If API behavior changes, verify with Swagger and/or `wwwroot/api-flow-tester.html`.
 - Do not edit generated `bin/` or `obj/` files.
 - Do not commit secrets from `appsettings.json`.

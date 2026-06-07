@@ -1,23 +1,22 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using CourtManager.Application.DTOs;
+using CourtManager.Application.Interfaces;
 using CourtManager.Domain.Entities;
-using CourtManager.Infrastructure;
 
 namespace CourtManager.Application.Features.Auth.Commands;
 
 public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, AuthResponseDto>
 {
     private readonly UserManager<User> _userManager;
-    private readonly ApplicationDbContext _dbContext;
+    private readonly IEmailVerificationTokenRepository _tokenRepository;
 
     public VerifyOtpCommandHandler(
         UserManager<User> userManager,
-        ApplicationDbContext dbContext)
+        IEmailVerificationTokenRepository tokenRepository)
     {
         _userManager = userManager;
-        _dbContext = dbContext;
+        _tokenRepository = tokenRepository;
     }
 
     public async Task<AuthResponseDto> Handle(VerifyOtpCommand request, CancellationToken cancellationToken)
@@ -32,14 +31,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, AuthRes
             };
         }
 
-        var token = await _dbContext.EmailVerificationTokens
-            .FirstOrDefaultAsync(t =>
-                t.Email == request.Email &&
-                t.Token == request.Otp &&
-                !t.IsUsed &&
-                t.ExpiresAt > DateTime.UtcNow,
-                cancellationToken);
-
+        var token = await _tokenRepository.GetValidTokenAsync(request.Email, request.Otp, cancellationToken);
         if (token == null)
         {
             return new AuthResponseDto
@@ -56,8 +48,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, AuthRes
         token.UsedAt = DateTime.UtcNow;
 
         await _userManager.UpdateAsync(user);
-        _dbContext.EmailVerificationTokens.Update(token);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _tokenRepository.UpdateAsync(token, cancellationToken);
 
         return new AuthResponseDto
         {

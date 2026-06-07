@@ -1,25 +1,23 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using CourtManager.Application.Interfaces;
 using CourtManager.Domain.Entities;
-using CourtManager.Infrastructure;
 
 namespace CourtManager.Application.Features.Auth.Commands;
 
 public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResponseDto>
 {
     private readonly UserManager<User> _userManager;
-    private readonly ApplicationDbContext _dbContext;
+    private readonly IEmailVerificationTokenRepository _tokenRepository;
     private readonly IEmailService _emailService;
 
     public SendOtpCommandHandler(
         UserManager<User> userManager,
-        ApplicationDbContext dbContext,
+        IEmailVerificationTokenRepository tokenRepository,
         IEmailService emailService)
     {
         _userManager = userManager;
-        _dbContext = dbContext;
+        _tokenRepository = tokenRepository;
         _emailService = emailService;
     }
 
@@ -49,8 +47,7 @@ public class SendOtpCommandHandler : IRequestHandler<SendOtpCommand, SendOtpResp
             IsUsed = false
         };
 
-        _dbContext.EmailVerificationTokens.Add(token);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _tokenRepository.AddAsync(token, cancellationToken);
 
         var emailSent = await _emailService.SendOtpAsync(request.Email, otp, cancellationToken);
         if (!emailSent)

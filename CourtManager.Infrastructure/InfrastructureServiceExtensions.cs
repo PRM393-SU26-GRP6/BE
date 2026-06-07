@@ -71,7 +71,6 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IAmenityRepository, AmenityRepository>();
         services.AddScoped<IVenueAmenityRepository, VenueAmenityRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
-        services.AddScoped<IEmailVerificationTokenRepository, EmailVerificationTokenRepository>();
         services.AddScoped<IStorageService, CloudflareR2StorageService>();
         services.AddScoped<IPasswordHasherService, PasswordHasherService>();
         services.AddScoped<IEmailService, EmailService>();

@@ -22,7 +22,7 @@ public static class ApiServiceExtensions
         services.AddEndpointsApiExplorer();
         services.AddHttpClient();
         services.AddSignalR();
-        
+
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CourtManager.APIs.Services.CurrentUserService>();
         services.AddScoped<IRealtimeEventPublisher, RealtimeEventPublisher>();
@@ -52,10 +52,10 @@ public static class ApiServiceExtensions
 
             options.AddSecurityDefinition("SePayApiKey", new OpenApiSecurityScheme
             {
-                Name = "X-API-Key",
+                Name = "Authorization",
                 Type = SecuritySchemeType.ApiKey,
                 In = ParameterLocation.Header,
-                Description = "SePay webhook API key"
+                Description = "For SePay webhook only. Header format: `Authorization: Apikey sepay_webhook_local_2026`"
             });
 
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement

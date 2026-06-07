@@ -22,6 +22,7 @@ public record ProcessSePayWebhookCommand(
     string? Gateway,
     string? AccountNumber,
     string? TransferType,
+    string? Code,
     string Content,
     decimal TransferAmount,
     string? ReferenceCode) : IRequest<PaymentGatewayCallbackResultDto>;
@@ -419,16 +420,16 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
             }
         }
 
-        var match = System.Text.RegularExpressions.Regex.Match(request.Content, @"CM([\w-]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        if (!match.Success)
+        var transactionCode = ResolveSePayTransactionCode(request);
+        if (string.IsNullOrWhiteSpace(transactionCode))
         {
-            return ProcessPaymentGatewayCallbackCommandHandler.AcceptedFailure("Noi dung chuyen khoan khong chua ma CM{TransactionCode}.");
+            return ProcessPaymentGatewayCallbackCommandHandler.AcceptedFailure("Khong tim thay ma thanh toan trong payload SePay.");
         }
 
-        var payment = await _paymentRepository.GetByTransactionIdAsync(match.Groups[1].Value, cancellationToken);
+        var payment = await _paymentRepository.GetByTransactionIdAsync(transactionCode, cancellationToken);
         if (payment == null)
         {
-            return ProcessPaymentGatewayCallbackCommandHandler.AcceptedFailure("Khong tim thay don hang tuong ung");
+            return ProcessPaymentGatewayCallbackCommandHandler.AcceptedFailure($"Khong tim thay don hang tuong ung voi ma thanh toan '{transactionCode}'.");
         }
 
         if (payment.PaymentStatus == PaymentStatus.Success)
@@ -482,5 +483,40 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
         await _paymentRepository.SaveChangesAsync(cancellationToken);
 
         return ProcessPaymentGatewayCallbackCommandHandler.Ok("Payment confirmed", payment.Id, payment.PaymentStatus.ToString());
+    }
+
+    private static string? ResolveSePayTransactionCode(ProcessSePayWebhookCommand request)
+    {
+        if (!string.IsNullOrWhiteSpace(request.Code))
+        {
+            return request.Code.Trim();
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Content))
+        {
+            return null;
+        }
+
+        var cmMatch = System.Text.RegularExpressions.Regex.Match(
+            request.Content,
+            @"\bCM(?<code>[\w-]+)\b",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        if (cmMatch.Success)
+        {
+            return cmMatch.Groups["code"].Value.Trim();
+        }
+
+        var tokenMatch = System.Text.RegularExpressions.Regex.Match(
+            request.Content,
+            @"\b(?<code>(?:DEP|FIN)-[A-Za-z0-9-]+)\b",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        if (tokenMatch.Success)
+        {
+            return tokenMatch.Groups["code"].Value.Trim();
+        }
+
+        return null;
     }
 }

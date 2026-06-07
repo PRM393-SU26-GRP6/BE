@@ -23,11 +23,17 @@ public class SePayWebhookDto
     [JsonPropertyName("subAccount")]
     public string? SubAccount { get; set; }
 
+    [JsonPropertyName("code")]
+    public string? Code { get; set; }
+
     [JsonPropertyName("transferType")]
     public string? TransferType { get; set; }
 
     [JsonPropertyName("transferAmount")]
     public decimal TransferAmount { get; set; }
+
+    [JsonPropertyName("accumulated")]
+    public decimal Accumulated { get; set; }
 
     [JsonPropertyName("accumulatedBalance")]
     public decimal AccumulatedBalance { get; set; }

@@ -448,8 +448,7 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
         payment.GatewayReferenceCode = request.ReferenceCode;
         payment.GatewayAccountNumber = request.AccountNumber;
         payment.GatewayRawContent = request.Content;
-        payment.GatewayDescription = request.Description;
-        payment.TransactionDate = request.TransactionDate;
+
 
         if (payment.Booking != null)
         {

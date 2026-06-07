@@ -130,7 +130,13 @@ public class TimeSlotsController : BaseApiController
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = "Failed to lock slot", errors = new[] { ex.Message } });
+            _logger.LogError(ex, "Unexpected error while locking slot {SlotId}: {Error}", id, ex.Message);
+            return BadRequest(new
+            {
+                success = false,
+                message = $"Lock failed: {ex.Message}",
+                errors = new[] { ex.GetType().Name }
+            });
         }
     }
 
@@ -165,7 +171,13 @@ public class TimeSlotsController : BaseApiController
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = "Failed to unlock slot", errors = new[] { ex.Message } });
+            _logger.LogError(ex, "Unexpected error while unlocking slot {SlotId}", id);
+            return BadRequest(new
+            {
+                success = false,
+                message = "An unexpected error occurred while unlocking the slot. Please try again.",
+                errors = Array.Empty<string>()
+            });
         }
     }
 
@@ -200,7 +212,13 @@ public class TimeSlotsController : BaseApiController
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = "Failed to create slot", errors = new[] { ex.Message } });
+            _logger.LogError(ex, "Unexpected error while creating slot for field {FieldId}", slot.FieldId);
+            return BadRequest(new
+            {
+                success = false,
+                message = "An unexpected error occurred while creating the slot. Please try again.",
+                errors = Array.Empty<string>()
+            });
         }
     }
 
@@ -241,7 +259,13 @@ public class TimeSlotsController : BaseApiController
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = "Failed to update slot", errors = new[] { ex.Message } });
+            _logger.LogError(ex, "Unexpected error while updating slot {SlotId}", id);
+            return BadRequest(new
+            {
+                success = false,
+                message = "An unexpected error occurred while updating the slot. Please try again.",
+                errors = Array.Empty<string>()
+            });
         }
     }
 

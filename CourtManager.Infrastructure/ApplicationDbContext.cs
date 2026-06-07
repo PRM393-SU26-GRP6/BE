@@ -81,8 +81,9 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
     /// </summary>
     private static void SeedData(ModelBuilder modelBuilder)
     {
-        var now = new DateTime(2026, 1, 5, 0, 0, 0, DateTimeKind.Utc);
-        var baseDate = new DateTime(2026, 1, 7, 0, 0, 0, DateTimeKind.Utc);
+        // Use future dates for testing: base date = 2 days from now
+        var now = new DateTime(2026, 6, 5, 0, 0, 0, DateTimeKind.Utc);
+        var baseDate = new DateTime(2026, 6, 9, 0, 0, 0, DateTimeKind.Utc);
 
         var roles = new[]
         {
@@ -207,7 +208,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
 
         var slots = new List<TimeSlot>();
         var slotIndex = 1;
-        foreach (var field in fields.Take(12))
+        foreach (var field in fields)
         {
             for (var hour = 18; hour < 22; hour++)
             {
@@ -221,7 +222,8 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
                     Price = field.PricePerHour,
                     SlotStatus = status,
                     LockedUntil = status == SlotStatus.Locked ? now.AddMinutes(20) : null,
-                    CreatedAt = now.AddDays(-14 + slotIndex % 5)
+                    CreatedAt = now.AddDays(-14 + slotIndex % 5),
+                    RowVersion = (uint)slotIndex
                 });
                 slotIndex++;
             }

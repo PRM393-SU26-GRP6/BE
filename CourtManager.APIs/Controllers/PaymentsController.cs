@@ -219,7 +219,8 @@ public class PaymentsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSePayQrInfo(Guid paymentId, CancellationToken cancellationToken)
     {
-        var payment = await _mediator.Send(new GetPaymentByIdPublicQuery(paymentId), cancellationToken);
+        var isOwnerOrAdmin = User.IsInRole("Admin") || User.IsInRole("Owner");
+        var payment = await _mediator.Send(new GetPaymentByIdPublicQuery(paymentId, CurrentUserId, isOwnerOrAdmin), cancellationToken);
 
         var qrResponse = new SePayQrResponseDto
         {
@@ -250,6 +251,9 @@ public class PaymentsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSePayCheckoutPayload(Guid paymentId, CancellationToken cancellationToken)
     {
+        var isOwnerOrAdmin = User.IsInRole("Admin") || User.IsInRole("Owner");
+        await _mediator.Send(new GetPaymentByIdPublicQuery(paymentId, CurrentUserId, isOwnerOrAdmin), cancellationToken);
+
         var command = new CourtManager.Application.Features.Payments.Commands.CreateSePayCheckoutCommand(
             paymentId,
             _sePaySettings.EffectiveMerchantId,

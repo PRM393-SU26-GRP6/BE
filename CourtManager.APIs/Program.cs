@@ -70,12 +70,13 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseRouting();
 
 // Enable Rate Limiter middleware
 app.UseRateLimiter();
 
-app.UseCors("AllowAll");
+app.UseCors(app.Environment.IsDevelopment() ? "AllowAll" : "AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers().RequireRateLimiting("GlobalPolicy");

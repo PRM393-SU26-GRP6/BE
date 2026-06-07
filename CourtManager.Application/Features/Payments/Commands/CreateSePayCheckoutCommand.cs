@@ -19,12 +19,12 @@ public class CreateSePayCheckoutCommand : IRequest<SePayCheckoutFormDto>
     public string CancelUrl { get; set; } = string.Empty;
 
     public CreateSePayCheckoutCommand(
-        Guid paymentId, 
-        string merchantId, 
-        string secretKey, 
-        string checkoutBaseUrl, 
-        string successUrl, 
-        string errorUrl, 
+        Guid paymentId,
+        string merchantId,
+        string secretKey,
+        string checkoutBaseUrl,
+        string successUrl,
+        string errorUrl,
         string cancelUrl)
     {
         PaymentId = paymentId;

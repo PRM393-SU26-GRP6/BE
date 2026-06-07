@@ -49,4 +49,22 @@ public interface ITimeSlotRepository : IRepository<TimeSlot>
         IEnumerable<Guid> slotIds,
         string status,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets a time slot by ID with Field and Venue eagerly loaded.
+    /// Used to avoid navigation null issues in booking logic.
+    /// </summary>
+    Task<TimeSlot?> GetByIdWithFieldVenueAsync(
+        Guid id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Atomically locks a slot if it is available.
+    /// Uses optimistic concurrency to prevent double-booking.
+    /// Returns true if lock acquired, false if slot already booked/locked.
+    /// </summary>
+    Task<bool> TryLockSlotAtomicAsync(
+        Guid slotId,
+        Guid userId,
+        CancellationToken cancellationToken = default);
 }

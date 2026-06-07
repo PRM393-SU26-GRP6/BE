@@ -50,31 +50,16 @@ public class BookingsController : BaseApiController
             "Creating booking for User: {UserId} with {SlotCount} slots",
             command.UserId, command.SlotIds.Length);
 
-        try
+        var result = await _mediator.Send(command, cancellationToken);
+        _logger.LogInformation("Booking created successfully with ID: {BookingId}", result.Id);
+
+        return CreatedAtAction(nameof(GetBookingById), new { id = result.Id }, new
         {
-            var result = await _mediator.Send(command, cancellationToken);
-            _logger.LogInformation("Booking created successfully with ID: {BookingId}", result.Id);
-            
-            return CreatedAtAction(nameof(GetBookingById), new { id = result.Id }, new
-            {
-                success = true,
-                message = "Booking created successfully",
-                data = result,
-                errors = Array.Empty<string>()
-            });
-        }
-        catch (CourtManager.Application.Exceptions.ValidationException ex)
-        {
-            return BadRequest(new { success = false, message = ex.Message });
-        }
-        catch (CourtManager.Application.Exceptions.NotFoundException ex)
-        {
-            return NotFound(new { success = false, message = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { success = false, message = "Failed to create booking", errors = new[] { ex.Message } });
-        }
+            success = true,
+            message = "Booking created successfully",
+            data = result,
+            errors = Array.Empty<string>()
+        });
     }
 
     /// <summary>
@@ -195,64 +180,6 @@ public class BookingsController : BaseApiController
         _logger.LogInformation("Booking {BookingId} cancelled successfully", id);
 
         return Ok(new { success = result, message = "Booking cancelled successfully" });
-    }
-
-    /// <summary>
-    /// Locks a time slot during payment process.
-    /// Changes slot status from "Available" to "Locked".
-    /// Prevents other bookings from using the slot while payment is processing.
-    /// </summary>
-    /// <param name="slotId">The time slot ID</param>
-    /// <param name="bookingId">The associated booking ID</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Success status</returns>
-    [HttpPut("slots/{slotId}/lock")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> LockTimeSlot(
-        Guid slotId,
-        [FromQuery] Guid bookingId,
-        CancellationToken cancellationToken = default)
-    {
-        _logger.LogInformation("Locking time slot {SlotId} for booking {BookingId}", slotId, bookingId);
-
-        var command = new LockTimeSlotCommand(slotId, bookingId, CurrentUserId);
-        var result = await _mediator.Send(command, cancellationToken);
-
-        _logger.LogInformation("Time slot {SlotId} locked successfully", slotId);
-
-        return Ok(new { success = result, message = "Time slot locked successfully" });
-    }
-
-    /// <summary>
-    /// Unlocks a time slot.
-    /// Changes slot status from "Locked" back to "Available".
-    /// Used when payment fails, times out, or is refunded.
-    /// </summary>
-    /// <param name="slotId">The time slot ID</param>
-    /// <param name="unlockReason">Reason for unlock (e.g., "PaymentFailed", "PaymentTimeout", "Refund")</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Success status</returns>
-    [HttpPut("slots/{slotId}/unlock")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> UnlockTimeSlot(
-        Guid slotId,
-        [FromQuery] string unlockReason = "ManualUnlock",
-        CancellationToken cancellationToken = default)
-    {
-        _logger.LogInformation("Unlocking time slot {SlotId} with reason: {Reason}", slotId, unlockReason);
-
-        var command = new UnlockTimeSlotCommand(slotId, unlockReason);
-        var result = await _mediator.Send(command, cancellationToken);
-
-        _logger.LogInformation("Time slot {SlotId} unlocked successfully", slotId);
-
-        return Ok(new { success = result, message = "Time slot unlocked successfully" });
     }
 
     /// <summary>

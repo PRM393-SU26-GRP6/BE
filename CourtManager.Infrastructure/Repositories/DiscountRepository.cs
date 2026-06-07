@@ -37,4 +37,19 @@ public class DiscountRepository : Repository<Discount>, IDiscountRepository
             .OrderByDescending(d => d.CreatedAt)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<bool> TryIncrementUsedCountAsync(Guid discountId, CancellationToken cancellationToken = default)
+    {
+        // Atomic increment with usage limit check
+        var rowsAffected = await _context.Database.ExecuteSqlInterpolatedAsync(
+            $@"
+                UPDATE ""Discounts""
+                SET ""UsedCount"" = ""UsedCount"" + 1
+                WHERE ""DiscountId"" = {discountId}
+                  AND (""UsageLimit"" = 0 OR ""UsedCount"" < ""UsageLimit"")
+                  AND ""IsActive"" = true",
+            cancellationToken);
+
+        return rowsAffected > 0;
+    }
 }

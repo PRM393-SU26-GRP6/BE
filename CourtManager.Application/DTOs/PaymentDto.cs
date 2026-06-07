@@ -19,11 +19,17 @@ public class PaymentDto
     public DateTime? PaidAt { get; set; }
     public string? PaymentUrl { get; set; }
     public string? BookingStatus { get; set; }
+    // Gateway info
+    public string? Gateway { get; set; }
+    public string? GatewayTransactionId { get; set; }
+    public string? GatewayReferenceCode { get; set; }
+    public string? GatewayAccountNumber { get; set; }
+    public string? GatewayDescription { get; set; }
+    public string? TransactionDate { get; set; }
 }
 
 public class ProcessPaymentRequestDto
 {
     public Guid BookingId { get; set; }
     public PaymentMethod PaymentMethod { get; set; }
-    public string? TransactionCode { get; set; }
 }

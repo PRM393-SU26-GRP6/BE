@@ -23,6 +23,7 @@ public class GetAvailableSlotsQueryHandler : IRequestHandler<GetAvailableSlotsQu
             FieldId = s.FieldId,
             StartTime = s.StartTime,
             EndTime = s.EndTime,
+            Price = s.Price,
             SlotStatus = s.SlotStatus.ToString(),
             CreatedAt = s.CreatedAt,
             UpdatedAt = s.UpdatedAt

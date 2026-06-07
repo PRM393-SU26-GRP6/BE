@@ -119,6 +119,23 @@ public static class ApiServiceExtensions
                       .AllowAnyMethod()
                       .AllowAnyHeader();
             });
+
+            var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+            options.AddPolicy("AllowFrontend", policy =>
+            {
+                if (allowedOrigins.Length == 0)
+                {
+                    policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                }
+                else
+                {
+                    policy.WithOrigins(allowedOrigins)
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                }
+            });
         });
 
         // Rate Limiting Configuration

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using CourtManager.Domain.Enums;
 
 namespace CourtManager.Domain.Entities;
@@ -19,6 +20,13 @@ public class TimeSlot
     public DateTime? UpdatedAt { get; set; }
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }
+
+    /// <summary>
+    /// Concurrency token for optimistic concurrency control.
+    /// Prevents race conditions in slot booking.
+    /// </summary>
+    [ConcurrencyCheck]
+    public uint RowVersion { get; set; } = 1;
 
     // Navigation properties
     public FootballField? Field { get; set; }

@@ -61,4 +61,47 @@ public class TimeSlotRepository : Repository<TimeSlot>, ITimeSlotRepository
             await _context.SaveChangesAsync(cancellationToken);
         }
     }
+
+    public async Task<TimeSlot?> GetByIdWithFieldVenueAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Include(s => s.Field)
+                .ThenInclude(f => f!.Venue)
+            .Include(s => s.LockedByUser)
+            .Include(s => s.BookingItems)
+                .ThenInclude(bi => bi.Booking)
+            .FirstOrDefaultAsync(s => s.SlotId == id, cancellationToken);
+    }
+
+    public async Task<bool> TryLockSlotAtomicAsync(Guid slotId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var now = DateTime.UtcNow;
+        var lockExpiry = now.AddMinutes(15);
+
+        var slotVersion = await _dbSet
+            .AsNoTracking()
+            .Where(s => s.SlotId == slotId)
+            .Select(s => s.RowVersion)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (slotVersion == null)
+            return false;
+
+        // Atomic update: only succeeds if the slot is still available and its row version has not changed.
+        // Note: SlotStatus stored as varchar in DB, use string values for comparison
+        var rowsAffected = await _context.Database.ExecuteSqlInterpolatedAsync(
+            $@"
+                UPDATE ""TimeSlots""
+                SET ""SlotStatus"" = 'Locked',
+                    ""LockedBy"" = {userId},
+                    ""LockedUntil"" = {lockExpiry},
+                    ""UpdatedAt"" = {now}
+                WHERE ""SlotId"" = {slotId}
+                  AND ""SlotStatus"" = 'Available'
+                  AND (""LockedUntil"" IS NULL OR ""LockedUntil"" < {now})
+                  AND ""RowVersion"" = {slotVersion}",
+            cancellationToken);
+
+        return rowsAffected > 0;
+    }
 }

@@ -23,6 +23,8 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
         builder.Property(p => p.GatewayReferenceCode).HasMaxLength(100);
         builder.Property(p => p.GatewayAccountNumber).HasMaxLength(100);
         builder.Property(p => p.GatewayRawContent).HasMaxLength(500);
+        builder.Property(p => p.GatewayDescription).HasMaxLength(500);
+        builder.Property(p => p.TransactionDate).HasMaxLength(100);
         builder.Property(p => p.PaidAt).IsRequired(false);
         builder.HasQueryFilter(p => !p.IsDeleted);
         builder.HasIndex(p => p.BookingId);

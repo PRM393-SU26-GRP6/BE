@@ -1,11 +1,10 @@
 # Visual Studio cache/options directory
 .vs
+.vscode
 
 # Compiled outputs
 bin/
 obj/
-scripts/
-artifacts/
 *.dll
 *.exe
 *.out

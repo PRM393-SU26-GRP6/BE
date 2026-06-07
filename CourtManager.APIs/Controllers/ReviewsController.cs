@@ -163,7 +163,13 @@ public class ReviewsController : BaseApiController
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = "Failed to create review", errors = new[] { ex.Message } });
+            _logger.LogError(ex, "Unexpected error while creating review for booking {BookingId}", request.BookingId);
+            return BadRequest(new
+            {
+                success = false,
+                message = "An unexpected error occurred while creating the review. Please try again.",
+                errors = Array.Empty<string>()
+            });
         }
     }
 
@@ -206,13 +212,19 @@ public class ReviewsController : BaseApiController
         {
             return NotFound(new { success = false, message = ex.Message });
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedAccessException)
         {
             return Forbid();
         }
         catch (Exception ex)
         {
-            return BadRequest(new { success = false, message = "Failed to update review", errors = new[] { ex.Message } });
+            _logger.LogError(ex, "Unexpected error while updating review {ReviewId}", id);
+            return BadRequest(new
+            {
+                success = false,
+                message = "An unexpected error occurred while updating the review. Please try again.",
+                errors = Array.Empty<string>()
+            });
         }
     }
 

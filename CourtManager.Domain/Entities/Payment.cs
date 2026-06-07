@@ -19,6 +19,8 @@ public class Payment
     public string? GatewayReferenceCode { get; set; }
     public string? GatewayAccountNumber { get; set; }
     public string? GatewayRawContent { get; set; }
+    public string? GatewayDescription { get; set; }
+    public string? TransactionDate { get; set; } // Raw date string from gateway
     public DateTime? PaidAt { get; set; }
     public decimal? RefundAmount { get; set; } // Set when PaymentType = Refund
     public string? RefundReason { get; set; }

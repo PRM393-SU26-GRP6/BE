@@ -45,6 +45,92 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasKey("AmenityId");
 
                     b.ToTable("Amenities");
+
+                    b.HasData(
+                        new
+                        {
+                            AmenityId = new Guid("8077e70b-71ae-925c-87b1-707df6b54bc0"),
+                            Icon = "parking",
+                            IsDeleted = false,
+                            Name = "Covered parking"
+                        },
+                        new
+                        {
+                            AmenityId = new Guid("8f3b4b0d-4710-9059-8a85-c256548f118c"),
+                            Icon = "shirt",
+                            IsDeleted = false,
+                            Name = "Changing room"
+                        },
+                        new
+                        {
+                            AmenityId = new Guid("99335921-22b7-3b51-8340-e756ae4c4930"),
+                            Icon = "shower-head",
+                            IsDeleted = false,
+                            Name = "Shower area"
+                        },
+                        new
+                        {
+                            AmenityId = new Guid("f5a935e4-be7d-f95f-953e-298059f47da2"),
+                            Icon = "lightbulb",
+                            IsDeleted = false,
+                            Name = "Night lighting"
+                        },
+                        new
+                        {
+                            AmenityId = new Guid("74d70a98-b403-3255-a580-98eda5f581fc"),
+                            Icon = "droplets",
+                            IsDeleted = false,
+                            Name = "Drinking water"
+                        },
+                        new
+                        {
+                            AmenityId = new Guid("bd8a547b-4ea6-065e-84eb-082bb11c0ce5"),
+                            Icon = "package",
+                            IsDeleted = false,
+                            Name = "Equipment rental"
+                        },
+                        new
+                        {
+                            AmenityId = new Guid("81815209-f0e6-f752-a864-5236f3aafd94"),
+                            Icon = "coffee",
+                            IsDeleted = false,
+                            Name = "Cafe lounge"
+                        },
+                        new
+                        {
+                            AmenityId = new Guid("72951c7c-043d-1c5c-a39a-e299eaece521"),
+                            Icon = "cross",
+                            IsDeleted = false,
+                            Name = "First aid kit"
+                        },
+                        new
+                        {
+                            AmenityId = new Guid("6215b4d4-8e66-845d-ad2f-53d4f1d3cbeb"),
+                            Icon = "wifi",
+                            IsDeleted = false,
+                            Name = "Free wifi"
+                        },
+                        new
+                        {
+                            AmenityId = new Guid("b8358615-9686-2d50-8067-ba459980f291"),
+                            Icon = "lock",
+                            IsDeleted = false,
+                            Name = "Security locker"
+                        },
+                        new
+                        {
+                            AmenityId = new Guid("a745c0e2-627f-085e-af23-316c1a756cbe"),
+                            Icon = "bike",
+                            IsDeleted = false,
+                            Name = "Bike parking"
+                        },
+                        new
+                        {
+                            AmenityId = new Guid("23c9f58d-b578-e552-872f-c81516bbbb45"),
+                            Icon = "table",
+                            IsDeleted = false,
+                            Name = "Scoreboard"
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.Booking", b =>
@@ -101,33 +187,145 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("60000000-0000-0000-0000-000000000001"),
-                            BookingStatus = "Completed",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DepositAmount = 100000m,
+                            Id = new Guid("682ba49f-52d0-7f51-934f-f573b2c6e822"),
+                            BookingStatus = "Pending",
+                            CreatedAt = new DateTime(2026, 5, 31, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 175000m,
                             IsDeleted = false,
-                            TotalPrice = 200000m,
-                            UserId = new Guid("20000000-0000-0000-0000-000000000006")
+                            Note = "Waiting for owner confirmation.",
+                            TotalPrice = 350000m,
+                            UserId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f")
                         },
                         new
                         {
-                            Id = new Guid("60000000-0000-0000-0000-000000000002"),
-                            BookingStatus = "Completed",
-                            CreatedAt = new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DepositAmount = 100000m,
+                            Id = new Guid("75ab8d9a-f5ab-9d59-9857-e77407addcd8"),
+                            BookingStatus = "Accepted",
+                            CreatedAt = new DateTime(2026, 6, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 180000m,
                             IsDeleted = false,
-                            TotalPrice = 200000m,
-                            UserId = new Guid("20000000-0000-0000-0000-000000000007")
+                            Note = "Accepted by venue owner.",
+                            TotalPrice = 360000m,
+                            UpdatedAt = new DateTime(2026, 6, 1, 3, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("b53af497-39fc-6351-a424-0a0063d43116")
                         },
                         new
                         {
-                            Id = new Guid("60000000-0000-0000-0000-000000000003"),
-                            BookingStatus = "Completed",
-                            CreatedAt = new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DepositAmount = 100000m,
+                            Id = new Guid("e909180c-8cea-915e-b9c0-47520fe4a6ad"),
+                            BookingStatus = "Deposited",
+                            CreatedAt = new DateTime(2026, 6, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 165000m,
                             IsDeleted = false,
-                            TotalPrice = 200000m,
-                            UserId = new Guid("20000000-0000-0000-0000-000000000008")
+                            Note = "Deposit paid through SePay.",
+                            TotalPrice = 330000m,
+                            UpdatedAt = new DateTime(2026, 6, 2, 3, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f")
+                        },
+                        new
+                        {
+                            Id = new Guid("9e03adc8-fc50-e257-b572-26ece917a5b7"),
+                            BookingStatus = "Completed",
+                            CreatedAt = new DateTime(2026, 6, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 210000m,
+                            IsDeleted = false,
+                            Note = "Completed after final payment.",
+                            TotalPrice = 420000m,
+                            UpdatedAt = new DateTime(2026, 6, 3, 3, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e")
+                        },
+                        new
+                        {
+                            Id = new Guid("e628c15a-2980-635d-bbfb-55eac35bf6f6"),
+                            BookingStatus = "Cancelled",
+                            CreatedAt = new DateTime(2026, 5, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 137500m,
+                            IsDeleted = false,
+                            Note = "Customer cancelled before deposit.",
+                            TotalPrice = 275000m,
+                            UpdatedAt = new DateTime(2026, 5, 29, 3, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b")
+                        },
+                        new
+                        {
+                            Id = new Guid("688cad1e-f0d6-1b5c-add2-059e8ee912b2"),
+                            BookingStatus = "Rejected",
+                            CreatedAt = new DateTime(2026, 5, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 205000m,
+                            IsDeleted = false,
+                            Note = "Venue rejected due to maintenance.",
+                            TotalPrice = 410000m,
+                            UpdatedAt = new DateTime(2026, 5, 30, 3, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("81d10681-e36e-595b-972a-f441c8237537")
+                        },
+                        new
+                        {
+                            Id = new Guid("f05fe560-3108-5857-ad8a-7c9005cf0dba"),
+                            BookingStatus = "Deposited",
+                            CreatedAt = new DateTime(2026, 6, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 197500m,
+                            IsDeleted = false,
+                            Note = "Team league match.",
+                            TotalPrice = 395000m,
+                            UpdatedAt = new DateTime(2026, 6, 4, 3, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f")
+                        },
+                        new
+                        {
+                            Id = new Guid("3ced2bd5-38e9-8b5a-8fc8-4429391d9e0c"),
+                            BookingStatus = "Completed",
+                            CreatedAt = new DateTime(2026, 5, 28, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 225000m,
+                            IsDeleted = false,
+                            Note = "Company friendly match.",
+                            TotalPrice = 450000m,
+                            UpdatedAt = new DateTime(2026, 5, 28, 3, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("b53af497-39fc-6351-a424-0a0063d43116")
+                        },
+                        new
+                        {
+                            Id = new Guid("33f8c662-d9af-335d-b547-7e116e8b4d74"),
+                            BookingStatus = "Accepted",
+                            CreatedAt = new DateTime(2026, 6, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 142500m,
+                            IsDeleted = false,
+                            Note = "Awaiting deposit payment.",
+                            TotalPrice = 285000m,
+                            UpdatedAt = new DateTime(2026, 6, 3, 3, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f")
+                        },
+                        new
+                        {
+                            Id = new Guid("60eed09f-32b4-c65a-9b85-fa0dcaac75b8"),
+                            BookingStatus = "Pending",
+                            CreatedAt = new DateTime(2026, 6, 4, 4, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 155000m,
+                            IsDeleted = false,
+                            Note = "New booking request.",
+                            TotalPrice = 310000m,
+                            UserId = new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e")
+                        },
+                        new
+                        {
+                            Id = new Guid("523e651a-d316-495b-9e88-614fc24c402e"),
+                            BookingStatus = "Completed",
+                            CreatedAt = new DateTime(2026, 5, 27, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 187500m,
+                            IsDeleted = false,
+                            Note = "Weekend tournament slot.",
+                            TotalPrice = 375000m,
+                            UpdatedAt = new DateTime(2026, 5, 27, 3, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b")
+                        },
+                        new
+                        {
+                            Id = new Guid("1a4b8f37-e3c9-4357-99a8-b997bebeb529"),
+                            BookingStatus = "Cancelled",
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DepositAmount = 147500m,
+                            IsDeleted = false,
+                            Note = "Schedule changed by customer.",
+                            TotalPrice = 295000m,
+                            UpdatedAt = new DateTime(2026, 5, 26, 3, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("81d10681-e36e-595b-972a-f441c8237537")
                         });
                 });
 
@@ -147,6 +345,56 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("DiscountId");
 
                     b.ToTable("BookingDiscounts");
+
+                    b.HasData(
+                        new
+                        {
+                            BookingId = new Guid("682ba49f-52d0-7f51-934f-f573b2c6e822"),
+                            DiscountId = new Guid("f4886193-d1cc-f65a-b1f9-f8fce52c7cdf"),
+                            DiscountAmount = 10000m
+                        },
+                        new
+                        {
+                            BookingId = new Guid("75ab8d9a-f5ab-9d59-9857-e77407addcd8"),
+                            DiscountId = new Guid("3eebaaae-ed4d-f455-b9e7-fde3bb9a5c47"),
+                            DiscountAmount = 40000m
+                        },
+                        new
+                        {
+                            BookingId = new Guid("e909180c-8cea-915e-b9c0-47520fe4a6ad"),
+                            DiscountId = new Guid("10bd247b-ac20-e859-babc-1f43a53e1eb0"),
+                            DiscountAmount = 30000m
+                        },
+                        new
+                        {
+                            BookingId = new Guid("9e03adc8-fc50-e257-b572-26ece917a5b7"),
+                            DiscountId = new Guid("846a4946-cdf8-185b-9837-ffce189e38c3"),
+                            DiscountAmount = 60000m
+                        },
+                        new
+                        {
+                            BookingId = new Guid("f05fe560-3108-5857-ad8a-7c9005cf0dba"),
+                            DiscountId = new Guid("68f1ee5c-cb34-3158-a18d-c174cfdc8386"),
+                            DiscountAmount = 25000m
+                        },
+                        new
+                        {
+                            BookingId = new Guid("3ced2bd5-38e9-8b5a-8fc8-4429391d9e0c"),
+                            DiscountId = new Guid("dd9dd966-65c1-f051-9431-43662195c57a"),
+                            DiscountAmount = 30000m
+                        },
+                        new
+                        {
+                            BookingId = new Guid("33f8c662-d9af-335d-b547-7e116e8b4d74"),
+                            DiscountId = new Guid("348ee346-d6c6-4554-9024-bf35b86b7fd2"),
+                            DiscountAmount = 35000m
+                        },
+                        new
+                        {
+                            BookingId = new Guid("523e651a-d316-495b-9e88-614fc24c402e"),
+                            DiscountId = new Guid("6b80024f-281f-d95f-a9a6-82a579c9622f"),
+                            DiscountAmount = 40000m
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.BookingItem", b =>
@@ -183,6 +431,116 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("BookingId", "SlotId");
 
                     b.ToTable("BookingItems", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            BookingItemId = new Guid("aa7d602f-8317-9452-bb92-77c164e137ea"),
+                            BookingId = new Guid("682ba49f-52d0-7f51-934f-f573b2c6e822"),
+                            CreatedAt = new DateTime(2026, 5, 31, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Price = 180000m,
+                            SlotId = new Guid("6fbced5a-84b1-5d5b-8a2c-3b71d7731091")
+                        },
+                        new
+                        {
+                            BookingItemId = new Guid("41cbdb3c-ca19-1c55-835a-4668e7feb824"),
+                            BookingId = new Guid("75ab8d9a-f5ab-9d59-9857-e77407addcd8"),
+                            CreatedAt = new DateTime(2026, 6, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Price = 180000m,
+                            SlotId = new Guid("b5444c8b-63f8-0a55-9419-6de7c1b9e0b6")
+                        },
+                        new
+                        {
+                            BookingItemId = new Guid("29845604-71be-505a-b33a-d83db4c04cf1"),
+                            BookingId = new Guid("e909180c-8cea-915e-b9c0-47520fe4a6ad"),
+                            CreatedAt = new DateTime(2026, 6, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Price = 180000m,
+                            SlotId = new Guid("31d79c72-1f45-2c59-865a-049d82fbbb3e")
+                        },
+                        new
+                        {
+                            BookingItemId = new Guid("812c1d7c-0019-ad5c-8142-8e5ce34f1bb5"),
+                            BookingId = new Guid("9e03adc8-fc50-e257-b572-26ece917a5b7"),
+                            CreatedAt = new DateTime(2026, 6, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Price = 180000m,
+                            SlotId = new Guid("c23792c7-d1d8-cd54-990c-c4c26c5f8ec1")
+                        },
+                        new
+                        {
+                            BookingItemId = new Guid("d895d4b5-f8f6-a85e-8035-cc235bdebc15"),
+                            BookingId = new Guid("e628c15a-2980-635d-bbfb-55eac35bf6f6"),
+                            CreatedAt = new DateTime(2026, 5, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Price = 220000m,
+                            SlotId = new Guid("f2a0f988-40e3-af5f-bf1f-a5dd453b8371")
+                        },
+                        new
+                        {
+                            BookingItemId = new Guid("dd92069c-9c13-3454-ba79-576acb3a5f58"),
+                            BookingId = new Guid("688cad1e-f0d6-1b5c-add2-059e8ee912b2"),
+                            CreatedAt = new DateTime(2026, 5, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Price = 220000m,
+                            SlotId = new Guid("c16bb36b-86b9-f45c-bda0-955b92ba386f")
+                        },
+                        new
+                        {
+                            BookingItemId = new Guid("9c1c985c-fd82-175f-89cd-465efd7e9b0a"),
+                            BookingId = new Guid("f05fe560-3108-5857-ad8a-7c9005cf0dba"),
+                            CreatedAt = new DateTime(2026, 6, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Price = 220000m,
+                            SlotId = new Guid("fe2f8199-f3f3-ea56-aee3-a0772ff88948")
+                        },
+                        new
+                        {
+                            BookingItemId = new Guid("be8038ff-ead9-e455-a078-aa7b130e0ac8"),
+                            BookingId = new Guid("3ced2bd5-38e9-8b5a-8fc8-4429391d9e0c"),
+                            CreatedAt = new DateTime(2026, 5, 28, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Price = 220000m,
+                            SlotId = new Guid("a41aa1a2-afdb-9850-aba5-cb7276ba896b")
+                        },
+                        new
+                        {
+                            BookingItemId = new Guid("ffcd142a-13cd-4d53-bb51-68a5dde7c565"),
+                            BookingId = new Guid("33f8c662-d9af-335d-b547-7e116e8b4d74"),
+                            CreatedAt = new DateTime(2026, 6, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Price = 185000m,
+                            SlotId = new Guid("9cdfa4ae-ceb2-a156-9375-71fda5d069c0")
+                        },
+                        new
+                        {
+                            BookingItemId = new Guid("b3ad338e-9448-d35f-80c2-02348865d8be"),
+                            BookingId = new Guid("60eed09f-32b4-c65a-9b85-fa0dcaac75b8"),
+                            CreatedAt = new DateTime(2026, 6, 4, 4, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Price = 185000m,
+                            SlotId = new Guid("15532bdb-abe3-7150-b1e0-0ee022f9f559")
+                        },
+                        new
+                        {
+                            BookingItemId = new Guid("ec1f6f6e-fe37-8653-aee8-89d2c86a410f"),
+                            BookingId = new Guid("523e651a-d316-495b-9e88-614fc24c402e"),
+                            CreatedAt = new DateTime(2026, 5, 27, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Price = 185000m,
+                            SlotId = new Guid("5121ac84-ad91-f157-b35b-077a398e9bd6")
+                        },
+                        new
+                        {
+                            BookingItemId = new Guid("04bda27f-533b-305f-acad-2547b349a71f"),
+                            BookingId = new Guid("1a4b8f37-e3c9-4357-99a8-b997bebeb529"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Price = 185000m,
+                            SlotId = new Guid("75166681-8a81-9a59-b666-37c2e249c1cb")
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.ChatRoom", b =>
@@ -219,6 +577,116 @@ namespace CourtManager.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("ChatRooms", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            RoomId = new Guid("fbb29be8-a6e1-6756-a051-7a5bf64d1d11"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"),
+                            HostId = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
+                            IsDeleted = false,
+                            LastMessageAt = new DateTime(2026, 5, 25, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            RoomId = new Guid("8f4c756e-90fb-7354-9748-91474d62a7e5"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = new Guid("b53af497-39fc-6351-a424-0a0063d43116"),
+                            HostId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            IsDeleted = false,
+                            LastMessageAt = new DateTime(2026, 5, 26, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            RoomId = new Guid("17bb8f15-6089-905d-abba-576a0517cf95"),
+                            CreatedAt = new DateTime(2026, 5, 27, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"),
+                            HostId = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
+                            IsDeleted = false,
+                            LastMessageAt = new DateTime(2026, 5, 27, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            RoomId = new Guid("e68230ab-13d8-6358-b0b2-48f52ab34f52"),
+                            CreatedAt = new DateTime(2026, 5, 28, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e"),
+                            HostId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            IsDeleted = false,
+                            LastMessageAt = new DateTime(2026, 5, 28, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            RoomId = new Guid("e5c97dc5-a377-ef58-b975-db03712736cb"),
+                            CreatedAt = new DateTime(2026, 5, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"),
+                            HostId = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
+                            IsDeleted = false,
+                            LastMessageAt = new DateTime(2026, 5, 29, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            RoomId = new Guid("bea19fa6-d965-0e52-8eb6-b0cabc857c85"),
+                            CreatedAt = new DateTime(2026, 5, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = new Guid("81d10681-e36e-595b-972a-f441c8237537"),
+                            HostId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            IsDeleted = false,
+                            LastMessageAt = new DateTime(2026, 5, 30, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            RoomId = new Guid("fe2a7ed3-0107-d356-892e-ca702fa22e46"),
+                            CreatedAt = new DateTime(2026, 5, 31, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"),
+                            HostId = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
+                            IsDeleted = false,
+                            LastMessageAt = new DateTime(2026, 5, 31, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            RoomId = new Guid("814a7c60-ac01-0f5b-bc59-7dee869d6bf2"),
+                            CreatedAt = new DateTime(2026, 6, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = new Guid("b53af497-39fc-6351-a424-0a0063d43116"),
+                            HostId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            IsDeleted = false,
+                            LastMessageAt = new DateTime(2026, 6, 1, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            RoomId = new Guid("94f42dce-592b-6d52-a51d-2b2b6d1a5865"),
+                            CreatedAt = new DateTime(2026, 6, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"),
+                            HostId = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
+                            IsDeleted = false,
+                            LastMessageAt = new DateTime(2026, 6, 2, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            RoomId = new Guid("58d096b8-dcec-8351-a96d-6becd8df96c7"),
+                            CreatedAt = new DateTime(2026, 6, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e"),
+                            HostId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            IsDeleted = false,
+                            LastMessageAt = new DateTime(2026, 6, 3, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            RoomId = new Guid("69ba1bf9-439b-de57-b77d-f7c0f97db207"),
+                            CreatedAt = new DateTime(2026, 6, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"),
+                            HostId = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
+                            IsDeleted = false,
+                            LastMessageAt = new DateTime(2026, 6, 4, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            RoomId = new Guid("40fc32bb-e297-3e53-8885-3e7976cbbdc1"),
+                            CreatedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = new Guid("81d10681-e36e-595b-972a-f441c8237537"),
+                            HostId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            IsDeleted = false,
+                            LastMessageAt = new DateTime(2026, 6, 5, 0, 15, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.Discount", b =>
@@ -296,6 +764,232 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("VenueId");
 
                     b.ToTable("Discounts", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            DiscountId = new Guid("f4886193-d1cc-f65a-b1f9-f8fce52c7cdf"),
+                            Code = "RIVER20",
+                            CreatedAt = new DateTime(2026, 5, 12, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountType = "Percentage",
+                            EndDate = new DateTime(2026, 8, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDiscountAmount = 60000m,
+                            MinBookingAmount = 200000m,
+                            Name = "Riverside weekday promotion",
+                            OwnerId = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
+                            StartDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsageLimit = 40,
+                            UsedCount = 5,
+                            Value = 20m,
+                            VenueId = new Guid("e44e7fa2-d7ec-5f55-af24-333a327d8b39")
+                        },
+                        new
+                        {
+                            DiscountId = new Guid("3eebaaae-ed4d-f455-b9e7-fde3bb9a5c47"),
+                            Code = "COMMUNITY50",
+                            CreatedAt = new DateTime(2026, 5, 13, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountType = "Fixed",
+                            EndDate = new DateTime(2026, 8, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDiscountAmount = 50000m,
+                            MinBookingAmount = 300000m,
+                            Name = "Community club voucher",
+                            OwnerId = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
+                            StartDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsageLimit = 30,
+                            UsedCount = 8,
+                            Value = 50000m
+                        },
+                        new
+                        {
+                            DiscountId = new Guid("10bd247b-ac20-e859-babc-1f43a53e1eb0"),
+                            Code = "GREEN10",
+                            CreatedAt = new DateTime(2026, 5, 14, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountType = "Percentage",
+                            EndDate = new DateTime(2026, 8, 7, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDiscountAmount = 40000m,
+                            MinBookingAmount = 0m,
+                            Name = "Green Pitch early week",
+                            OwnerId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            StartDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsageLimit = 25,
+                            UsedCount = 4,
+                            Value = 10m,
+                            VenueId = new Guid("1285e289-4aec-e150-a19d-a18470d844c4")
+                        },
+                        new
+                        {
+                            DiscountId = new Guid("846a4946-cdf8-185b-9837-ffce189e38c3"),
+                            Code = "ARENA75",
+                            CreatedAt = new DateTime(2026, 5, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountType = "Fixed",
+                            EndDate = new DateTime(2026, 8, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDiscountAmount = 75000m,
+                            MinBookingAmount = 500000m,
+                            Name = "Arena loyalty discount",
+                            OwnerId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            StartDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsageLimit = 20,
+                            UsedCount = 6,
+                            Value = 75000m
+                        },
+                        new
+                        {
+                            DiscountId = new Guid("68f1ee5c-cb34-3158-a18d-c174cfdc8386"),
+                            Code = "STUDENT15",
+                            CreatedAt = new DateTime(2026, 5, 16, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountType = "Percentage",
+                            EndDate = new DateTime(2026, 8, 9, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDiscountAmount = 45000m,
+                            MinBookingAmount = 150000m,
+                            Name = "Student evening offer",
+                            OwnerId = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
+                            StartDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsageLimit = 60,
+                            UsedCount = 12,
+                            Value = 15m,
+                            VenueId = new Guid("c5a685df-a31c-4755-95f3-c8398a3d9bcd")
+                        },
+                        new
+                        {
+                            DiscountId = new Guid("dd9dd966-65c1-f051-9431-43662195c57a"),
+                            Code = "THUDUC30",
+                            CreatedAt = new DateTime(2026, 5, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountType = "Fixed",
+                            EndDate = new DateTime(2026, 8, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDiscountAmount = 30000m,
+                            MinBookingAmount = 180000m,
+                            Name = "Thu Duc neighborhood voucher",
+                            OwnerId = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
+                            StartDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsageLimit = 80,
+                            UsedCount = 18,
+                            Value = 30000m
+                        },
+                        new
+                        {
+                            DiscountId = new Guid("348ee346-d6c6-4554-9024-bf35b86b7fd2"),
+                            Code = "FLIGHT12",
+                            CreatedAt = new DateTime(2026, 5, 18, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountType = "Percentage",
+                            EndDate = new DateTime(2026, 8, 11, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDiscountAmount = 50000m,
+                            MinBookingAmount = 200000m,
+                            Name = "Airport field promotion",
+                            OwnerId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            StartDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsageLimit = 35,
+                            UsedCount = 7,
+                            Value = 12m,
+                            VenueId = new Guid("c725798d-b572-2957-a60b-7a42bda965f3")
+                        },
+                        new
+                        {
+                            DiscountId = new Guid("6b80024f-281f-d95f-a9a6-82a579c9622f"),
+                            Code = "WEEKEND40",
+                            CreatedAt = new DateTime(2026, 5, 19, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountType = "Fixed",
+                            EndDate = new DateTime(2026, 8, 12, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDiscountAmount = 40000m,
+                            MinBookingAmount = 250000m,
+                            Name = "Weekend booking voucher",
+                            OwnerId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            StartDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsageLimit = 45,
+                            UsedCount = 9,
+                            Value = 40000m
+                        },
+                        new
+                        {
+                            DiscountId = new Guid("033a6084-5112-7251-a441-fd9a61bd9e1b"),
+                            Code = "WESTSIDE8",
+                            CreatedAt = new DateTime(2026, 5, 20, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountType = "Percentage",
+                            EndDate = new DateTime(2026, 8, 13, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDiscountAmount = 30000m,
+                            MinBookingAmount = 0m,
+                            Name = "West side happy hour",
+                            OwnerId = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
+                            StartDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsageLimit = 50,
+                            UsedCount = 3,
+                            Value = 8m,
+                            VenueId = new Guid("b444aa42-e678-3c53-ab15-e5e05da85358")
+                        },
+                        new
+                        {
+                            DiscountId = new Guid("d83505b1-1f9a-7752-87ad-603d3926437d"),
+                            Code = "HANRIVER60",
+                            CreatedAt = new DateTime(2026, 5, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountType = "Fixed",
+                            EndDate = new DateTime(2026, 8, 14, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDiscountAmount = 60000m,
+                            MinBookingAmount = 360000m,
+                            Name = "Han River group voucher",
+                            OwnerId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            StartDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsageLimit = 28,
+                            UsedCount = 5,
+                            Value = 60000m,
+                            VenueId = new Guid("e958c525-1a45-f854-97aa-247ccd2a75cd")
+                        },
+                        new
+                        {
+                            DiscountId = new Guid("f99c851e-2926-f95d-bfa2-b987220f2de2"),
+                            Code = "WESTLAKE18",
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountType = "Percentage",
+                            EndDate = new DateTime(2026, 8, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDiscountAmount = 70000m,
+                            MinBookingAmount = 300000m,
+                            Name = "West Lake membership discount",
+                            OwnerId = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
+                            StartDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsageLimit = 22,
+                            UsedCount = 10,
+                            Value = 18m,
+                            VenueId = new Guid("aea33891-2194-505e-898a-64c536f8408c")
+                        },
+                        new
+                        {
+                            DiscountId = new Guid("2bb0a6c3-3938-0f5c-bf38-734441d43f8f"),
+                            Code = "NINHKIEU25",
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DiscountType = "Fixed",
+                            EndDate = new DateTime(2026, 8, 16, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            IsDeleted = false,
+                            MaxDiscountAmount = 25000m,
+                            MinBookingAmount = 120000m,
+                            Name = "Ninh Kieu off-peak voucher",
+                            OwnerId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            StartDate = new DateTime(2026, 5, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UsageLimit = 70,
+                            UsedCount = 11,
+                            Value = 25000m,
+                            VenueId = new Guid("b81936c7-48de-fd50-be07-27f4af2021f3")
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.FootballField", b =>
@@ -353,63 +1047,291 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("40000000-0000-0000-0000-000000000001"),
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "",
-                            FieldName = "Sân 5 số 1",
-                            FieldType = "FiveASide",
-                            IsActive = true,
-                            IsDeleted = false,
-                            PricePerHour = 200000m,
-                            VenueId = new Guid("30000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            Id = new Guid("40000000-0000-0000-0000-000000000002"),
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "",
-                            FieldName = "Sân 5 số 2",
-                            FieldType = "FiveASide",
-                            IsActive = true,
-                            IsDeleted = false,
-                            PricePerHour = 220000m,
-                            VenueId = new Guid("30000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            Id = new Guid("40000000-0000-0000-0000-000000000003"),
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "",
-                            FieldName = "Sân 7 VIP",
-                            FieldType = "SevenASide",
-                            IsActive = true,
-                            IsDeleted = false,
-                            PricePerHour = 450000m,
-                            VenueId = new Guid("30000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            Id = new Guid("40000000-0000-0000-0000-000000000004"),
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "",
-                            FieldName = "Sân A",
+                            Id = new Guid("45af42d7-f17d-4e5e-be92-aa2f64bc139b"),
+                            CreatedAt = new DateTime(2026, 1, 11, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Main artificial turf field.",
+                            FieldName = "Saigon Riverside Sports Park A",
                             FieldType = "FiveASide",
                             IsActive = true,
                             IsDeleted = false,
                             PricePerHour = 180000m,
-                            VenueId = new Guid("30000000-0000-0000-0000-000000000002")
+                            VenueId = new Guid("e44e7fa2-d7ec-5f55-af24-333a327d8b39")
                         },
                         new
                         {
-                            Id = new Guid("40000000-0000-0000-0000-000000000005"),
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "",
-                            FieldName = "Sân B",
+                            Id = new Guid("294eaa8c-61fd-fc53-a189-e2605d6550ae"),
+                            CreatedAt = new DateTime(2026, 1, 12, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Secondary field for friendly matches.",
+                            FieldName = "Saigon Riverside Sports Park B",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 220000m,
+                            VenueId = new Guid("e44e7fa2-d7ec-5f55-af24-333a327d8b39")
+                        },
+                        new
+                        {
+                            Id = new Guid("79f3417a-16a9-245b-ba20-06b22c6d3499"),
+                            CreatedAt = new DateTime(2026, 1, 13, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Main artificial turf field.",
+                            FieldName = "Thanh Da Community Football Hub A",
                             FieldType = "SevenASide",
                             IsActive = true,
                             IsDeleted = false,
-                            PricePerHour = 400000m,
-                            VenueId = new Guid("30000000-0000-0000-0000-000000000002")
+                            PricePerHour = 185000m,
+                            VenueId = new Guid("74b290df-251c-135a-949e-b8dd5d6d520e")
+                        },
+                        new
+                        {
+                            Id = new Guid("a495e9ef-94ab-df5c-b307-f2c002ddcfe1"),
+                            CreatedAt = new DateTime(2026, 1, 14, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Secondary field for friendly matches.",
+                            FieldName = "Thanh Da Community Football Hub B",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 225000m,
+                            VenueId = new Guid("74b290df-251c-135a-949e-b8dd5d6d520e")
+                        },
+                        new
+                        {
+                            Id = new Guid("d8b4c3b4-eae4-235e-ad10-312e902e6f4c"),
+                            CreatedAt = new DateTime(2026, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Main artificial turf field.",
+                            FieldName = "District 7 Green Pitch A",
+                            FieldType = "SevenASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 190000m,
+                            VenueId = new Guid("1285e289-4aec-e150-a19d-a18470d844c4")
+                        },
+                        new
+                        {
+                            Id = new Guid("f2f0e4ec-ebfe-ff54-a6e2-e67e6e24d0c7"),
+                            CreatedAt = new DateTime(2026, 1, 16, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Secondary field for friendly matches.",
+                            FieldName = "District 7 Green Pitch B",
+                            FieldType = "ElevenASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 230000m,
+                            VenueId = new Guid("1285e289-4aec-e150-a19d-a18470d844c4")
+                        },
+                        new
+                        {
+                            Id = new Guid("85433577-1e55-3153-8189-16c078122b94"),
+                            CreatedAt = new DateTime(2026, 1, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Main artificial turf field.",
+                            FieldName = "Phu My Hung Arena A",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 195000m,
+                            VenueId = new Guid("76b2e98e-5d43-2452-ad77-c411fbb2e388")
+                        },
+                        new
+                        {
+                            Id = new Guid("14cf58fc-b1e6-de5b-bcec-45b06e83c66a"),
+                            CreatedAt = new DateTime(2026, 1, 18, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Secondary field for friendly matches.",
+                            FieldName = "Phu My Hung Arena B",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 235000m,
+                            VenueId = new Guid("76b2e98e-5d43-2452-ad77-c411fbb2e388")
+                        },
+                        new
+                        {
+                            Id = new Guid("09e80b9f-6396-1753-b72e-17e13cc94abb"),
+                            CreatedAt = new DateTime(2026, 1, 19, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Main artificial turf field.",
+                            FieldName = "Thu Duc University Stadium A",
+                            FieldType = "SevenASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 200000m,
+                            VenueId = new Guid("c5a685df-a31c-4755-95f3-c8398a3d9bcd")
+                        },
+                        new
+                        {
+                            Id = new Guid("ad88bad6-8267-2d57-a1a1-7320527a9aec"),
+                            CreatedAt = new DateTime(2026, 1, 20, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Secondary field for friendly matches.",
+                            FieldName = "Thu Duc University Stadium B",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 240000m,
+                            VenueId = new Guid("c5a685df-a31c-4755-95f3-c8398a3d9bcd")
+                        },
+                        new
+                        {
+                            Id = new Guid("ad617cd9-d99d-c958-8a5a-f9cadf1cdcff"),
+                            CreatedAt = new DateTime(2026, 1, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Main artificial turf field.",
+                            FieldName = "Linh Trung Five-A-Side Club A",
+                            FieldType = "SevenASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 205000m,
+                            VenueId = new Guid("a1067327-953b-345a-9d63-9f4932f73bc2")
+                        },
+                        new
+                        {
+                            Id = new Guid("6410c6c3-9f7f-b05a-b040-d6edfba2d8aa"),
+                            CreatedAt = new DateTime(2026, 1, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Secondary field for friendly matches.",
+                            FieldName = "Linh Trung Five-A-Side Club B",
+                            FieldType = "ElevenASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 245000m,
+                            VenueId = new Guid("a1067327-953b-345a-9d63-9f4932f73bc2")
+                        },
+                        new
+                        {
+                            Id = new Guid("3682998c-7f03-a350-89d8-2ce45ea05eb9"),
+                            CreatedAt = new DateTime(2026, 1, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Main artificial turf field.",
+                            FieldName = "Tan Binh Flight Path Fields A",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 210000m,
+                            VenueId = new Guid("c725798d-b572-2957-a60b-7a42bda965f3")
+                        },
+                        new
+                        {
+                            Id = new Guid("6c0c039f-c8ee-ec55-9e58-e7aa2e93778c"),
+                            CreatedAt = new DateTime(2026, 1, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Secondary field for friendly matches.",
+                            FieldName = "Tan Binh Flight Path Fields B",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 250000m,
+                            VenueId = new Guid("c725798d-b572-2957-a60b-7a42bda965f3")
+                        },
+                        new
+                        {
+                            Id = new Guid("208d5f71-5196-6a53-ad42-9156ad65bf46"),
+                            CreatedAt = new DateTime(2026, 1, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Main artificial turf field.",
+                            FieldName = "Go Vap Weekend Arena A",
+                            FieldType = "SevenASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 215000m,
+                            VenueId = new Guid("f4e18d2f-7b53-f353-a00f-02da102573be")
+                        },
+                        new
+                        {
+                            Id = new Guid("8d6a77e0-82a1-045f-8f29-95f3f02bf455"),
+                            CreatedAt = new DateTime(2026, 1, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Secondary field for friendly matches.",
+                            FieldName = "Go Vap Weekend Arena B",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 255000m,
+                            VenueId = new Guid("f4e18d2f-7b53-f353-a00f-02da102573be")
+                        },
+                        new
+                        {
+                            Id = new Guid("724604cf-d676-845b-a538-85d3af910e6c"),
+                            CreatedAt = new DateTime(2026, 1, 27, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Main artificial turf field.",
+                            FieldName = "Binh Tan Sports Yard A",
+                            FieldType = "SevenASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 220000m,
+                            VenueId = new Guid("b444aa42-e678-3c53-ab15-e5e05da85358")
+                        },
+                        new
+                        {
+                            Id = new Guid("23369eca-5734-b452-95e7-0aa5558fdd64"),
+                            CreatedAt = new DateTime(2026, 1, 28, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Secondary field for friendly matches.",
+                            FieldName = "Binh Tan Sports Yard B",
+                            FieldType = "ElevenASide",
+                            IsActive = false,
+                            IsDeleted = false,
+                            PricePerHour = 260000m,
+                            VenueId = new Guid("b444aa42-e678-3c53-ab15-e5e05da85358")
+                        },
+                        new
+                        {
+                            Id = new Guid("5c7cc6ae-9bba-d454-8042-305cc655d89f"),
+                            CreatedAt = new DateTime(2026, 1, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Main artificial turf field.",
+                            FieldName = "Da Nang Han River Football Center A",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 225000m,
+                            VenueId = new Guid("e958c525-1a45-f854-97aa-247ccd2a75cd")
+                        },
+                        new
+                        {
+                            Id = new Guid("59f6e46d-42d7-a55c-882c-e1487fbc48e7"),
+                            CreatedAt = new DateTime(2026, 1, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Secondary field for friendly matches.",
+                            FieldName = "Da Nang Han River Football Center B",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 265000m,
+                            VenueId = new Guid("e958c525-1a45-f854-97aa-247ccd2a75cd")
+                        },
+                        new
+                        {
+                            Id = new Guid("a0e5a644-336c-2b59-bc7a-9f524ab67be9"),
+                            CreatedAt = new DateTime(2026, 1, 31, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Main artificial turf field.",
+                            FieldName = "Hanoi West Lake Mini Pitch A",
+                            FieldType = "SevenASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 230000m,
+                            VenueId = new Guid("aea33891-2194-505e-898a-64c536f8408c")
+                        },
+                        new
+                        {
+                            Id = new Guid("20c94649-263e-9359-90db-156fbf078756"),
+                            CreatedAt = new DateTime(2026, 2, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Secondary field for friendly matches.",
+                            FieldName = "Hanoi West Lake Mini Pitch B",
+                            FieldType = "FiveASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 270000m,
+                            VenueId = new Guid("aea33891-2194-505e-898a-64c536f8408c")
+                        },
+                        new
+                        {
+                            Id = new Guid("d69222bd-d845-145a-8281-891e544ed55a"),
+                            CreatedAt = new DateTime(2026, 2, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Main artificial turf field.",
+                            FieldName = "Can Tho Ninh Kieu Sports Ground A",
+                            FieldType = "SevenASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 235000m,
+                            VenueId = new Guid("b81936c7-48de-fd50-be07-27f4af2021f3")
+                        },
+                        new
+                        {
+                            Id = new Guid("2abd8ce8-1d77-9954-9421-394da8d9b623"),
+                            CreatedAt = new DateTime(2026, 2, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Secondary field for friendly matches.",
+                            FieldName = "Can Tho Ninh Kieu Sports Ground B",
+                            FieldType = "ElevenASide",
+                            IsActive = true,
+                            IsDeleted = false,
+                            PricePerHour = 275000m,
+                            VenueId = new Guid("b81936c7-48de-fd50-be07-27f4af2021f3")
                         });
                 });
 
@@ -451,6 +1373,124 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("RoomId", "SentAt");
 
                     b.ToTable("Messages", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            MessageId = new Guid("5a2b7d0d-b91b-3559-93b1-f84cc0454c93"),
+                            IsDeleted = false,
+                            MessageText = "Chao anh, toi muon dat san thu bay luc 19h, san con trong khong?",
+                            RoomId = new Guid("fbb29be8-a6e1-6756-a051-7a5bf64d1d11"),
+                            SenderId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"),
+                            SentAt = new DateTime(2026, 5, 25, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            MessageId = new Guid("993390e2-028a-6358-bf9f-9ef504fa1f7e"),
+                            IsDeleted = false,
+                            MessageText = "San con trong, anh vui long coc truoc 30 phut de giu lich.",
+                            ReadAt = new DateTime(2026, 5, 26, 0, 15, 0, 0, DateTimeKind.Utc),
+                            RoomId = new Guid("8f4c756e-90fb-7354-9748-91474d62a7e5"),
+                            SenderId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            SentAt = new DateTime(2026, 5, 26, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            MessageId = new Guid("b48c9d78-0185-7050-8bf6-6ae5fd4d5b1f"),
+                            IsDeleted = false,
+                            MessageText = "Doi cua minh can thue bong va ao bib, san co ho tro khong?",
+                            ReadAt = new DateTime(2026, 5, 27, 0, 15, 0, 0, DateTimeKind.Utc),
+                            RoomId = new Guid("17bb8f15-6089-905d-abba-576a0517cf95"),
+                            SenderId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"),
+                            SentAt = new DateTime(2026, 5, 27, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            MessageId = new Guid("5f1c0c77-d0d8-865d-9c7d-665bb6214275"),
+                            IsDeleted = false,
+                            MessageText = "Ben em co san bong, ao bib va nuoc uong tai quay le tan.",
+                            RoomId = new Guid("e68230ab-13d8-6358-b0b2-48f52ab34f52"),
+                            SenderId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            SentAt = new DateTime(2026, 5, 28, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            MessageId = new Guid("b6525ee6-a8ad-e95c-8a83-12eb5f2d19dd"),
+                            IsDeleted = false,
+                            MessageText = "Neu troi mua lon thi minh co doi lich sang ngay khac duoc khong?",
+                            ReadAt = new DateTime(2026, 5, 29, 0, 15, 0, 0, DateTimeKind.Utc),
+                            RoomId = new Guid("e5c97dc5-a377-ef58-b975-db03712736cb"),
+                            SenderId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"),
+                            SentAt = new DateTime(2026, 5, 29, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            MessageId = new Guid("288071c8-fabf-675a-8bbe-985a613a5fb8"),
+                            IsDeleted = false,
+                            MessageText = "Duoc anh, ben em se ho tro doi lich neu thong bao truoc gio da.",
+                            ReadAt = new DateTime(2026, 5, 30, 0, 15, 0, 0, DateTimeKind.Utc),
+                            RoomId = new Guid("bea19fa6-d965-0e52-8eb6-b0cabc857c85"),
+                            SenderId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            SentAt = new DateTime(2026, 5, 30, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            MessageId = new Guid("e30d9931-d63f-8157-9268-28592d75091e"),
+                            IsDeleted = false,
+                            MessageText = "Minh da thanh toan coc, nho kiem tra giup ma giao dich.",
+                            RoomId = new Guid("fe2a7ed3-0107-d356-892e-ca702fa22e46"),
+                            SenderId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"),
+                            SentAt = new DateTime(2026, 5, 31, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            MessageId = new Guid("26133014-7474-0054-bde1-fcecaaf288f4"),
+                            IsDeleted = false,
+                            MessageText = "Ben em da xac nhan coc, lich da duoc giu thanh cong.",
+                            ReadAt = new DateTime(2026, 6, 1, 0, 15, 0, 0, DateTimeKind.Utc),
+                            RoomId = new Guid("814a7c60-ac01-0f5b-bc59-7dee869d6bf2"),
+                            SenderId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            SentAt = new DateTime(2026, 6, 1, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            MessageId = new Guid("8ec140a5-200f-6d53-b264-2e25af44be05"),
+                            IsDeleted = false,
+                            MessageText = "Toi can hoa don cho cong ty sau tran dau.",
+                            ReadAt = new DateTime(2026, 6, 2, 0, 15, 0, 0, DateTimeKind.Utc),
+                            RoomId = new Guid("94f42dce-592b-6d52-a51d-2b2b6d1a5865"),
+                            SenderId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"),
+                            SentAt = new DateTime(2026, 6, 2, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            MessageId = new Guid("9cf6cd8f-931a-7850-9fb3-add16ebe26b3"),
+                            IsDeleted = false,
+                            MessageText = "Anh gui thong tin cong ty, ben em se gui hoa don trong ngay.",
+                            RoomId = new Guid("58d096b8-dcec-8351-a96d-6becd8df96c7"),
+                            SenderId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            SentAt = new DateTime(2026, 6, 3, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            MessageId = new Guid("38aea5e6-ed1a-6c5c-bff4-f8486794b909"),
+                            IsDeleted = false,
+                            MessageText = "San co cho gui xe may rieng khong?",
+                            ReadAt = new DateTime(2026, 6, 4, 0, 15, 0, 0, DateTimeKind.Utc),
+                            RoomId = new Guid("69ba1bf9-439b-de57-b77d-f7c0f97db207"),
+                            SenderId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"),
+                            SentAt = new DateTime(2026, 6, 4, 0, 15, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            MessageId = new Guid("eee9300c-5149-415f-b580-0811275b81e7"),
+                            IsDeleted = false,
+                            MessageText = "Co khu gui xe rieng ngay cong vao, mien phi cho nguoi choi.",
+                            ReadAt = new DateTime(2026, 6, 5, 0, 15, 0, 0, DateTimeKind.Utc),
+                            RoomId = new Guid("40fc32bb-e297-3e53-8885-3e7976cbbdc1"),
+                            SenderId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            SentAt = new DateTime(2026, 6, 5, 0, 15, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.Notification", b =>
@@ -498,6 +1538,140 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Notifications", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            NotificationId = new Guid("4c77ec9c-2b1a-dc5b-8a29-eabe13fc63a3"),
+                            CreatedAt = new DateTime(2026, 6, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Message = "A customer has submitted a new booking request.",
+                            RefId = "682ba49f-52d0-7f51-934f-f573b2c6e822",
+                            SenderId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"),
+                            Title = "Booking request received",
+                            Type = 0
+                        },
+                        new
+                        {
+                            NotificationId = new Guid("8a401056-dda9-765c-a486-ca31419762f1"),
+                            CreatedAt = new DateTime(2026, 6, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Message = "Your booking has been accepted by the venue manager.",
+                            RefId = "75ab8d9a-f5ab-9d59-9857-e77407addcd8",
+                            SenderId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            Title = "Booking accepted",
+                            Type = 1
+                        },
+                        new
+                        {
+                            NotificationId = new Guid("ca73a25b-b382-1054-b57c-84ea963d9eaf"),
+                            CreatedAt = new DateTime(2026, 6, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Message = "Your deposit payment has been confirmed.",
+                            RefId = "e909180c-8cea-915e-b9c0-47520fe4a6ad",
+                            SenderId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"),
+                            Title = "Deposit confirmed",
+                            Type = 2
+                        },
+                        new
+                        {
+                            NotificationId = new Guid("4fc8ee4a-65d5-d551-a569-fe7cff7fdb69"),
+                            CreatedAt = new DateTime(2026, 6, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Message = "Your booking has been fully paid.",
+                            RefId = "9e03adc8-fc50-e257-b572-26ece917a5b7",
+                            SenderId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            Title = "Final payment completed",
+                            Type = 3
+                        },
+                        new
+                        {
+                            NotificationId = new Guid("7b322e08-b6c7-9051-accc-f23db0876077"),
+                            CreatedAt = new DateTime(2026, 5, 31, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Message = "A booking was cancelled before the match time.",
+                            RefId = "e628c15a-2980-635d-bbfb-55eac35bf6f6",
+                            SenderId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"),
+                            Title = "Booking cancelled",
+                            Type = 4
+                        },
+                        new
+                        {
+                            NotificationId = new Guid("16eb01d8-478c-1052-a848-5b5d331a27e3"),
+                            CreatedAt = new DateTime(2026, 5, 30, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Message = "The venue manager could not accept the requested slot.",
+                            RefId = "688cad1e-f0d6-1b5c-add2-059e8ee912b2",
+                            SenderId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            Title = "Booking rejected",
+                            Type = 0
+                        },
+                        new
+                        {
+                            NotificationId = new Guid("248e767b-fbd1-765e-a621-af5c5c5d17f4"),
+                            CreatedAt = new DateTime(2026, 5, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Message = "You have a new message about your booking.",
+                            RefId = "f05fe560-3108-5857-ad8a-7c9005cf0dba",
+                            SenderId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"),
+                            Title = "New chat message",
+                            Type = 1
+                        },
+                        new
+                        {
+                            NotificationId = new Guid("97035cd2-8716-6451-9bac-10e034a00ed9"),
+                            CreatedAt = new DateTime(2026, 5, 28, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Message = "A discount code was applied to a booking.",
+                            RefId = "3ced2bd5-38e9-8b5a-8fc8-4429391d9e0c",
+                            SenderId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            Title = "Discount applied",
+                            Type = 2
+                        },
+                        new
+                        {
+                            NotificationId = new Guid("f1b6d9ba-bf7a-665f-aa99-bd45e5b4eda3"),
+                            CreatedAt = new DateTime(2026, 5, 27, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Message = "One of your selected slots changed status.",
+                            RefId = "33f8c662-d9af-335d-b547-7e116e8b4d74",
+                            SenderId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"),
+                            Title = "Slot status updated",
+                            Type = 3
+                        },
+                        new
+                        {
+                            NotificationId = new Guid("8026f84c-ed63-de5c-9b00-f9ad4ecba28a"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Message = "A payment is waiting for bank confirmation.",
+                            RefId = "60eed09f-32b4-c65a-9b85-fa0dcaac75b8",
+                            SenderId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            Title = "Payment pending",
+                            Type = 4
+                        },
+                        new
+                        {
+                            NotificationId = new Guid("d5c82e74-5b49-d554-a368-ee5e14ada28a"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Message = "A customer submitted a venue review.",
+                            RefId = "523e651a-d316-495b-9e88-614fc24c402e",
+                            SenderId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"),
+                            Title = "Review submitted",
+                            Type = 0
+                        },
+                        new
+                        {
+                            NotificationId = new Guid("a39a0ace-4fc8-585f-92f5-cfd19f98c6ae"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Message = "System maintenance is scheduled after midnight.",
+                            RefId = "1a4b8f37-e3c9-4357-99a8-b997bebeb529",
+                            SenderId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            Title = "System maintenance notice",
+                            Type = 1
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.NotificationRecipient", b =>
@@ -522,6 +1696,83 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("NotificationRecipients");
+
+                    b.HasData(
+                        new
+                        {
+                            RecipientId = new Guid("6a496349-045a-e851-865c-438c077c10a6"),
+                            NotificationId = new Guid("4c77ec9c-2b1a-dc5b-8a29-eabe13fc63a3"),
+                            ReadAt = new DateTime(2026, 6, 4, 2, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f")
+                        },
+                        new
+                        {
+                            RecipientId = new Guid("53489e62-b880-0c50-9bd3-4708d5c7a68e"),
+                            NotificationId = new Guid("8a401056-dda9-765c-a486-ca31419762f1"),
+                            UserId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece")
+                        },
+                        new
+                        {
+                            RecipientId = new Guid("29b7bbef-32cd-2b5d-bcd3-f326e1a06d67"),
+                            NotificationId = new Guid("ca73a25b-b382-1054-b57c-84ea963d9eaf"),
+                            UserId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f")
+                        },
+                        new
+                        {
+                            RecipientId = new Guid("c49fadcb-01f3-6154-985b-58493f27b254"),
+                            NotificationId = new Guid("4fc8ee4a-65d5-d551-a569-fe7cff7fdb69"),
+                            UserId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c")
+                        },
+                        new
+                        {
+                            RecipientId = new Guid("ab334594-f033-465f-bbc2-b3d9c315990a"),
+                            NotificationId = new Guid("7b322e08-b6c7-9051-accc-f23db0876077"),
+                            ReadAt = new DateTime(2026, 5, 31, 2, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b")
+                        },
+                        new
+                        {
+                            RecipientId = new Guid("cb487dbe-c95b-d754-987c-9c6b7ee3e90c"),
+                            NotificationId = new Guid("16eb01d8-478c-1052-a848-5b5d331a27e3"),
+                            UserId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece")
+                        },
+                        new
+                        {
+                            RecipientId = new Guid("25f572cf-feed-f45e-8cad-9649a06f15f5"),
+                            NotificationId = new Guid("248e767b-fbd1-765e-a621-af5c5c5d17f4"),
+                            UserId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f")
+                        },
+                        new
+                        {
+                            RecipientId = new Guid("2202b536-add3-c75e-b4fd-cb421a5b807f"),
+                            NotificationId = new Guid("97035cd2-8716-6451-9bac-10e034a00ed9"),
+                            UserId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c")
+                        },
+                        new
+                        {
+                            RecipientId = new Guid("f2b34149-15fe-bb5b-992a-de4d4834bd85"),
+                            NotificationId = new Guid("f1b6d9ba-bf7a-665f-aa99-bd45e5b4eda3"),
+                            ReadAt = new DateTime(2026, 5, 27, 2, 0, 0, 0, DateTimeKind.Utc),
+                            UserId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f")
+                        },
+                        new
+                        {
+                            RecipientId = new Guid("319efd5e-d6ec-cb5a-a5d7-e0ce3c0e9d00"),
+                            NotificationId = new Guid("8026f84c-ed63-de5c-9b00-f9ad4ecba28a"),
+                            UserId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece")
+                        },
+                        new
+                        {
+                            RecipientId = new Guid("63d03e2c-b6a7-5657-846d-c575b002ba23"),
+                            NotificationId = new Guid("d5c82e74-5b49-d554-a368-ee5e14ada28a"),
+                            UserId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b")
+                        },
+                        new
+                        {
+                            RecipientId = new Guid("e0f1866e-bfb5-e250-b3ad-6951a58d7b9c"),
+                            NotificationId = new Guid("a39a0ace-4fc8-585f-92f5-cfd19f98c6ae"),
+                            UserId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c")
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.Payment", b =>
@@ -546,6 +1797,10 @@ namespace CourtManager.Infrastructure.Migrations
                     b.Property<string>("GatewayAccountNumber")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("GatewayDescription")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("GatewayRawContent")
                         .HasMaxLength(500)
@@ -593,6 +1848,10 @@ namespace CourtManager.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("TransactionDate")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BookingId");
@@ -607,6 +1866,181 @@ namespace CourtManager.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Payments", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("1f0e3fc5-ab2f-455c-b5b5-0cc3146dbf86"),
+                            Amount = 165000m,
+                            BookingId = new Guid("e909180c-8cea-915e-b9c0-47520fe4a6ad"),
+                            Gateway = "SePay",
+                            GatewayAccountNumber = "84519828888",
+                            GatewayRawContent = "CMDEP-2026-0001",
+                            GatewayReferenceCode = "FT2026050001",
+                            GatewayTransactionId = "SEPAY-20260001",
+                            IsDeleted = false,
+                            PaidAt = new DateTime(2026, 6, 2, 1, 0, 0, 0, DateTimeKind.Utc),
+                            PaymentMethod = 3,
+                            PaymentStatus = "Success",
+                            PaymentType = "Deposit",
+                            TransactionCode = "DEP-2026-0001"
+                        },
+                        new
+                        {
+                            Id = new Guid("05080d93-e6b1-2e51-91be-a66268fcffd6"),
+                            Amount = 210000m,
+                            BookingId = new Guid("9e03adc8-fc50-e257-b572-26ece917a5b7"),
+                            Gateway = "Cash",
+                            IsDeleted = false,
+                            PaidAt = new DateTime(2026, 6, 3, 1, 0, 0, 0, DateTimeKind.Utc),
+                            PaymentMethod = 0,
+                            PaymentStatus = "Success",
+                            PaymentType = "Deposit",
+                            TransactionCode = "DEP-2026-0002"
+                        },
+                        new
+                        {
+                            Id = new Guid("943bab94-5bde-3a5b-9338-a6fb552c5ca6"),
+                            Amount = 210000m,
+                            BookingId = new Guid("9e03adc8-fc50-e257-b572-26ece917a5b7"),
+                            Gateway = "Cash",
+                            IsDeleted = false,
+                            PaidAt = new DateTime(2026, 6, 3, 3, 0, 0, 0, DateTimeKind.Utc),
+                            PaymentMethod = 0,
+                            PaymentStatus = "Success",
+                            PaymentType = "Final",
+                            TransactionCode = "FIN-2026-0003"
+                        },
+                        new
+                        {
+                            Id = new Guid("b2e7df7a-bdfd-8054-9818-57e34fb7058f"),
+                            Amount = 197500m,
+                            BookingId = new Guid("f05fe560-3108-5857-ad8a-7c9005cf0dba"),
+                            Gateway = "VNPay",
+                            IsDeleted = false,
+                            PaidAt = new DateTime(2026, 6, 4, 1, 0, 0, 0, DateTimeKind.Utc),
+                            PaymentMethod = 2,
+                            PaymentStatus = "Success",
+                            PaymentType = "Deposit",
+                            TransactionCode = "DEP-2026-0004"
+                        },
+                        new
+                        {
+                            Id = new Guid("5d253d5b-ae53-ab58-acef-7ca3d9a2ba2e"),
+                            Amount = 225000m,
+                            BookingId = new Guid("3ced2bd5-38e9-8b5a-8fc8-4429391d9e0c"),
+                            Gateway = "SePay",
+                            GatewayAccountNumber = "84519828888",
+                            GatewayRawContent = "CMDEP-2026-0005",
+                            GatewayReferenceCode = "FT2026050005",
+                            GatewayTransactionId = "SEPAY-20260005",
+                            IsDeleted = false,
+                            PaidAt = new DateTime(2026, 5, 28, 2, 0, 0, 0, DateTimeKind.Utc),
+                            PaymentMethod = 3,
+                            PaymentStatus = "Success",
+                            PaymentType = "Deposit",
+                            TransactionCode = "DEP-2026-0005"
+                        },
+                        new
+                        {
+                            Id = new Guid("089abb78-e465-6d50-b047-ec062133573a"),
+                            Amount = 225000m,
+                            BookingId = new Guid("3ced2bd5-38e9-8b5a-8fc8-4429391d9e0c"),
+                            Gateway = "SePay",
+                            GatewayAccountNumber = "84519828888",
+                            GatewayRawContent = "CMFIN-2026-0006",
+                            GatewayReferenceCode = "FT2026050006",
+                            GatewayTransactionId = "SEPAY-20260006",
+                            IsDeleted = false,
+                            PaidAt = new DateTime(2026, 5, 28, 4, 0, 0, 0, DateTimeKind.Utc),
+                            PaymentMethod = 3,
+                            PaymentStatus = "Success",
+                            PaymentType = "Final",
+                            TransactionCode = "FIN-2026-0006"
+                        },
+                        new
+                        {
+                            Id = new Guid("58261033-9428-0b54-a68a-64cae236f667"),
+                            Amount = 187500m,
+                            BookingId = new Guid("523e651a-d316-495b-9e88-614fc24c402e"),
+                            Gateway = "MoMo",
+                            IsDeleted = false,
+                            PaidAt = new DateTime(2026, 5, 27, 2, 0, 0, 0, DateTimeKind.Utc),
+                            PaymentMethod = 1,
+                            PaymentStatus = "Success",
+                            PaymentType = "Deposit",
+                            TransactionCode = "DEP-2026-0007"
+                        },
+                        new
+                        {
+                            Id = new Guid("611028e1-59ad-f352-8340-141eb3d2bedd"),
+                            Amount = 187500m,
+                            BookingId = new Guid("523e651a-d316-495b-9e88-614fc24c402e"),
+                            Gateway = "MoMo",
+                            IsDeleted = false,
+                            PaidAt = new DateTime(2026, 5, 27, 5, 0, 0, 0, DateTimeKind.Utc),
+                            PaymentMethod = 1,
+                            PaymentStatus = "Success",
+                            PaymentType = "Final",
+                            TransactionCode = "FIN-2026-0008"
+                        },
+                        new
+                        {
+                            Id = new Guid("dfd3965f-0463-9e57-ac42-ec4ba50502c6"),
+                            Amount = 180000m,
+                            BookingId = new Guid("75ab8d9a-f5ab-9d59-9857-e77407addcd8"),
+                            Gateway = "SePay",
+                            GatewayAccountNumber = "84519828888",
+                            GatewayRawContent = "CMDEP-2026-0009",
+                            GatewayReferenceCode = "FT2026050009",
+                            GatewayTransactionId = "SEPAY-20260009",
+                            IsDeleted = false,
+                            PaymentMethod = 3,
+                            PaymentStatus = "Pending",
+                            PaymentType = "Deposit",
+                            TransactionCode = "DEP-2026-0009"
+                        },
+                        new
+                        {
+                            Id = new Guid("f82c5aa7-c89e-e454-9a4d-43569e509ef2"),
+                            Amount = 142500m,
+                            BookingId = new Guid("33f8c662-d9af-335d-b547-7e116e8b4d74"),
+                            Gateway = "VNPay",
+                            IsDeleted = false,
+                            PaymentMethod = 2,
+                            PaymentStatus = "Pending",
+                            PaymentType = "Deposit",
+                            TransactionCode = "DEP-2026-0010"
+                        },
+                        new
+                        {
+                            Id = new Guid("2fbfbeae-bf78-a452-be7d-d8d36728f0ef"),
+                            Amount = 205000m,
+                            BookingId = new Guid("688cad1e-f0d6-1b5c-add2-059e8ee912b2"),
+                            Gateway = "SePay",
+                            GatewayAccountNumber = "84519828888",
+                            GatewayRawContent = "CMDEP-2026-0011",
+                            GatewayReferenceCode = "FT2026050011",
+                            GatewayTransactionId = "SEPAY-20260011",
+                            IsDeleted = false,
+                            PaymentMethod = 3,
+                            PaymentStatus = "Failed",
+                            PaymentType = "Deposit",
+                            TransactionCode = "DEP-2026-0011"
+                        },
+                        new
+                        {
+                            Id = new Guid("6d37d298-3fba-9c55-bae7-67c8fac57c4a"),
+                            Amount = 147500m,
+                            BookingId = new Guid("1a4b8f37-e3c9-4357-99a8-b997bebeb529"),
+                            Gateway = "Cash",
+                            IsDeleted = false,
+                            PaidAt = new DateTime(2026, 5, 26, 1, 0, 0, 0, DateTimeKind.Utc),
+                            PaymentMethod = 0,
+                            PaymentStatus = "Refunded",
+                            PaymentType = "Deposit",
+                            TransactionCode = "DEP-2026-0012"
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.Review", b =>
@@ -656,36 +2090,135 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            ReviewId = new Guid("50000000-0000-0000-0000-000000000001"),
-                            BookingId = new Guid("60000000-0000-0000-0000-000000000001"),
-                            Comment = "Sân rất đẹp, đèn sáng.",
-                            CreatedAt = new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsDeleted = false,
-                            Rating = 5,
-                            UserId = new Guid("20000000-0000-0000-0000-000000000006"),
-                            VenueId = new Guid("30000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            ReviewId = new Guid("50000000-0000-0000-0000-000000000002"),
-                            BookingId = new Guid("60000000-0000-0000-0000-000000000002"),
-                            Comment = "Cỏ hơi mòn ở khu vực giữa sân.",
-                            CreatedAt = new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ReviewId = new Guid("dc361c44-3c33-4453-bd7f-4b7cf26aa407"),
+                            BookingId = new Guid("682ba49f-52d0-7f51-934f-f573b2c6e822"),
+                            Comment = "Mat san em, den sang va nhan vien huong dan nhanh.",
+                            CreatedAt = new DateTime(2026, 5, 17, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Rating = 4,
-                            UserId = new Guid("20000000-0000-0000-0000-000000000007"),
-                            VenueId = new Guid("30000000-0000-0000-0000-000000000001")
+                            UserId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"),
+                            VenueId = new Guid("e44e7fa2-d7ec-5f55-af24-333a327d8b39")
                         },
                         new
                         {
-                            ReviewId = new Guid("50000000-0000-0000-0000-000000000003"),
-                            BookingId = new Guid("60000000-0000-0000-0000-000000000003"),
-                            Comment = "Giá cả hợp lý, chủ sân nhiệt tình.",
-                            CreatedAt = new DateTime(2025, 1, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ReviewId = new Guid("4d0ea3ba-1f98-3750-b6aa-8476b1455bce"),
+                            BookingId = new Guid("75ab8d9a-f5ab-9d59-9857-e77407addcd8"),
+                            Comment = "Vi tri de tim, bai xe rong, gia hop ly.",
+                            CreatedAt = new DateTime(2026, 5, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsDeleted = false,
                             Rating = 5,
-                            UserId = new Guid("20000000-0000-0000-0000-000000000008"),
-                            VenueId = new Guid("30000000-0000-0000-0000-000000000002")
+                            UserId = new Guid("b53af497-39fc-6351-a424-0a0063d43116"),
+                            VenueId = new Guid("74b290df-251c-135a-949e-b8dd5d6d520e")
+                        },
+                        new
+                        {
+                            ReviewId = new Guid("9f77c259-40af-3751-babe-a8dc7057d518"),
+                            BookingId = new Guid("e909180c-8cea-915e-b9c0-47520fe4a6ad"),
+                            Comment = "San tot nhung phong thay do hoi dong vao cuoi tuan.",
+                            CreatedAt = new DateTime(2026, 5, 19, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Rating = 3,
+                            UserId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"),
+                            VenueId = new Guid("1285e289-4aec-e150-a19d-a18470d844c4")
+                        },
+                        new
+                        {
+                            ReviewId = new Guid("f05f54a6-7eee-0250-a25a-dff608f24fcb"),
+                            BookingId = new Guid("9e03adc8-fc50-e257-b572-26ece917a5b7"),
+                            Comment = "Dat lich nhanh, thanh toan thuan tien.",
+                            CreatedAt = new DateTime(2026, 5, 20, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Rating = 4,
+                            UserId = new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e"),
+                            VenueId = new Guid("76b2e98e-5d43-2452-ad77-c411fbb2e388")
+                        },
+                        new
+                        {
+                            ReviewId = new Guid("e5f74a1b-9148-f851-966b-7486b7489c51"),
+                            BookingId = new Guid("e628c15a-2980-635d-bbfb-55eac35bf6f6"),
+                            Comment = "Chu san ho tro doi gio rat linh hoat.",
+                            CreatedAt = new DateTime(2026, 5, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Rating = 5,
+                            UserId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"),
+                            VenueId = new Guid("c5a685df-a31c-4755-95f3-c8398a3d9bcd")
+                        },
+                        new
+                        {
+                            ReviewId = new Guid("66b77147-0055-1659-8664-bd1eb63d8f20"),
+                            BookingId = new Guid("688cad1e-f0d6-1b5c-add2-059e8ee912b2"),
+                            Comment = "Co day du bong va ao bib cho doi minh.",
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Rating = 3,
+                            UserId = new Guid("81d10681-e36e-595b-972a-f441c8237537"),
+                            VenueId = new Guid("a1067327-953b-345a-9d63-9f4932f73bc2")
+                        },
+                        new
+                        {
+                            ReviewId = new Guid("c7c87667-9694-9950-b977-08433f9ae3e8"),
+                            BookingId = new Guid("f05fe560-3108-5857-ad8a-7c9005cf0dba"),
+                            Comment = "Khu cho doi sach se, phu hop di cung gia dinh.",
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Rating = 4,
+                            UserId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"),
+                            VenueId = new Guid("c725798d-b572-2957-a60b-7a42bda965f3")
+                        },
+                        new
+                        {
+                            ReviewId = new Guid("f0ba7eb1-7891-c356-afa5-ee2f27e6b24a"),
+                            BookingId = new Guid("3ced2bd5-38e9-8b5a-8fc8-4429391d9e0c"),
+                            Comment = "Mat co on dinh, khong bi tron khi troi am.",
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Rating = 5,
+                            UserId = new Guid("b53af497-39fc-6351-a424-0a0063d43116"),
+                            VenueId = new Guid("f4e18d2f-7b53-f353-a00f-02da102573be")
+                        },
+                        new
+                        {
+                            ReviewId = new Guid("e1388f9b-eece-dc50-b44f-b5074241e076"),
+                            BookingId = new Guid("33f8c662-d9af-335d-b547-7e116e8b4d74"),
+                            Comment = "Nhan vien check-in dung gio, khong phai cho lau.",
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Rating = 3,
+                            UserId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"),
+                            VenueId = new Guid("b444aa42-e678-3c53-ab15-e5e05da85358")
+                        },
+                        new
+                        {
+                            ReviewId = new Guid("eea05db7-6429-0353-a2be-3bd74ca9677c"),
+                            BookingId = new Guid("60eed09f-32b4-c65a-9b85-fa0dcaac75b8"),
+                            Comment = "Can cai thien them bang diem dien tu.",
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Rating = 4,
+                            UserId = new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e"),
+                            VenueId = new Guid("e958c525-1a45-f854-97aa-247ccd2a75cd")
+                        },
+                        new
+                        {
+                            ReviewId = new Guid("34cd8723-ab28-665f-ab88-3aeba15cc879"),
+                            BookingId = new Guid("523e651a-d316-495b-9e88-614fc24c402e"),
+                            Comment = "Gia cuoi tuan hoi cao nhung dich vu tot.",
+                            CreatedAt = new DateTime(2026, 5, 27, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Rating = 5,
+                            UserId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"),
+                            VenueId = new Guid("aea33891-2194-505e-898a-64c536f8408c")
+                        },
+                        new
+                        {
+                            ReviewId = new Guid("07bb5e52-8236-a652-8f11-c23e7bd78399"),
+                            BookingId = new Guid("1a4b8f37-e3c9-4357-99a8-b997bebeb529"),
+                            Comment = "San phu hop da giao huu cong ty.",
+                            CreatedAt = new DateTime(2026, 5, 28, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
+                            Rating = 3,
+                            UserId = new Guid("81d10681-e36e-595b-972a-f441c8237537"),
+                            VenueId = new Guid("b81936c7-48de-fd50-be07-27f4af2021f3")
                         });
                 });
 
@@ -728,8 +2261,17 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("10000000-0000-0000-0000-000000000001"),
-                            ConcurrencyStamp = "10000000-0000-0000-0000-000000000001",
+                            Id = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"),
+                            ConcurrencyStamp = "76075424-3dac-6259-a0f7-00a4c6c20191",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Regular booking user",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        },
+                        new
+                        {
+                            Id = new Guid("b5abbaf1-931c-5353-b9ab-1f38eb30b8b8"),
+                            ConcurrencyStamp = "b5abbaf1-931c-5353-b9ab-1f38eb30b8b8",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Administrator with full access",
                             Name = "Admin",
@@ -737,21 +2279,12 @@ namespace CourtManager.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("10000000-0000-0000-0000-000000000002"),
-                            ConcurrencyStamp = "10000000-0000-0000-0000-000000000002",
+                            Id = new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"),
+                            ConcurrencyStamp = "07371171-eec1-3255-b1b2-1d8e8e81ede7",
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Court owner",
+                            Description = "Venue and field owner",
                             Name = "Owner",
                             NormalizedName = "OWNER"
-                        },
-                        new
-                        {
-                            Id = new Guid("10000000-0000-0000-0000-000000000003"),
-                            ConcurrencyStamp = "10000000-0000-0000-0000-000000000003",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Regular user",
-                            Name = "User",
-                            NormalizedName = "USER"
                         });
                 });
 
@@ -787,6 +2320,10 @@ namespace CourtManager.Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
+                    b.Property<long>("RowVersion")
+                        .IsConcurrencyToken()
+                        .HasColumnType("bigint");
+
                     b.Property<string>("SlotStatus")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -807,6 +2344,1172 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("FieldId", "StartTime");
 
                     b.ToTable("TimeSlots", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            SlotId = new Guid("6fbced5a-84b1-5d5b-8a2c-3b71d7731091"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("45af42d7-f17d-4e5e-be92-aa2f64bc139b"),
+                            IsDeleted = false,
+                            Price = 180000m,
+                            RowVersion = 1L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("b5444c8b-63f8-0a55-9419-6de7c1b9e0b6"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("45af42d7-f17d-4e5e-be92-aa2f64bc139b"),
+                            IsDeleted = false,
+                            Price = 180000m,
+                            RowVersion = 2L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("31d79c72-1f45-2c59-865a-049d82fbbb3e"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("45af42d7-f17d-4e5e-be92-aa2f64bc139b"),
+                            IsDeleted = false,
+                            Price = 180000m,
+                            RowVersion = 3L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("c23792c7-d1d8-cd54-990c-c4c26c5f8ec1"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("45af42d7-f17d-4e5e-be92-aa2f64bc139b"),
+                            IsDeleted = false,
+                            Price = 180000m,
+                            RowVersion = 4L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("f2a0f988-40e3-af5f-bf1f-a5dd453b8371"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("294eaa8c-61fd-fc53-a189-e2605d6550ae"),
+                            IsDeleted = false,
+                            Price = 220000m,
+                            RowVersion = 5L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("c16bb36b-86b9-f45c-bda0-955b92ba386f"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("294eaa8c-61fd-fc53-a189-e2605d6550ae"),
+                            IsDeleted = false,
+                            Price = 220000m,
+                            RowVersion = 6L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("fe2f8199-f3f3-ea56-aee3-a0772ff88948"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("294eaa8c-61fd-fc53-a189-e2605d6550ae"),
+                            IsDeleted = false,
+                            LockedUntil = new DateTime(2026, 6, 5, 0, 20, 0, 0, DateTimeKind.Utc),
+                            Price = 220000m,
+                            RowVersion = 7L,
+                            SlotStatus = "Locked",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("a41aa1a2-afdb-9850-aba5-cb7276ba896b"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("294eaa8c-61fd-fc53-a189-e2605d6550ae"),
+                            IsDeleted = false,
+                            Price = 220000m,
+                            RowVersion = 8L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("9cdfa4ae-ceb2-a156-9375-71fda5d069c0"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("79f3417a-16a9-245b-ba20-06b22c6d3499"),
+                            IsDeleted = false,
+                            Price = 185000m,
+                            RowVersion = 9L,
+                            SlotStatus = "Booked",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("15532bdb-abe3-7150-b1e0-0ee022f9f559"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("79f3417a-16a9-245b-ba20-06b22c6d3499"),
+                            IsDeleted = false,
+                            Price = 185000m,
+                            RowVersion = 10L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("5121ac84-ad91-f157-b35b-077a398e9bd6"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("79f3417a-16a9-245b-ba20-06b22c6d3499"),
+                            IsDeleted = false,
+                            Price = 185000m,
+                            RowVersion = 11L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("75166681-8a81-9a59-b666-37c2e249c1cb"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("79f3417a-16a9-245b-ba20-06b22c6d3499"),
+                            IsDeleted = false,
+                            Price = 185000m,
+                            RowVersion = 12L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("953f198b-b4c7-a25f-b1fa-9d8fa5dc23f5"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("a495e9ef-94ab-df5c-b307-f2c002ddcfe1"),
+                            IsDeleted = false,
+                            Price = 225000m,
+                            RowVersion = 13L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("8b70691f-7e6b-cd5a-8f2b-abc9d0272569"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("a495e9ef-94ab-df5c-b307-f2c002ddcfe1"),
+                            IsDeleted = false,
+                            LockedUntil = new DateTime(2026, 6, 5, 0, 20, 0, 0, DateTimeKind.Utc),
+                            Price = 225000m,
+                            RowVersion = 14L,
+                            SlotStatus = "Locked",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("f92a0d42-7929-3e5b-8f1e-c8f58be22caa"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("a495e9ef-94ab-df5c-b307-f2c002ddcfe1"),
+                            IsDeleted = false,
+                            Price = 225000m,
+                            RowVersion = 15L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("6b592d94-6309-df5f-8915-6202c84c5d8c"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("a495e9ef-94ab-df5c-b307-f2c002ddcfe1"),
+                            IsDeleted = false,
+                            Price = 225000m,
+                            RowVersion = 16L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("84bbc889-74d1-065b-84d0-d3a34d1677cf"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("d8b4c3b4-eae4-235e-ad10-312e902e6f4c"),
+                            IsDeleted = false,
+                            Price = 190000m,
+                            RowVersion = 17L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("c0253a2a-9205-0b53-8ffd-5e912843b5c6"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("d8b4c3b4-eae4-235e-ad10-312e902e6f4c"),
+                            IsDeleted = false,
+                            Price = 190000m,
+                            RowVersion = 18L,
+                            SlotStatus = "Booked",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("b6a8de4f-1fa4-425f-a4a1-0b7860359450"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("d8b4c3b4-eae4-235e-ad10-312e902e6f4c"),
+                            IsDeleted = false,
+                            Price = 190000m,
+                            RowVersion = 19L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("8845749a-92f4-fe53-8a01-036c051fbdd4"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("d8b4c3b4-eae4-235e-ad10-312e902e6f4c"),
+                            IsDeleted = false,
+                            Price = 190000m,
+                            RowVersion = 20L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("e127cc3d-3a8f-f550-b03b-be63c8330dc4"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("f2f0e4ec-ebfe-ff54-a6e2-e67e6e24d0c7"),
+                            IsDeleted = false,
+                            LockedUntil = new DateTime(2026, 6, 5, 0, 20, 0, 0, DateTimeKind.Utc),
+                            Price = 230000m,
+                            RowVersion = 21L,
+                            SlotStatus = "Locked",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("06d7859e-0ab5-045d-8b38-8b88c4272db0"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("f2f0e4ec-ebfe-ff54-a6e2-e67e6e24d0c7"),
+                            IsDeleted = false,
+                            Price = 230000m,
+                            RowVersion = 22L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("d80e35a2-7e78-4351-97a7-26145dbe3882"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("f2f0e4ec-ebfe-ff54-a6e2-e67e6e24d0c7"),
+                            IsDeleted = false,
+                            Price = 230000m,
+                            RowVersion = 23L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("7f0006ba-6bb4-ab5f-8754-d74e5841e645"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("f2f0e4ec-ebfe-ff54-a6e2-e67e6e24d0c7"),
+                            IsDeleted = false,
+                            Price = 230000m,
+                            RowVersion = 24L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("8dae3ee0-2266-5d54-8524-c6028d2418d6"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("85433577-1e55-3153-8189-16c078122b94"),
+                            IsDeleted = false,
+                            Price = 195000m,
+                            RowVersion = 25L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("4e889b07-277b-7655-9a63-ad0a363ca856"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("85433577-1e55-3153-8189-16c078122b94"),
+                            IsDeleted = false,
+                            Price = 195000m,
+                            RowVersion = 26L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("c2a327a5-8634-ab58-ac77-28d113d9c3c1"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("85433577-1e55-3153-8189-16c078122b94"),
+                            IsDeleted = false,
+                            Price = 195000m,
+                            RowVersion = 27L,
+                            SlotStatus = "Booked",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("e2de90d9-940a-7557-82be-ce34cd51e2e8"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("85433577-1e55-3153-8189-16c078122b94"),
+                            IsDeleted = false,
+                            LockedUntil = new DateTime(2026, 6, 5, 0, 20, 0, 0, DateTimeKind.Utc),
+                            Price = 195000m,
+                            RowVersion = 28L,
+                            SlotStatus = "Locked",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("c9e9df36-ea22-1758-b5bd-12754e5ea1f4"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("14cf58fc-b1e6-de5b-bcec-45b06e83c66a"),
+                            IsDeleted = false,
+                            Price = 235000m,
+                            RowVersion = 29L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("c311314f-c845-c75e-a009-9907198429b9"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("14cf58fc-b1e6-de5b-bcec-45b06e83c66a"),
+                            IsDeleted = false,
+                            Price = 235000m,
+                            RowVersion = 30L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("1cc39181-5644-5053-bbba-2749a077476c"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("14cf58fc-b1e6-de5b-bcec-45b06e83c66a"),
+                            IsDeleted = false,
+                            Price = 235000m,
+                            RowVersion = 31L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("040bc61c-499f-4750-b7e2-c7fe4f5938ab"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("14cf58fc-b1e6-de5b-bcec-45b06e83c66a"),
+                            IsDeleted = false,
+                            Price = 235000m,
+                            RowVersion = 32L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("919d9e36-5928-bf55-bab4-fffc84de0838"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("09e80b9f-6396-1753-b72e-17e13cc94abb"),
+                            IsDeleted = false,
+                            Price = 200000m,
+                            RowVersion = 33L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("3d2a384b-1331-8952-adff-a38ef7f53b6b"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("09e80b9f-6396-1753-b72e-17e13cc94abb"),
+                            IsDeleted = false,
+                            Price = 200000m,
+                            RowVersion = 34L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("e83985ff-e394-575d-8128-92fbc8afa75c"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("09e80b9f-6396-1753-b72e-17e13cc94abb"),
+                            IsDeleted = false,
+                            LockedUntil = new DateTime(2026, 6, 5, 0, 20, 0, 0, DateTimeKind.Utc),
+                            Price = 200000m,
+                            RowVersion = 35L,
+                            SlotStatus = "Locked",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("78d595b5-43ea-075b-aaeb-4886c784d4b7"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("09e80b9f-6396-1753-b72e-17e13cc94abb"),
+                            IsDeleted = false,
+                            Price = 200000m,
+                            RowVersion = 36L,
+                            SlotStatus = "Booked",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("2d70063b-e039-815c-a3e3-9aa9558796aa"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("ad88bad6-8267-2d57-a1a1-7320527a9aec"),
+                            IsDeleted = false,
+                            Price = 240000m,
+                            RowVersion = 37L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("b5288789-3ec5-d05e-b715-7d1d5b3c7548"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("ad88bad6-8267-2d57-a1a1-7320527a9aec"),
+                            IsDeleted = false,
+                            Price = 240000m,
+                            RowVersion = 38L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("88ad348b-db86-e555-9a17-01e4144cb549"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("ad88bad6-8267-2d57-a1a1-7320527a9aec"),
+                            IsDeleted = false,
+                            Price = 240000m,
+                            RowVersion = 39L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("576e404d-c1f3-8f5c-a170-d77c18465e8f"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("ad88bad6-8267-2d57-a1a1-7320527a9aec"),
+                            IsDeleted = false,
+                            Price = 240000m,
+                            RowVersion = 40L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("5b93bade-b937-9557-9567-b335ba4a7409"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("ad617cd9-d99d-c958-8a5a-f9cadf1cdcff"),
+                            IsDeleted = false,
+                            Price = 205000m,
+                            RowVersion = 41L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("a8f5a04b-4730-e95e-9dff-3e62777a5c7c"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("ad617cd9-d99d-c958-8a5a-f9cadf1cdcff"),
+                            IsDeleted = false,
+                            LockedUntil = new DateTime(2026, 6, 5, 0, 20, 0, 0, DateTimeKind.Utc),
+                            Price = 205000m,
+                            RowVersion = 42L,
+                            SlotStatus = "Locked",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("7106e4d2-0b62-525f-9b81-c5f41ebafb89"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("ad617cd9-d99d-c958-8a5a-f9cadf1cdcff"),
+                            IsDeleted = false,
+                            Price = 205000m,
+                            RowVersion = 43L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("96214fbd-d81c-2b50-87a5-27362aa8675a"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("ad617cd9-d99d-c958-8a5a-f9cadf1cdcff"),
+                            IsDeleted = false,
+                            Price = 205000m,
+                            RowVersion = 44L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("3c006a7f-08a8-215a-8a32-a7e8bfd55cdf"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("6410c6c3-9f7f-b05a-b040-d6edfba2d8aa"),
+                            IsDeleted = false,
+                            Price = 245000m,
+                            RowVersion = 45L,
+                            SlotStatus = "Booked",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("8de6ef22-b0c5-d454-be60-4621d5c847b4"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("6410c6c3-9f7f-b05a-b040-d6edfba2d8aa"),
+                            IsDeleted = false,
+                            Price = 245000m,
+                            RowVersion = 46L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("63acab69-d781-915d-bf5e-c1994a1a8311"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("6410c6c3-9f7f-b05a-b040-d6edfba2d8aa"),
+                            IsDeleted = false,
+                            Price = 245000m,
+                            RowVersion = 47L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("bbe9d84d-24a1-8459-a75e-24a4c39a7c6e"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("6410c6c3-9f7f-b05a-b040-d6edfba2d8aa"),
+                            IsDeleted = false,
+                            Price = 245000m,
+                            RowVersion = 48L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("abfd74d7-416d-705b-8748-effe22f413b1"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("3682998c-7f03-a350-89d8-2ce45ea05eb9"),
+                            IsDeleted = false,
+                            LockedUntil = new DateTime(2026, 6, 5, 0, 20, 0, 0, DateTimeKind.Utc),
+                            Price = 210000m,
+                            RowVersion = 49L,
+                            SlotStatus = "Locked",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("b8b4826c-d631-9057-bb26-d587358ddfec"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("3682998c-7f03-a350-89d8-2ce45ea05eb9"),
+                            IsDeleted = false,
+                            Price = 210000m,
+                            RowVersion = 50L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("7cfdf522-13d6-e659-9004-5b853cdf2c42"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("3682998c-7f03-a350-89d8-2ce45ea05eb9"),
+                            IsDeleted = false,
+                            Price = 210000m,
+                            RowVersion = 51L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("db960ef6-9fa6-405e-a70a-7b19956c5868"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("3682998c-7f03-a350-89d8-2ce45ea05eb9"),
+                            IsDeleted = false,
+                            Price = 210000m,
+                            RowVersion = 52L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("006e7d31-b1de-bd56-858b-5c83e270530d"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("6c0c039f-c8ee-ec55-9e58-e7aa2e93778c"),
+                            IsDeleted = false,
+                            Price = 250000m,
+                            RowVersion = 53L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("3cabba4c-29d5-355f-a014-a2c132f1b3a8"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("6c0c039f-c8ee-ec55-9e58-e7aa2e93778c"),
+                            IsDeleted = false,
+                            Price = 250000m,
+                            RowVersion = 54L,
+                            SlotStatus = "Booked",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("c98eec9d-c965-c958-9a13-a965d83ba0b4"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("6c0c039f-c8ee-ec55-9e58-e7aa2e93778c"),
+                            IsDeleted = false,
+                            Price = 250000m,
+                            RowVersion = 55L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("ad3423df-7105-b45b-99e8-386d63dff8ae"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("6c0c039f-c8ee-ec55-9e58-e7aa2e93778c"),
+                            IsDeleted = false,
+                            LockedUntil = new DateTime(2026, 6, 5, 0, 20, 0, 0, DateTimeKind.Utc),
+                            Price = 250000m,
+                            RowVersion = 56L,
+                            SlotStatus = "Locked",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("7f1056a9-4a06-4c5a-a0ec-9432e30a7597"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("208d5f71-5196-6a53-ad42-9156ad65bf46"),
+                            IsDeleted = false,
+                            Price = 215000m,
+                            RowVersion = 57L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("94742e80-2e1d-a85a-98a7-15b90ec4d24e"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("208d5f71-5196-6a53-ad42-9156ad65bf46"),
+                            IsDeleted = false,
+                            Price = 215000m,
+                            RowVersion = 58L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("6315cdb6-4e92-4952-8b06-fce6232abd62"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("208d5f71-5196-6a53-ad42-9156ad65bf46"),
+                            IsDeleted = false,
+                            Price = 215000m,
+                            RowVersion = 59L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("de66c5f1-236a-6755-9a99-f697a6a05dc8"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("208d5f71-5196-6a53-ad42-9156ad65bf46"),
+                            IsDeleted = false,
+                            Price = 215000m,
+                            RowVersion = 60L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("0f965541-5a9b-1659-83ec-b666ef205611"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("8d6a77e0-82a1-045f-8f29-95f3f02bf455"),
+                            IsDeleted = false,
+                            Price = 255000m,
+                            RowVersion = 61L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("c6629796-f4e2-765f-a046-fd122a29e294"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("8d6a77e0-82a1-045f-8f29-95f3f02bf455"),
+                            IsDeleted = false,
+                            Price = 255000m,
+                            RowVersion = 62L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("08a95b3c-18d6-4858-9fb3-6553233e1f49"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("8d6a77e0-82a1-045f-8f29-95f3f02bf455"),
+                            IsDeleted = false,
+                            Price = 255000m,
+                            RowVersion = 63L,
+                            SlotStatus = "Booked",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("59c3a59a-7e2a-4a54-b4dc-7caf93a18b4d"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("8d6a77e0-82a1-045f-8f29-95f3f02bf455"),
+                            IsDeleted = false,
+                            Price = 255000m,
+                            RowVersion = 64L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("a0c246d7-46b3-5452-b2ca-59b0ff65b8b3"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("724604cf-d676-845b-a538-85d3af910e6c"),
+                            IsDeleted = false,
+                            Price = 220000m,
+                            RowVersion = 65L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("7f08c352-7f5d-fb5d-89dd-1a11383604a3"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("724604cf-d676-845b-a538-85d3af910e6c"),
+                            IsDeleted = false,
+                            Price = 220000m,
+                            RowVersion = 66L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("34978f12-b18d-b252-b590-ce8bd4ee15a9"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("724604cf-d676-845b-a538-85d3af910e6c"),
+                            IsDeleted = false,
+                            Price = 220000m,
+                            RowVersion = 67L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("c68d1d30-565b-f95a-8a56-f2c827bf635a"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("724604cf-d676-845b-a538-85d3af910e6c"),
+                            IsDeleted = false,
+                            Price = 220000m,
+                            RowVersion = 68L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("d2a70344-c2cf-8f5d-8a31-d2d7f602458f"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("23369eca-5734-b452-95e7-0aa5558fdd64"),
+                            IsDeleted = false,
+                            Price = 260000m,
+                            RowVersion = 69L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("5f57200c-7795-4a59-96d3-7abf1b1341f3"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("23369eca-5734-b452-95e7-0aa5558fdd64"),
+                            IsDeleted = false,
+                            LockedUntil = new DateTime(2026, 6, 5, 0, 20, 0, 0, DateTimeKind.Utc),
+                            Price = 260000m,
+                            RowVersion = 70L,
+                            SlotStatus = "Locked",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("d326b461-e298-cb5c-806b-4c2e087391dc"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("23369eca-5734-b452-95e7-0aa5558fdd64"),
+                            IsDeleted = false,
+                            Price = 260000m,
+                            RowVersion = 71L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("9001f1cf-c993-015d-98ff-2a4e2d8af25a"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("23369eca-5734-b452-95e7-0aa5558fdd64"),
+                            IsDeleted = false,
+                            Price = 260000m,
+                            RowVersion = 72L,
+                            SlotStatus = "Booked",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("464157ca-79b4-785c-ab87-ef646cc12c3e"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("5c7cc6ae-9bba-d454-8042-305cc655d89f"),
+                            IsDeleted = false,
+                            Price = 225000m,
+                            RowVersion = 73L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("e7a59147-c628-b355-8553-8bc3f7b85745"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("5c7cc6ae-9bba-d454-8042-305cc655d89f"),
+                            IsDeleted = false,
+                            Price = 225000m,
+                            RowVersion = 74L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("83f65b05-bb7b-bb58-ad79-4a2341f700f6"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("5c7cc6ae-9bba-d454-8042-305cc655d89f"),
+                            IsDeleted = false,
+                            Price = 225000m,
+                            RowVersion = 75L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("8144160e-c5e2-5854-b3ae-68a1da13e931"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("5c7cc6ae-9bba-d454-8042-305cc655d89f"),
+                            IsDeleted = false,
+                            Price = 225000m,
+                            RowVersion = 76L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("f0218b75-a7b6-5358-892d-d5aa1ed77844"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("59f6e46d-42d7-a55c-882c-e1487fbc48e7"),
+                            IsDeleted = false,
+                            LockedUntil = new DateTime(2026, 6, 5, 0, 20, 0, 0, DateTimeKind.Utc),
+                            Price = 265000m,
+                            RowVersion = 77L,
+                            SlotStatus = "Locked",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("b256a207-79b9-b05d-9a19-e81b3267f00a"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("59f6e46d-42d7-a55c-882c-e1487fbc48e7"),
+                            IsDeleted = false,
+                            Price = 265000m,
+                            RowVersion = 78L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("b4f4b466-5a2f-fe58-a877-21dc03c630b6"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("59f6e46d-42d7-a55c-882c-e1487fbc48e7"),
+                            IsDeleted = false,
+                            Price = 265000m,
+                            RowVersion = 79L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("5a489d34-f586-d95a-a62c-e2713a556737"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("59f6e46d-42d7-a55c-882c-e1487fbc48e7"),
+                            IsDeleted = false,
+                            Price = 265000m,
+                            RowVersion = 80L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("e2a26c1a-3c4d-cc5e-8728-e1797e151c65"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("a0e5a644-336c-2b59-bc7a-9f524ab67be9"),
+                            IsDeleted = false,
+                            Price = 230000m,
+                            RowVersion = 81L,
+                            SlotStatus = "Booked",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("1dcf9f73-0800-8155-b507-0868ecad7134"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("a0e5a644-336c-2b59-bc7a-9f524ab67be9"),
+                            IsDeleted = false,
+                            Price = 230000m,
+                            RowVersion = 82L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("679f0390-9f2b-6450-8b8d-34072b00a133"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("a0e5a644-336c-2b59-bc7a-9f524ab67be9"),
+                            IsDeleted = false,
+                            Price = 230000m,
+                            RowVersion = 83L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("2fef1d81-7e74-c557-bd22-64d5199ad675"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("a0e5a644-336c-2b59-bc7a-9f524ab67be9"),
+                            IsDeleted = false,
+                            LockedUntil = new DateTime(2026, 6, 5, 0, 20, 0, 0, DateTimeKind.Utc),
+                            Price = 230000m,
+                            RowVersion = 84L,
+                            SlotStatus = "Locked",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("6ac7a77e-e79f-425a-bc11-3f058ec92354"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("20c94649-263e-9359-90db-156fbf078756"),
+                            IsDeleted = false,
+                            Price = 270000m,
+                            RowVersion = 85L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("abbbfe7e-6e0e-5456-8928-c2154f6d2055"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("20c94649-263e-9359-90db-156fbf078756"),
+                            IsDeleted = false,
+                            Price = 270000m,
+                            RowVersion = 86L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("75bea63b-66eb-e555-a08d-9c75a50252e1"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("20c94649-263e-9359-90db-156fbf078756"),
+                            IsDeleted = false,
+                            Price = 270000m,
+                            RowVersion = 87L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("e52f9a50-d5d1-e15a-ab62-3870087cd1fe"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("20c94649-263e-9359-90db-156fbf078756"),
+                            IsDeleted = false,
+                            Price = 270000m,
+                            RowVersion = 88L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("7267e2b9-efc6-6b58-89a5-e083cf16ad38"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("d69222bd-d845-145a-8281-891e544ed55a"),
+                            IsDeleted = false,
+                            Price = 235000m,
+                            RowVersion = 89L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("70688fbb-45e8-5d54-9809-bf4cfafc8352"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("d69222bd-d845-145a-8281-891e544ed55a"),
+                            IsDeleted = false,
+                            Price = 235000m,
+                            RowVersion = 90L,
+                            SlotStatus = "Booked",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("83e57048-5bdf-5e56-a8cd-f2a548264963"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("d69222bd-d845-145a-8281-891e544ed55a"),
+                            IsDeleted = false,
+                            LockedUntil = new DateTime(2026, 6, 5, 0, 20, 0, 0, DateTimeKind.Utc),
+                            Price = 235000m,
+                            RowVersion = 91L,
+                            SlotStatus = "Locked",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("1689dbb6-65cf-2556-876c-317b4f2750ec"),
+                            CreatedAt = new DateTime(2026, 5, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("d69222bd-d845-145a-8281-891e544ed55a"),
+                            IsDeleted = false,
+                            Price = 235000m,
+                            RowVersion = 92L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("f5cabc80-51c7-2455-a3c3-ea44c96e66a3"),
+                            CreatedAt = new DateTime(2026, 5, 25, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("2abd8ce8-1d77-9954-9421-394da8d9b623"),
+                            IsDeleted = false,
+                            Price = 275000m,
+                            RowVersion = 93L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 18, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("9a015167-580b-1d56-bec4-6e9179233ee1"),
+                            CreatedAt = new DateTime(2026, 5, 26, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("2abd8ce8-1d77-9954-9421-394da8d9b623"),
+                            IsDeleted = false,
+                            Price = 275000m,
+                            RowVersion = 94L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 19, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("e18f2b8c-4982-5c55-96b0-037488f78f3a"),
+                            CreatedAt = new DateTime(2026, 5, 22, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("2abd8ce8-1d77-9954-9421-394da8d9b623"),
+                            IsDeleted = false,
+                            Price = 275000m,
+                            RowVersion = 95L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 20, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            SlotId = new Guid("b8886b81-3ad1-f25f-a274-fb0391a1ec04"),
+                            CreatedAt = new DateTime(2026, 5, 23, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndTime = new DateTime(2026, 6, 9, 22, 0, 0, 0, DateTimeKind.Utc),
+                            FieldId = new Guid("2abd8ce8-1d77-9954-9421-394da8d9b623"),
+                            IsDeleted = false,
+                            Price = 275000m,
+                            RowVersion = 96L,
+                            SlotStatus = "Available",
+                            StartTime = new DateTime(2026, 6, 9, 21, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.User", b =>
@@ -919,233 +3622,279 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("20000000-0000-0000-0000-000000000001"),
+                            Id = new Guid("b41aae5d-9596-9a5d-b8e5-0f8b199a8135"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000001",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "admin1@court.com",
-                            EmailConfirmed = false,
-                            FullName = "System Admin1",
+                            ConcurrencyStamp = "b41aae5d-9596-9a5d-b8e5-0f8b199a8135",
+                            CreatedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "lan.nguyen@courtmanager.vn",
+                            EmailConfirmed = true,
+                            FullName = "Lan Nguyen",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "ADMIN1@COURT.COM",
-                            NormalizedUserName = "ADMIN1@COURT.COM",
+                            NormalizedEmail = "LAN.NGUYEN@COURTMANAGER.VN",
+                            NormalizedUserName = "LAN.NGUYEN@COURTMANAGER.VN",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
-                            Phone = "0900000001",
-                            PhoneNumber = "0900000001",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "20000000-0000-0000-0000-000000000001",
+                            Phone = "0902311001",
+                            PhoneNumber = "0902311001",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "b41aae5d-9596-9a5d-b8e5-0f8b199a8135",
                             TwoFactorEnabled = false,
-                            UserName = "admin1@court.com"
+                            UserName = "lan.nguyen@courtmanager.vn"
                         },
                         new
                         {
-                            Id = new Guid("20000000-0000-0000-0000-000000000002"),
+                            Id = new Guid("e3266388-5d3f-c459-beef-1edc2d465a3e"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000002",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "admin2@court.com",
-                            EmailConfirmed = false,
-                            FullName = "System Admin2",
+                            ConcurrencyStamp = "e3266388-5d3f-c459-beef-1edc2d465a3e",
+                            CreatedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "minh.tran@courtmanager.vn",
+                            EmailConfirmed = true,
+                            FullName = "Minh Tran",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "ADMIN2@COURT.COM",
-                            NormalizedUserName = "ADMIN2@COURT.COM",
+                            NormalizedEmail = "MINH.TRAN@COURTMANAGER.VN",
+                            NormalizedUserName = "MINH.TRAN@COURTMANAGER.VN",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
-                            Phone = "0900000002",
-                            PhoneNumber = "0900000002",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "20000000-0000-0000-0000-000000000002",
+                            Phone = "0902311002",
+                            PhoneNumber = "0902311002",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "e3266388-5d3f-c459-beef-1edc2d465a3e",
                             TwoFactorEnabled = false,
-                            UserName = "admin2@court.com"
+                            UserName = "minh.tran@courtmanager.vn"
                         },
                         new
                         {
-                            Id = new Guid("20000000-0000-0000-0000-000000000003"),
+                            Id = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000003",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "owner1@court.com",
-                            EmailConfirmed = false,
-                            FullName = "Court Owner1",
+                            ConcurrencyStamp = "ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc",
+                            CreatedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "duy.pham@sporthub.vn",
+                            EmailConfirmed = true,
+                            FullName = "Duy Pham",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "OWNER1@COURT.COM",
-                            NormalizedUserName = "OWNER1@COURT.COM",
+                            NormalizedEmail = "DUY.PHAM@SPORTHUB.VN",
+                            NormalizedUserName = "DUY.PHAM@SPORTHUB.VN",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
-                            Phone = "0900000003",
-                            PhoneNumber = "0900000003",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "20000000-0000-0000-0000-000000000003",
+                            Phone = "0902311003",
+                            PhoneNumber = "0902311003",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc",
                             TwoFactorEnabled = false,
-                            UserName = "owner1@court.com"
+                            UserName = "duy.pham@sporthub.vn"
                         },
                         new
                         {
-                            Id = new Guid("20000000-0000-0000-0000-000000000004"),
+                            Id = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000004",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "owner2@court.com",
-                            EmailConfirmed = false,
-                            FullName = "Court Owner2",
+                            ConcurrencyStamp = "2f958e63-14a1-ee5f-b359-e923bbd70ece",
+                            CreatedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "hanh.le@saigonfields.vn",
+                            EmailConfirmed = true,
+                            FullName = "Hanh Le",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "OWNER2@COURT.COM",
-                            NormalizedUserName = "OWNER2@COURT.COM",
+                            NormalizedEmail = "HANH.LE@SAIGONFIELDS.VN",
+                            NormalizedUserName = "HANH.LE@SAIGONFIELDS.VN",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
-                            Phone = "0900000004",
-                            PhoneNumber = "0900000004",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "20000000-0000-0000-0000-000000000004",
+                            Phone = "0902311004",
+                            PhoneNumber = "0902311004",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "2f958e63-14a1-ee5f-b359-e923bbd70ece",
                             TwoFactorEnabled = false,
-                            UserName = "owner2@court.com"
+                            UserName = "hanh.le@saigonfields.vn"
                         },
                         new
                         {
-                            Id = new Guid("20000000-0000-0000-0000-000000000005"),
+                            Id = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000005",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "owner3@court.com",
-                            EmailConfirmed = false,
-                            FullName = "Court Owner3",
+                            ConcurrencyStamp = "ff182b52-5005-895d-a90a-224ef11c5e61",
+                            CreatedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "quang.vo@greenpitch.vn",
+                            EmailConfirmed = true,
+                            FullName = "Quang Vo",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "OWNER3@COURT.COM",
-                            NormalizedUserName = "OWNER3@COURT.COM",
+                            NormalizedEmail = "QUANG.VO@GREENPITCH.VN",
+                            NormalizedUserName = "QUANG.VO@GREENPITCH.VN",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
-                            Phone = "0900000005",
-                            PhoneNumber = "0900000005",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "20000000-0000-0000-0000-000000000005",
+                            Phone = "0902311005",
+                            PhoneNumber = "0902311005",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "ff182b52-5005-895d-a90a-224ef11c5e61",
                             TwoFactorEnabled = false,
-                            UserName = "owner3@court.com"
+                            UserName = "quang.vo@greenpitch.vn"
                         },
                         new
                         {
-                            Id = new Guid("20000000-0000-0000-0000-000000000006"),
+                            Id = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000006",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "user1@court.com",
-                            EmailConfirmed = false,
-                            FullName = "Pro User1",
+                            ConcurrencyStamp = "49f942ec-d197-7c5c-a011-6454ca64ec2c",
+                            CreatedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "bao.hoang@cityarena.vn",
+                            EmailConfirmed = true,
+                            FullName = "Bao Hoang",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
-                            NormalizedEmail = "USER1@COURT.COM",
-                            NormalizedUserName = "USER1@COURT.COM",
+                            NormalizedEmail = "BAO.HOANG@CITYARENA.VN",
+                            NormalizedUserName = "BAO.HOANG@CITYARENA.VN",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
-                            Phone = "0900000006",
-                            PhoneNumber = "0900000006",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "20000000-0000-0000-0000-000000000006",
+                            Phone = "0902311006",
+                            PhoneNumber = "0902311006",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "49f942ec-d197-7c5c-a011-6454ca64ec2c",
                             TwoFactorEnabled = false,
-                            UserName = "user1@court.com"
+                            UserName = "bao.hoang@cityarena.vn"
                         },
                         new
                         {
-                            Id = new Guid("20000000-0000-0000-0000-000000000007"),
+                            Id = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000007",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "user2@court.com",
-                            EmailConfirmed = false,
-                            FullName = "Pro User2",
+                            ConcurrencyStamp = "28d446ef-917b-8b59-a814-da2a00b0b76f",
+                            CreatedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "andang.football@gmail.com",
+                            EmailConfirmed = true,
+                            FullName = "An Dang",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
-                            LoyaltyPoints = 0,
-                            NormalizedEmail = "USER2@COURT.COM",
-                            NormalizedUserName = "USER2@COURT.COM",
+                            LoyaltyPoints = 120,
+                            NormalizedEmail = "ANDANG.FOOTBALL@GMAIL.COM",
+                            NormalizedUserName = "ANDANG.FOOTBALL@GMAIL.COM",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
-                            Phone = "0900000007",
-                            PhoneNumber = "0900000007",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "20000000-0000-0000-0000-000000000007",
+                            Phone = "0902311007",
+                            PhoneNumber = "0902311007",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "28d446ef-917b-8b59-a814-da2a00b0b76f",
                             TwoFactorEnabled = false,
-                            UserName = "user2@court.com"
+                            UserName = "andang.football@gmail.com"
                         },
                         new
                         {
-                            Id = new Guid("20000000-0000-0000-0000-000000000008"),
+                            Id = new Guid("b53af497-39fc-6351-a424-0a0063d43116"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000008",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "user3@court.com",
-                            EmailConfirmed = false,
-                            FullName = "Casual User3",
+                            ConcurrencyStamp = "b53af497-39fc-6351-a424-0a0063d43116",
+                            CreatedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "mypham.saigon@gmail.com",
+                            EmailConfirmed = true,
+                            FullName = "My Pham",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
-                            LoyaltyPoints = 0,
-                            NormalizedEmail = "USER3@COURT.COM",
-                            NormalizedUserName = "USER3@COURT.COM",
+                            LoyaltyPoints = 120,
+                            NormalizedEmail = "MYPHAM.SAIGON@GMAIL.COM",
+                            NormalizedUserName = "MYPHAM.SAIGON@GMAIL.COM",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
-                            Phone = "0900000008",
-                            PhoneNumber = "0900000008",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "20000000-0000-0000-0000-000000000008",
+                            Phone = "0902311008",
+                            PhoneNumber = "0902311008",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "b53af497-39fc-6351-a424-0a0063d43116",
                             TwoFactorEnabled = false,
-                            UserName = "user3@court.com"
+                            UserName = "mypham.saigon@gmail.com"
                         },
                         new
                         {
-                            Id = new Guid("20000000-0000-0000-0000-000000000009"),
+                            Id = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000009",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "user4@court.com",
-                            EmailConfirmed = false,
-                            FullName = "Casual User4",
+                            ConcurrencyStamp = "cbfe125b-7a8c-335c-aa61-df49f35c448f",
+                            CreatedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "khoabui.runner@outlook.com",
+                            EmailConfirmed = true,
+                            FullName = "Khoa Bui",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
-                            LoyaltyPoints = 0,
-                            NormalizedEmail = "USER4@COURT.COM",
-                            NormalizedUserName = "USER4@COURT.COM",
+                            LoyaltyPoints = 120,
+                            NormalizedEmail = "KHOABUI.RUNNER@OUTLOOK.COM",
+                            NormalizedUserName = "KHOABUI.RUNNER@OUTLOOK.COM",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
-                            Phone = "0900000009",
-                            PhoneNumber = "0900000009",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "20000000-0000-0000-0000-000000000009",
+                            Phone = "0902311009",
+                            PhoneNumber = "0902311009",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "cbfe125b-7a8c-335c-aa61-df49f35c448f",
                             TwoFactorEnabled = false,
-                            UserName = "user4@court.com"
+                            UserName = "khoabui.runner@outlook.com"
                         },
                         new
                         {
-                            Id = new Guid("20000000-0000-0000-0000-000000000010"),
+                            Id = new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "20000000-0000-0000-0000-000000000010",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "user5@court.com",
-                            EmailConfirmed = false,
-                            FullName = "Newbie User5",
+                            ConcurrencyStamp = "de68f3de-ceab-c85f-b54a-645613f6a13e",
+                            CreatedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "thaodo.booking@gmail.com",
+                            EmailConfirmed = true,
+                            FullName = "Thao Do",
                             IsActive = true,
                             IsDeleted = false,
                             LockoutEnabled = false,
-                            LoyaltyPoints = 0,
-                            NormalizedEmail = "USER5@COURT.COM",
-                            NormalizedUserName = "USER5@COURT.COM",
+                            LoyaltyPoints = 120,
+                            NormalizedEmail = "THAODO.BOOKING@GMAIL.COM",
+                            NormalizedUserName = "THAODO.BOOKING@GMAIL.COM",
                             PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
-                            Phone = "0900000010",
-                            PhoneNumber = "0900000010",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "20000000-0000-0000-0000-000000000010",
+                            Phone = "0902311010",
+                            PhoneNumber = "0902311010",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "de68f3de-ceab-c85f-b54a-645613f6a13e",
                             TwoFactorEnabled = false,
-                            UserName = "user5@court.com"
+                            UserName = "thaodo.booking@gmail.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "eff1cca4-9f7a-0f53-a3e0-115f934fc55b",
+                            CreatedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "tuanmai.sports@yahoo.com",
+                            EmailConfirmed = true,
+                            FullName = "Tuan Mai",
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockoutEnabled = false,
+                            LoyaltyPoints = 120,
+                            NormalizedEmail = "TUANMAI.SPORTS@YAHOO.COM",
+                            NormalizedUserName = "TUANMAI.SPORTS@YAHOO.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            Phone = "0902311011",
+                            PhoneNumber = "0902311011",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "eff1cca4-9f7a-0f53-a3e0-115f934fc55b",
+                            TwoFactorEnabled = false,
+                            UserName = "tuanmai.sports@yahoo.com"
+                        },
+                        new
+                        {
+                            Id = new Guid("81d10681-e36e-595b-972a-f441c8237537"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "81d10681-e36e-595b-972a-f441c8237537",
+                            CreatedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "linhhuynh.club@gmail.com",
+                            EmailConfirmed = true,
+                            FullName = "Linh Huynh",
+                            IsActive = true,
+                            IsDeleted = false,
+                            LockoutEnabled = false,
+                            LoyaltyPoints = 120,
+                            NormalizedEmail = "LINHHUYNH.CLUB@GMAIL.COM",
+                            NormalizedUserName = "LINHHUYNH.CLUB@GMAIL.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMhNOhWJhrehCy84iiKMjD+gAwmKtd2V+CHm4EhzxmaTyXKW9OS5bmKjoFGKqWDFAg==",
+                            Phone = "0902311012",
+                            PhoneNumber = "0902311012",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "81d10681-e36e-595b-972a-f441c8237537",
+                            TwoFactorEnabled = false,
+                            UserName = "linhhuynh.club@gmail.com"
                         });
                 });
 
@@ -1208,63 +3957,75 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = new Guid("20000000-0000-0000-0000-000000000001"),
-                            RoleId = new Guid("10000000-0000-0000-0000-000000000001"),
-                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            UserId = new Guid("b41aae5d-9596-9a5d-b8e5-0f8b199a8135"),
+                            RoleId = new Guid("b5abbaf1-931c-5353-b9ab-1f38eb30b8b8"),
+                            AssignedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            UserId = new Guid("20000000-0000-0000-0000-000000000002"),
-                            RoleId = new Guid("10000000-0000-0000-0000-000000000001"),
-                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            UserId = new Guid("e3266388-5d3f-c459-beef-1edc2d465a3e"),
+                            RoleId = new Guid("b5abbaf1-931c-5353-b9ab-1f38eb30b8b8"),
+                            AssignedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            UserId = new Guid("20000000-0000-0000-0000-000000000003"),
-                            RoleId = new Guid("10000000-0000-0000-0000-000000000002"),
-                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            UserId = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
+                            RoleId = new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"),
+                            AssignedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            UserId = new Guid("20000000-0000-0000-0000-000000000004"),
-                            RoleId = new Guid("10000000-0000-0000-0000-000000000002"),
-                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            UserId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            RoleId = new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"),
+                            AssignedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            UserId = new Guid("20000000-0000-0000-0000-000000000005"),
-                            RoleId = new Guid("10000000-0000-0000-0000-000000000002"),
-                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            UserId = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
+                            RoleId = new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"),
+                            AssignedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            UserId = new Guid("20000000-0000-0000-0000-000000000006"),
-                            RoleId = new Guid("10000000-0000-0000-0000-000000000003"),
-                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            UserId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            RoleId = new Guid("07371171-eec1-3255-b1b2-1d8e8e81ede7"),
+                            AssignedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            UserId = new Guid("20000000-0000-0000-0000-000000000007"),
-                            RoleId = new Guid("10000000-0000-0000-0000-000000000003"),
-                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            UserId = new Guid("28d446ef-917b-8b59-a814-da2a00b0b76f"),
+                            RoleId = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"),
+                            AssignedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            UserId = new Guid("20000000-0000-0000-0000-000000000008"),
-                            RoleId = new Guid("10000000-0000-0000-0000-000000000003"),
-                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            UserId = new Guid("b53af497-39fc-6351-a424-0a0063d43116"),
+                            RoleId = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"),
+                            AssignedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            UserId = new Guid("20000000-0000-0000-0000-000000000009"),
-                            RoleId = new Guid("10000000-0000-0000-0000-000000000003"),
-                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            UserId = new Guid("cbfe125b-7a8c-335c-aa61-df49f35c448f"),
+                            RoleId = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"),
+                            AssignedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            UserId = new Guid("20000000-0000-0000-0000-000000000010"),
-                            RoleId = new Guid("10000000-0000-0000-0000-000000000003"),
-                            AssignedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            UserId = new Guid("de68f3de-ceab-c85f-b54a-645613f6a13e"),
+                            RoleId = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"),
+                            AssignedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = new Guid("eff1cca4-9f7a-0f53-a3e0-115f934fc55b"),
+                            RoleId = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"),
+                            AssignedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = new Guid("81d10681-e36e-595b-972a-f441c8237537"),
+                            RoleId = new Guid("76075424-3dac-6259-a0f7-00a4c6c20191"),
+                            AssignedAt = new DateTime(2026, 6, 5, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -1327,33 +4088,183 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            VenueId = new Guid("30000000-0000-0000-0000-000000000001"),
-                            Address = "30 Phan Thúc Duyện, Tân Bình, TP.HCM",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Cụm sân bóng mini lớn nhất Tân Bình.",
+                            VenueId = new Guid("e44e7fa2-d7ec-5f55-af24-333a327d8b39"),
+                            Address = "12 Nguyen Huu Canh, Binh Thanh, Ho Chi Minh City",
+                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Riverside venue with four compact football fields.",
                             IsActive = true,
                             IsDeleted = false,
-                            Latitude = 10.8016m,
-                            Longitude = 106.6653m,
-                            OpeningHours = "06:00 - 23:00",
-                            OwnerId = new Guid("20000000-0000-0000-0000-000000000003"),
-                            PhoneContact = "0900000003",
-                            VenueName = "Sân Bóng Chảo Lửa"
+                            Latitude = 10.791054m,
+                            Longitude = 106.719809m,
+                            OpeningHours = "06:00-23:00",
+                            OwnerId = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
+                            PhoneContact = "02873010001",
+                            VenueName = "Saigon Riverside Sports Park"
                         },
                         new
                         {
-                            VenueId = new Guid("30000000-0000-0000-0000-000000000002"),
-                            Address = "Hẻm 12 Thăng Long, Tân Bình, TP.HCM",
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Sân cỏ nhân tạo mới thay, chất lượng cao.",
+                            VenueId = new Guid("74b290df-251c-135a-949e-b8dd5d6d520e"),
+                            Address = "91 Binh Quoi, Binh Thanh, Ho Chi Minh City",
+                            CreatedAt = new DateTime(2026, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Community sports hub near Thanh Da peninsula.",
                             IsActive = true,
                             IsDeleted = false,
-                            Latitude = 10.8030m,
-                            Longitude = 106.6620m,
-                            OpeningHours = "05:00 - 24:00",
-                            OwnerId = new Guid("20000000-0000-0000-0000-000000000003"),
-                            PhoneContact = "0900000003",
-                            VenueName = "Sân Bóng Thăng Long"
+                            Latitude = 10.815713m,
+                            Longitude = 106.731719m,
+                            OpeningHours = "05:30-22:30",
+                            OwnerId = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
+                            PhoneContact = "02873010002",
+                            VenueName = "Thanh Da Community Football Hub"
+                        },
+                        new
+                        {
+                            VenueId = new Guid("1285e289-4aec-e150-a19d-a18470d844c4"),
+                            Address = "45 Nguyen Luong Bang, District 7, Ho Chi Minh City",
+                            CreatedAt = new DateTime(2026, 1, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Well maintained turf fields for evening leagues.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Latitude = 10.729210m,
+                            Longitude = 106.721916m,
+                            OpeningHours = "06:00-23:30",
+                            OwnerId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            PhoneContact = "02873010003",
+                            VenueName = "District 7 Green Pitch"
+                        },
+                        new
+                        {
+                            VenueId = new Guid("76b2e98e-5d43-2452-ad77-c411fbb2e388"),
+                            Address = "19 Ton Dat Tien, District 7, Ho Chi Minh City",
+                            CreatedAt = new DateTime(2026, 1, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Premium arena close to office and residential areas.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Latitude = 10.732221m,
+                            Longitude = 106.704730m,
+                            OpeningHours = "06:00-23:00",
+                            OwnerId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            PhoneContact = "02873010004",
+                            VenueName = "Phu My Hung Arena"
+                        },
+                        new
+                        {
+                            VenueId = new Guid("c5a685df-a31c-4755-95f3-c8398a3d9bcd"),
+                            Address = "1 Vo Van Ngan, Thu Duc City, Ho Chi Minh City",
+                            CreatedAt = new DateTime(2026, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Large venue suitable for student tournaments.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Latitude = 10.849643m,
+                            Longitude = 106.771566m,
+                            OpeningHours = "05:00-22:00",
+                            OwnerId = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
+                            PhoneContact = "02873010005",
+                            VenueName = "Thu Duc University Stadium"
+                        },
+                        new
+                        {
+                            VenueId = new Guid("a1067327-953b-345a-9d63-9f4932f73bc2"),
+                            Address = "37 Linh Trung, Thu Duc City, Ho Chi Minh City",
+                            CreatedAt = new DateTime(2026, 1, 6, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Neighborhood five-a-side club with loyal weekly players.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Latitude = 10.871823m,
+                            Longitude = 106.779496m,
+                            OpeningHours = "05:30-22:30",
+                            OwnerId = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
+                            PhoneContact = "02873010006",
+                            VenueName = "Linh Trung Five-A-Side Club"
+                        },
+                        new
+                        {
+                            VenueId = new Guid("c725798d-b572-2957-a60b-7a42bda965f3"),
+                            Address = "88 Bach Dang, Tan Binh, Ho Chi Minh City",
+                            CreatedAt = new DateTime(2026, 1, 7, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Convenient fields near the airport corridor.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Latitude = 10.813651m,
+                            Longitude = 106.665408m,
+                            OpeningHours = "06:00-23:00",
+                            OwnerId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            PhoneContact = "02873010007",
+                            VenueName = "Tan Binh Flight Path Fields"
+                        },
+                        new
+                        {
+                            VenueId = new Guid("f4e18d2f-7b53-f353-a00f-02da102573be"),
+                            Address = "154 Phan Van Tri, Go Vap, Ho Chi Minh City",
+                            CreatedAt = new DateTime(2026, 1, 8, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Popular weekend venue for amateur clubs.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Latitude = 10.833116m,
+                            Longitude = 106.680982m,
+                            OpeningHours = "06:00-23:30",
+                            OwnerId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            PhoneContact = "02873010008",
+                            VenueName = "Go Vap Weekend Arena"
+                        },
+                        new
+                        {
+                            VenueId = new Guid("b444aa42-e678-3c53-ab15-e5e05da85358"),
+                            Address = "22 Ten Lua, Binh Tan, Ho Chi Minh City",
+                            CreatedAt = new DateTime(2026, 1, 9, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Accessible west-side venue with affordable slots.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Latitude = 10.753894m,
+                            Longitude = 106.607990m,
+                            OpeningHours = "05:30-22:00",
+                            OwnerId = new Guid("ef0c12c5-0bcf-4e5f-a13a-4b01b2ed44fc"),
+                            PhoneContact = "02873010009",
+                            VenueName = "Binh Tan Sports Yard"
+                        },
+                        new
+                        {
+                            VenueId = new Guid("e958c525-1a45-f854-97aa-247ccd2a75cd"),
+                            Address = "75 Tran Hung Dao, Son Tra, Da Nang",
+                            CreatedAt = new DateTime(2026, 1, 10, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Modern riverside venue in central Da Nang.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Latitude = 16.070884m,
+                            Longitude = 108.229401m,
+                            OpeningHours = "06:00-23:00",
+                            OwnerId = new Guid("2f958e63-14a1-ee5f-b359-e923bbd70ece"),
+                            PhoneContact = "02367301010",
+                            VenueName = "Da Nang Han River Football Center"
+                        },
+                        new
+                        {
+                            VenueId = new Guid("aea33891-2194-505e-898a-64c536f8408c"),
+                            Address = "28 Trich Sai, Tay Ho, Hanoi",
+                            CreatedAt = new DateTime(2026, 1, 11, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Compact football complex near West Lake.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Latitude = 21.055408m,
+                            Longitude = 105.813839m,
+                            OpeningHours = "06:00-22:30",
+                            OwnerId = new Guid("ff182b52-5005-895d-a90a-224ef11c5e61"),
+                            PhoneContact = "02473010011",
+                            VenueName = "Hanoi West Lake Mini Pitch"
+                        },
+                        new
+                        {
+                            VenueId = new Guid("b81936c7-48de-fd50-be07-27f4af2021f3"),
+                            Address = "9 Hai Ba Trung, Ninh Kieu, Can Tho",
+                            CreatedAt = new DateTime(2026, 1, 12, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Central Can Tho venue for evening bookings.",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Latitude = 10.034103m,
+                            Longitude = 105.788535m,
+                            OpeningHours = "05:30-22:30",
+                            OwnerId = new Guid("49f942ec-d197-7c5c-a011-6454ca64ec2c"),
+                            PhoneContact = "02927301012",
+                            VenueName = "Can Tho Ninh Kieu Sports Ground"
                         });
                 });
 
@@ -1370,6 +4281,188 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("AmenityId");
 
                     b.ToTable("VenueAmenities");
+
+                    b.HasData(
+                        new
+                        {
+                            VenueId = new Guid("e44e7fa2-d7ec-5f55-af24-333a327d8b39"),
+                            AmenityId = new Guid("8077e70b-71ae-925c-87b1-707df6b54bc0")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("e44e7fa2-d7ec-5f55-af24-333a327d8b39"),
+                            AmenityId = new Guid("f5a935e4-be7d-f95f-953e-298059f47da2")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("e44e7fa2-d7ec-5f55-af24-333a327d8b39"),
+                            AmenityId = new Guid("81815209-f0e6-f752-a864-5236f3aafd94")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("74b290df-251c-135a-949e-b8dd5d6d520e"),
+                            AmenityId = new Guid("8f3b4b0d-4710-9059-8a85-c256548f118c")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("74b290df-251c-135a-949e-b8dd5d6d520e"),
+                            AmenityId = new Guid("74d70a98-b403-3255-a580-98eda5f581fc")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("74b290df-251c-135a-949e-b8dd5d6d520e"),
+                            AmenityId = new Guid("72951c7c-043d-1c5c-a39a-e299eaece521")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("1285e289-4aec-e150-a19d-a18470d844c4"),
+                            AmenityId = new Guid("99335921-22b7-3b51-8340-e756ae4c4930")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("1285e289-4aec-e150-a19d-a18470d844c4"),
+                            AmenityId = new Guid("bd8a547b-4ea6-065e-84eb-082bb11c0ce5")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("1285e289-4aec-e150-a19d-a18470d844c4"),
+                            AmenityId = new Guid("6215b4d4-8e66-845d-ad2f-53d4f1d3cbeb")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("76b2e98e-5d43-2452-ad77-c411fbb2e388"),
+                            AmenityId = new Guid("f5a935e4-be7d-f95f-953e-298059f47da2")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("76b2e98e-5d43-2452-ad77-c411fbb2e388"),
+                            AmenityId = new Guid("81815209-f0e6-f752-a864-5236f3aafd94")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("76b2e98e-5d43-2452-ad77-c411fbb2e388"),
+                            AmenityId = new Guid("b8358615-9686-2d50-8067-ba459980f291")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("c5a685df-a31c-4755-95f3-c8398a3d9bcd"),
+                            AmenityId = new Guid("74d70a98-b403-3255-a580-98eda5f581fc")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("c5a685df-a31c-4755-95f3-c8398a3d9bcd"),
+                            AmenityId = new Guid("72951c7c-043d-1c5c-a39a-e299eaece521")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("c5a685df-a31c-4755-95f3-c8398a3d9bcd"),
+                            AmenityId = new Guid("a745c0e2-627f-085e-af23-316c1a756cbe")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("a1067327-953b-345a-9d63-9f4932f73bc2"),
+                            AmenityId = new Guid("bd8a547b-4ea6-065e-84eb-082bb11c0ce5")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("a1067327-953b-345a-9d63-9f4932f73bc2"),
+                            AmenityId = new Guid("6215b4d4-8e66-845d-ad2f-53d4f1d3cbeb")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("a1067327-953b-345a-9d63-9f4932f73bc2"),
+                            AmenityId = new Guid("23c9f58d-b578-e552-872f-c81516bbbb45")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("c725798d-b572-2957-a60b-7a42bda965f3"),
+                            AmenityId = new Guid("81815209-f0e6-f752-a864-5236f3aafd94")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("c725798d-b572-2957-a60b-7a42bda965f3"),
+                            AmenityId = new Guid("b8358615-9686-2d50-8067-ba459980f291")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("c725798d-b572-2957-a60b-7a42bda965f3"),
+                            AmenityId = new Guid("8077e70b-71ae-925c-87b1-707df6b54bc0")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("f4e18d2f-7b53-f353-a00f-02da102573be"),
+                            AmenityId = new Guid("72951c7c-043d-1c5c-a39a-e299eaece521")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("f4e18d2f-7b53-f353-a00f-02da102573be"),
+                            AmenityId = new Guid("a745c0e2-627f-085e-af23-316c1a756cbe")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("f4e18d2f-7b53-f353-a00f-02da102573be"),
+                            AmenityId = new Guid("8f3b4b0d-4710-9059-8a85-c256548f118c")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("b444aa42-e678-3c53-ab15-e5e05da85358"),
+                            AmenityId = new Guid("6215b4d4-8e66-845d-ad2f-53d4f1d3cbeb")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("b444aa42-e678-3c53-ab15-e5e05da85358"),
+                            AmenityId = new Guid("23c9f58d-b578-e552-872f-c81516bbbb45")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("b444aa42-e678-3c53-ab15-e5e05da85358"),
+                            AmenityId = new Guid("99335921-22b7-3b51-8340-e756ae4c4930")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("e958c525-1a45-f854-97aa-247ccd2a75cd"),
+                            AmenityId = new Guid("b8358615-9686-2d50-8067-ba459980f291")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("e958c525-1a45-f854-97aa-247ccd2a75cd"),
+                            AmenityId = new Guid("8077e70b-71ae-925c-87b1-707df6b54bc0")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("e958c525-1a45-f854-97aa-247ccd2a75cd"),
+                            AmenityId = new Guid("f5a935e4-be7d-f95f-953e-298059f47da2")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("aea33891-2194-505e-898a-64c536f8408c"),
+                            AmenityId = new Guid("a745c0e2-627f-085e-af23-316c1a756cbe")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("aea33891-2194-505e-898a-64c536f8408c"),
+                            AmenityId = new Guid("8f3b4b0d-4710-9059-8a85-c256548f118c")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("aea33891-2194-505e-898a-64c536f8408c"),
+                            AmenityId = new Guid("74d70a98-b403-3255-a580-98eda5f581fc")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("b81936c7-48de-fd50-be07-27f4af2021f3"),
+                            AmenityId = new Guid("23c9f58d-b578-e552-872f-c81516bbbb45")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("b81936c7-48de-fd50-be07-27f4af2021f3"),
+                            AmenityId = new Guid("99335921-22b7-3b51-8340-e756ae4c4930")
+                        },
+                        new
+                        {
+                            VenueId = new Guid("b81936c7-48de-fd50-be07-27f4af2021f3"),
+                            AmenityId = new Guid("bd8a547b-4ea6-065e-84eb-082bb11c0ce5")
+                        });
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.VenueImage", b =>
@@ -1400,6 +4493,200 @@ namespace CourtManager.Infrastructure.Migrations
                     b.HasIndex("VenueId");
 
                     b.ToTable("VenueImages", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ImageId = new Guid("6d8f0aa8-5100-c05f-80cd-4ff3301ae171"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/1-cover.jpg",
+                            IsDeleted = false,
+                            IsPrimary = true,
+                            VenueId = new Guid("e44e7fa2-d7ec-5f55-af24-333a327d8b39")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("3ea9c8b1-c9b3-9b58-b278-de5903f9accd"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/1-field.jpg",
+                            IsDeleted = false,
+                            IsPrimary = false,
+                            VenueId = new Guid("e44e7fa2-d7ec-5f55-af24-333a327d8b39")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("eea5c71a-29cc-8e56-b6ac-2e5b1a37594e"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/2-cover.jpg",
+                            IsDeleted = false,
+                            IsPrimary = true,
+                            VenueId = new Guid("74b290df-251c-135a-949e-b8dd5d6d520e")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("8f41fab7-2efe-0856-b844-f323d084d99d"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/2-field.jpg",
+                            IsDeleted = false,
+                            IsPrimary = false,
+                            VenueId = new Guid("74b290df-251c-135a-949e-b8dd5d6d520e")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("76c837b7-9902-f858-91c0-d0508f1c0bfa"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/3-cover.jpg",
+                            IsDeleted = false,
+                            IsPrimary = true,
+                            VenueId = new Guid("1285e289-4aec-e150-a19d-a18470d844c4")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("0be32b6f-d831-b052-b2e3-86d585cc3dcb"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/3-field.jpg",
+                            IsDeleted = false,
+                            IsPrimary = false,
+                            VenueId = new Guid("1285e289-4aec-e150-a19d-a18470d844c4")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("5c1f126e-21ca-b456-9196-08623510c396"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/4-cover.jpg",
+                            IsDeleted = false,
+                            IsPrimary = true,
+                            VenueId = new Guid("76b2e98e-5d43-2452-ad77-c411fbb2e388")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("394e958f-ae3d-2e51-9184-614bb7eac2f3"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/4-field.jpg",
+                            IsDeleted = false,
+                            IsPrimary = false,
+                            VenueId = new Guid("76b2e98e-5d43-2452-ad77-c411fbb2e388")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("1f6cb772-e116-4a59-b0d0-5ccf51bfe681"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/5-cover.jpg",
+                            IsDeleted = false,
+                            IsPrimary = true,
+                            VenueId = new Guid("c5a685df-a31c-4755-95f3-c8398a3d9bcd")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("31981a18-d937-735d-876b-4a8ad53a96dc"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/5-field.jpg",
+                            IsDeleted = false,
+                            IsPrimary = false,
+                            VenueId = new Guid("c5a685df-a31c-4755-95f3-c8398a3d9bcd")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("9d59949b-e1d2-3f5e-b246-14eda540acfc"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/6-cover.jpg",
+                            IsDeleted = false,
+                            IsPrimary = true,
+                            VenueId = new Guid("a1067327-953b-345a-9d63-9f4932f73bc2")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("b37671e6-eae1-d15a-9fb8-3712830e5f52"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/6-field.jpg",
+                            IsDeleted = false,
+                            IsPrimary = false,
+                            VenueId = new Guid("a1067327-953b-345a-9d63-9f4932f73bc2")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("a1e7c7c2-b969-4a51-a57d-0d2e810cd868"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/7-cover.jpg",
+                            IsDeleted = false,
+                            IsPrimary = true,
+                            VenueId = new Guid("c725798d-b572-2957-a60b-7a42bda965f3")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("13c493e8-6551-4852-9ada-181a936a9f69"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/7-field.jpg",
+                            IsDeleted = false,
+                            IsPrimary = false,
+                            VenueId = new Guid("c725798d-b572-2957-a60b-7a42bda965f3")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("2383662e-fec7-0f50-834c-ce09582f040a"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/8-cover.jpg",
+                            IsDeleted = false,
+                            IsPrimary = true,
+                            VenueId = new Guid("f4e18d2f-7b53-f353-a00f-02da102573be")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("db576a38-eeff-2e59-87e8-4d4f39f2d890"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/8-field.jpg",
+                            IsDeleted = false,
+                            IsPrimary = false,
+                            VenueId = new Guid("f4e18d2f-7b53-f353-a00f-02da102573be")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("c0835fac-188d-4a5f-b0b5-2428741d8043"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/9-cover.jpg",
+                            IsDeleted = false,
+                            IsPrimary = true,
+                            VenueId = new Guid("b444aa42-e678-3c53-ab15-e5e05da85358")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("35082070-0c36-9b5b-856d-e975a537d9b4"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/9-field.jpg",
+                            IsDeleted = false,
+                            IsPrimary = false,
+                            VenueId = new Guid("b444aa42-e678-3c53-ab15-e5e05da85358")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("63fd918a-007d-fd57-a84b-52ff3f886fdf"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/10-cover.jpg",
+                            IsDeleted = false,
+                            IsPrimary = true,
+                            VenueId = new Guid("e958c525-1a45-f854-97aa-247ccd2a75cd")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("a83a48cf-debb-6152-a15a-24f40e78334b"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/10-field.jpg",
+                            IsDeleted = false,
+                            IsPrimary = false,
+                            VenueId = new Guid("e958c525-1a45-f854-97aa-247ccd2a75cd")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("950ba886-f8d2-d555-b516-2c5503be75f2"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/11-cover.jpg",
+                            IsDeleted = false,
+                            IsPrimary = true,
+                            VenueId = new Guid("aea33891-2194-505e-898a-64c536f8408c")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("2dcb3eb4-2891-095a-b7f1-bf412ab92403"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/11-field.jpg",
+                            IsDeleted = false,
+                            IsPrimary = false,
+                            VenueId = new Guid("aea33891-2194-505e-898a-64c536f8408c")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("28382b24-c202-4d5c-9c0a-d5da02d0b2ab"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/12-cover.jpg",
+                            IsDeleted = false,
+                            IsPrimary = true,
+                            VenueId = new Guid("b81936c7-48de-fd50-be07-27f4af2021f3")
+                        },
+                        new
+                        {
+                            ImageId = new Guid("1d259280-e9cb-955f-97a8-f56aecdcddad"),
+                            ImageUrl = "https://images.courtmanager.vn/venues/12-field.jpg",
+                            IsDeleted = false,
+                            IsPrimary = false,
+                            VenueId = new Guid("b81936c7-48de-fd50-be07-27f4af2021f3")
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

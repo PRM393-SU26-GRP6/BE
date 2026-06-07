@@ -17,6 +17,10 @@ public class TimeSlotConfiguration : IEntityTypeConfiguration<TimeSlot>
         builder.HasMany(s => s.BookingItems).WithOne(bi => bi.Slot).HasForeignKey(bi => bi.SlotId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne(s => s.LockedByUser).WithMany().HasForeignKey(s => s.LockedBy).OnDelete(DeleteBehavior.Restrict);
         builder.HasIndex(s => new { s.FieldId, s.StartTime });
+
+        // Optimistic concurrency control via version number (PostgreSQL compatible)
+        builder.Property(s => s.RowVersion).IsConcurrencyToken();
+
         builder.ToTable("TimeSlots");
     }
 }

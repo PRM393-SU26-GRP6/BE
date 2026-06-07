@@ -4,6 +4,8 @@ using Microsoft.OpenApi;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
+using CourtManager.APIs.Services.Realtime;
+using CourtManager.Application.Interfaces;
 
 namespace CourtManager.APIs.Configuration;
 
@@ -19,9 +21,11 @@ public static class ApiServiceExtensions
         });
         services.AddEndpointsApiExplorer();
         services.AddHttpClient();
-        
+        services.AddSignalR();
+
         services.AddHttpContextAccessor();
-        services.AddScoped<CourtManager.Application.Interfaces.ICurrentUserService, CourtManager.APIs.Services.CurrentUserService>();
+        services.AddScoped<ICurrentUserService, CourtManager.APIs.Services.CurrentUserService>();
+        services.AddScoped<IRealtimeEventPublisher, RealtimeEventPublisher>();
 
         // SePay Configuration
         services.Configure<SePaySettings>(configuration.GetSection("SePay"));
@@ -48,10 +52,10 @@ public static class ApiServiceExtensions
 
             options.AddSecurityDefinition("SePayApiKey", new OpenApiSecurityScheme
             {
-                Name = "X-API-Key",
+                Name = "Authorization",
                 Type = SecuritySchemeType.ApiKey,
                 In = ParameterLocation.Header,
-                Description = "SePay webhook API key"
+                Description = "For SePay webhook only. Header format: `Authorization: Apikey sepay_webhook_local_2026`"
             });
 
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
@@ -81,6 +85,18 @@ public static class ApiServiceExtensions
 
                 options.Events = new JwtBearerEvents
                 {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    },
                     OnAuthenticationFailed = context =>
                     {
                         if (context.Exception is SecurityTokenExpiredException)
@@ -102,6 +118,23 @@ public static class ApiServiceExtensions
                 policy.AllowAnyOrigin()
                       .AllowAnyMethod()
                       .AllowAnyHeader();
+            });
+
+            var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+            options.AddPolicy("AllowFrontend", policy =>
+            {
+                if (allowedOrigins.Length == 0)
+                {
+                    policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                }
+                else
+                {
+                    policy.WithOrigins(allowedOrigins)
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                }
             });
         });
 

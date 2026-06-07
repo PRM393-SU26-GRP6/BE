@@ -1,6 +1,6 @@
 using AutoMapper;
 using CourtManager.Application.DTOs;
-using CourtManager.Domain.Interfaces;
+using CourtManager.Application.Interfaces;
 using MediatR;
 
 namespace CourtManager.Application.Features.Amenities.Queries;

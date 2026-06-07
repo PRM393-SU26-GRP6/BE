@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using CourtManager.Domain.Entities;
-using CourtManager.Domain.Interfaces;
+using CourtManager.Application.Interfaces;
 
 namespace CourtManager.Infrastructure.Repositories;
 
@@ -16,6 +16,8 @@ public class PaymentRepository : Repository<Payment>, IPaymentRepository
     {
         return await _dbSet
             .Include(p => p.Booking)
+                .ThenInclude(b => b!.BookingItems)
+                    .ThenInclude(i => i.Slot)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 

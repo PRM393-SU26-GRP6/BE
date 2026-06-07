@@ -9,10 +9,12 @@ namespace CourtManager.APIs.Controllers;
 public class FieldsController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly ILogger<FieldsController> _logger;
 
-    public FieldsController(IMediator mediator)
+    public FieldsController(IMediator mediator, ILogger<FieldsController> logger)
     {
         _mediator = mediator;
+        _logger = logger;
     }
 
     [HttpGet("{id}")]
@@ -31,11 +33,12 @@ public class FieldsController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Unexpected error while fetching field {FieldId}", id);
             return NotFound(new
             {
                 success = false,
                 message = "Field not found",
-                errors = new[] { ex.Message }
+                errors = Array.Empty<string>()
             });
         }
     }
@@ -59,11 +62,12 @@ public class FieldsController : ControllerBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Unexpected error while fetching slots for field {FieldId}", id);
             return BadRequest(new
             {
                 success = false,
-                message = "Failed to get field slots",
-                errors = new[] { ex.Message }
+                message = "An unexpected error occurred while fetching field slots. Please try again.",
+                errors = Array.Empty<string>()
             });
         }
     }

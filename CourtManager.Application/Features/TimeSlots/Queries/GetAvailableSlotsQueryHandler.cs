@@ -1,5 +1,5 @@
 using CourtManager.Application.DTOs;
-using CourtManager.Domain.Interfaces;
+using CourtManager.Application.Interfaces;
 using MediatR;
 
 namespace CourtManager.Application.Features.TimeSlots.Queries;
@@ -23,6 +23,7 @@ public class GetAvailableSlotsQueryHandler : IRequestHandler<GetAvailableSlotsQu
             FieldId = s.FieldId,
             StartTime = s.StartTime,
             EndTime = s.EndTime,
+            Price = s.Price,
             SlotStatus = s.SlotStatus.ToString(),
             CreatedAt = s.CreatedAt,
             UpdatedAt = s.UpdatedAt

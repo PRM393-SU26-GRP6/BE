@@ -1,7 +1,7 @@
 using AutoMapper;
 using CourtManager.Application.DTOs;
 using CourtManager.Application.Exceptions;
-using CourtManager.Domain.Interfaces;
+using CourtManager.Application.Interfaces;
 using MediatR;
 
 namespace CourtManager.Application.Features.Fields.Commands;

@@ -1,5 +1,5 @@
 using MediatR;
-using CourtManager.Domain.Interfaces;
+using CourtManager.Application.Interfaces;
 using CourtManager.Application.Exceptions;
 using Microsoft.Extensions.Logging;
 

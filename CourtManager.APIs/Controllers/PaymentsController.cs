@@ -173,6 +173,15 @@ public class PaymentsController : BaseApiController
     /// Receives automatic bank transfer notifications from SePay.
     /// Secured by API key header validation.
     /// </summary>
+    /// <remarks>
+    /// Enter the API key directly in the request parameters.
+    ///
+    /// Recommended:
+    /// - `authorization = Apikey sepay_webhook_local_2026`
+    ///
+    /// Or alternatively:
+    /// - `x-api-key = sepay_webhook_local_2026`
+    /// </remarks>
     /// <param name="webhook">The SePay webhook payload</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Webhook processing result</returns>
@@ -181,11 +190,24 @@ public class PaymentsController : BaseApiController
     [ProducesResponseType(typeof(PaymentGatewayCallbackResultDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> SePayWebhook(
+        [FromHeader(Name = "Authorization")] string? authorization,
+        [FromHeader(Name = "X-API-Key")] string? xApiKey,
         [FromBody] SePayWebhookDto webhook,
         CancellationToken cancellationToken)
     {
-        // Validate API key from header
-        var apiKey = Request.Headers["X-API-Key"].FirstOrDefault();
+        // Validate API key from Authorization or X-API-Key header
+        var authorizationHeader = authorization;
+        var apiKey = xApiKey;
+
+        if (string.IsNullOrWhiteSpace(apiKey) && !string.IsNullOrWhiteSpace(authorizationHeader))
+        {
+            const string prefix = "Apikey ";
+            if (authorizationHeader.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                apiKey = authorizationHeader[prefix.Length..].Trim();
+            }
+        }
+
         if (string.IsNullOrWhiteSpace(apiKey) || apiKey != _sePaySettings.EffectiveWebhookApiKey)
         {
             _logger.LogWarning("SePay webhook rejected: invalid or missing API key");
@@ -200,11 +222,18 @@ public class PaymentsController : BaseApiController
             webhook.Gateway,
             webhook.AccountNumber,
             webhook.TransferType,
+            webhook.Code,
             webhook.Content,
             webhook.TransferAmount,
             webhook.ReferenceCode), cancellationToken);
 
-        return StatusCode(result.StatusCode, result);
+        return StatusCode(result.StatusCode, new
+        {
+            success = result.StatusCode is >= 200 and < 300,
+            message = result.Message,
+            paymentId = result.PaymentId,
+            status = result.PaymentStatus
+        });
     }
 
     /// <summary>
@@ -219,7 +248,8 @@ public class PaymentsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSePayQrInfo(Guid paymentId, CancellationToken cancellationToken)
     {
-        var payment = await _mediator.Send(new GetPaymentByIdPublicQuery(paymentId), cancellationToken);
+        var isOwnerOrAdmin = User.IsInRole("Admin") || User.IsInRole("Owner");
+        var payment = await _mediator.Send(new GetPaymentByIdPublicQuery(paymentId, CurrentUserId, isOwnerOrAdmin), cancellationToken);
 
         var qrResponse = new SePayQrResponseDto
         {
@@ -250,6 +280,9 @@ public class PaymentsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSePayCheckoutPayload(Guid paymentId, CancellationToken cancellationToken)
     {
+        var isOwnerOrAdmin = User.IsInRole("Admin") || User.IsInRole("Owner");
+        await _mediator.Send(new GetPaymentByIdPublicQuery(paymentId, CurrentUserId, isOwnerOrAdmin), cancellationToken);
+
         var command = new CourtManager.Application.Features.Payments.Commands.CreateSePayCheckoutCommand(
             paymentId,
             _sePaySettings.EffectiveMerchantId,

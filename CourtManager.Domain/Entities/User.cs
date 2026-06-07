@@ -18,8 +18,6 @@ public class User : IdentityUser<Guid>
     public bool IsActive { get; set; }
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }
-    public bool IsEmailVerified { get; set; } = false;
-    public DateTime? EmailVerifiedAt { get; set; }
 
     // Navigation properties
     public ICollection<Booking> Bookings { get; set; } = [];

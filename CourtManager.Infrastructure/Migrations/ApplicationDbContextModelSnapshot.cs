@@ -3543,9 +3543,6 @@ namespace CourtManager.Infrastructure.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime?>("EmailVerifiedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -3557,9 +3554,6 @@ namespace CourtManager.Infrastructure.Migrations
                         .HasDefaultValue(true);
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsEmailVerified")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("LockoutEnabled")
@@ -3637,7 +3631,6 @@ namespace CourtManager.Infrastructure.Migrations
                             FullName = "Lan Nguyen",
                             IsActive = true,
                             IsDeleted = false,
-                            IsEmailVerified = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
                             NormalizedEmail = "LAN.NGUYEN@COURTMANAGER.VN",
@@ -3661,7 +3654,6 @@ namespace CourtManager.Infrastructure.Migrations
                             FullName = "Minh Tran",
                             IsActive = true,
                             IsDeleted = false,
-                            IsEmailVerified = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
                             NormalizedEmail = "MINH.TRAN@COURTMANAGER.VN",
@@ -3685,7 +3677,6 @@ namespace CourtManager.Infrastructure.Migrations
                             FullName = "Duy Pham",
                             IsActive = true,
                             IsDeleted = false,
-                            IsEmailVerified = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
                             NormalizedEmail = "DUY.PHAM@SPORTHUB.VN",
@@ -3709,7 +3700,6 @@ namespace CourtManager.Infrastructure.Migrations
                             FullName = "Hanh Le",
                             IsActive = true,
                             IsDeleted = false,
-                            IsEmailVerified = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
                             NormalizedEmail = "HANH.LE@SAIGONFIELDS.VN",
@@ -3733,7 +3723,6 @@ namespace CourtManager.Infrastructure.Migrations
                             FullName = "Quang Vo",
                             IsActive = true,
                             IsDeleted = false,
-                            IsEmailVerified = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
                             NormalizedEmail = "QUANG.VO@GREENPITCH.VN",
@@ -3757,7 +3746,6 @@ namespace CourtManager.Infrastructure.Migrations
                             FullName = "Bao Hoang",
                             IsActive = true,
                             IsDeleted = false,
-                            IsEmailVerified = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 0,
                             NormalizedEmail = "BAO.HOANG@CITYARENA.VN",
@@ -3781,7 +3769,6 @@ namespace CourtManager.Infrastructure.Migrations
                             FullName = "An Dang",
                             IsActive = true,
                             IsDeleted = false,
-                            IsEmailVerified = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 120,
                             NormalizedEmail = "ANDANG.FOOTBALL@GMAIL.COM",
@@ -3805,7 +3792,6 @@ namespace CourtManager.Infrastructure.Migrations
                             FullName = "My Pham",
                             IsActive = true,
                             IsDeleted = false,
-                            IsEmailVerified = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 120,
                             NormalizedEmail = "MYPHAM.SAIGON@GMAIL.COM",
@@ -3829,7 +3815,6 @@ namespace CourtManager.Infrastructure.Migrations
                             FullName = "Khoa Bui",
                             IsActive = true,
                             IsDeleted = false,
-                            IsEmailVerified = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 120,
                             NormalizedEmail = "KHOABUI.RUNNER@OUTLOOK.COM",
@@ -3853,7 +3838,6 @@ namespace CourtManager.Infrastructure.Migrations
                             FullName = "Thao Do",
                             IsActive = true,
                             IsDeleted = false,
-                            IsEmailVerified = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 120,
                             NormalizedEmail = "THAODO.BOOKING@GMAIL.COM",
@@ -3877,7 +3861,6 @@ namespace CourtManager.Infrastructure.Migrations
                             FullName = "Tuan Mai",
                             IsActive = true,
                             IsDeleted = false,
-                            IsEmailVerified = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 120,
                             NormalizedEmail = "TUANMAI.SPORTS@YAHOO.COM",
@@ -3901,7 +3884,6 @@ namespace CourtManager.Infrastructure.Migrations
                             FullName = "Linh Huynh",
                             IsActive = true,
                             IsDeleted = false,
-                            IsEmailVerified = false,
                             LockoutEnabled = false,
                             LoyaltyPoints = 120,
                             NormalizedEmail = "LINHHUYNH.CLUB@GMAIL.COM",

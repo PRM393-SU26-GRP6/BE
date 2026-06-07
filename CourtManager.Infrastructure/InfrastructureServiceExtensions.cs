@@ -73,7 +73,6 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IStorageService, CloudflareR2StorageService>();
         services.AddScoped<IPasswordHasherService, PasswordHasherService>();
-        services.AddScoped<IEmailService, EmailService>();
 
         // Register Background Services
         services.AddHostedService<SlotUnlockBackgroundService>();

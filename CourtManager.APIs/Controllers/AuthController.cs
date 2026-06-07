@@ -69,6 +69,51 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Send OTP to user email for verification.
+    /// </summary>
+    [HttpPost("send-otp")]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("AuthPolicy")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<SendOtpResponseDto>> SendOtp([FromBody] SendOtpRequestDto request)
+    {
+        var command = new SendOtpCommand { Email = request.Email };
+        var result = await _mediator.Send(command);
+
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Verify OTP and mark email as verified.
+    /// </summary>
+    [HttpPost("verify-otp")]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("AuthPolicy")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<AuthResponseDto>> VerifyOtp([FromBody] VerifyOtpRequestDto request)
+    {
+        var command = new VerifyOtpCommand
+        {
+            Email = request.Email,
+            Otp = request.Otp
+        };
+
+        var result = await _mediator.Send(command);
+
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Login user and return access and refresh tokens.
     /// </summary>
     [HttpPost("login")]

@@ -81,3 +81,20 @@ public class ResetPasswordRequestDto
     public string NewPassword { get; set; } = string.Empty;
     public string ConfirmNewPassword { get; set; } = string.Empty;
 }
+
+/// <summary>
+/// DTO for sending OTP to email.
+/// </summary>
+public class SendOtpRequestDto
+{
+    public string Email { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// DTO for verifying OTP.
+/// </summary>
+public class VerifyOtpRequestDto
+{
+    public string Email { get; set; } = string.Empty;
+    public string Otp { get; set; } = string.Empty;
+}

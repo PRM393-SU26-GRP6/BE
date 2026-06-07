@@ -992,50 +992,6 @@ namespace CourtManager.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("CourtManager.Domain.Entities.EmailVerificationToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsUsed")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
-
-                    b.Property<DateTime?>("UsedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("Token", "Email", "IsUsed");
-
-                    b.ToTable("EmailVerificationTokens");
-                });
-
             modelBuilder.Entity("CourtManager.Domain.Entities.FootballField", b =>
                 {
                     b.Property<Guid>("Id")
@@ -4927,17 +4883,6 @@ namespace CourtManager.Infrastructure.Migrations
                     b.Navigation("Owner");
 
                     b.Navigation("Venue");
-                });
-
-            modelBuilder.Entity("CourtManager.Domain.Entities.EmailVerificationToken", b =>
-                {
-                    b.HasOne("CourtManager.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CourtManager.Domain.Entities.FootballField", b =>

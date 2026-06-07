@@ -152,9 +152,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
             IsActive = true,
             LoyaltyPoints = spec.Role == "User" ? 120 : 0,
             SecurityStamp = spec.Id.ToString(),
-            ConcurrencyStamp = spec.Id.ToString(),
-            IsEmailVerified = true,
-            EmailVerifiedAt = now
+            ConcurrencyStamp = spec.Id.ToString()
         }));
 
         modelBuilder.Entity<UserRole>().HasData(seedUsers.Select(spec => new UserRole

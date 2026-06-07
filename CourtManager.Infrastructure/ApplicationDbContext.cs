@@ -36,6 +36,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
     public DbSet<NotificationRecipient> NotificationRecipients => Set<NotificationRecipient>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<UserDevice> UserDevices => Set<UserDevice>();
+    public DbSet<EmailVerificationToken> EmailVerificationTokens => Set<EmailVerificationToken>();
 
     /// <summary>
     /// Configures the model and applies all entity configurations.
@@ -68,6 +69,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
         modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
         modelBuilder.ApplyConfiguration(new DiscountConfiguration());
         modelBuilder.ApplyConfiguration(new UserDeviceConfiguration());
+        modelBuilder.ApplyConfiguration(new EmailVerificationTokenConfiguration());
 
         modelBuilder.Entity<BookingDiscount>().HasKey(bd => new { bd.BookingId, bd.DiscountId });
         modelBuilder.Entity<VenueAmenity>().HasKey(va => new { va.VenueId, va.AmenityId });

@@ -227,7 +227,13 @@ public class PaymentsController : BaseApiController
             webhook.TransferAmount,
             webhook.ReferenceCode), cancellationToken);
 
-        return StatusCode(result.StatusCode, result);
+        return StatusCode(result.StatusCode, new
+        {
+            success = result.StatusCode is >= 200 and < 300,
+            message = result.Message,
+            paymentId = result.PaymentId,
+            status = result.PaymentStatus
+        });
     }
 
     /// <summary>

@@ -4,6 +4,7 @@ using CourtManager.Application.DTOs;
 using CourtManager.Application.Interfaces;
 using CourtManager.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace CourtManager.Application.Features.Auth.Commands;
 
@@ -14,13 +15,19 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
 {
     private readonly UserManager<User> _userManager;
     private readonly IJwtTokenService _jwtTokenService;
+    private readonly Microsoft.Extensions.Caching.Memory.IMemoryCache _memoryCache;
+    private readonly IEmailService _emailService;
 
     public RegisterCommandHandler(
         UserManager<User> userManager,
-        IJwtTokenService jwtTokenService)
+        IJwtTokenService jwtTokenService,
+        Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache,
+        IEmailService emailService)
     {
         _userManager = userManager;
         _jwtTokenService = jwtTokenService;
+        _memoryCache = memoryCache;
+        _emailService = emailService;
     }
 
     /// <summary>
@@ -59,6 +66,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
             Phone = request.PhoneNumber,
             PhoneNumber = request.PhoneNumber,
             IsActive = true,
+            EmailConfirmed = false, // Must verify via OTP
             CreatedAt = DateTime.UtcNow
         };
 
@@ -74,34 +82,52 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
             };
         }
 
-        // Add default role "User"
-        await _userManager.AddToRoleAsync(user, "User");
+        // Add role dynamically based on enum
+        var roleName = request.Role.ToString();
+        await _userManager.AddToRoleAsync(user, roleName);
 
-        // Get user roles
-        var roles = await _userManager.GetRolesAsync(user);
+        // Generate OTP
+        var otpCode = new Random().Next(100000, 999999).ToString();
+        var cacheKey = $"otp:register:{request.Email}";
+        
+        // Cache OTP for 10 minutes
+        _memoryCache.Set(cacheKey, otpCode, TimeSpan.FromMinutes(10));
 
-        // Generate tokens
-        var accessToken = _jwtTokenService.GenerateAccessToken(user, roles);
-        var refreshToken = _jwtTokenService.GenerateRefreshTokenJwt(user, roles);
-        var refreshTokenExpiryTime = _jwtTokenService.GetRefreshTokenExpiryTime();
+        // Send OTP via Gmail
+        var emailSubject = "CourtManager - Account Verification OTP";
+        var emailBody = $@"
+            <h2>Welcome to CourtManager!</h2>
+            <p>Thank you for registering. Please use the following One-Time Password (OTP) to verify your account:</p>
+            <h1 style='color: #1e88e5; letter-spacing: 5px;'>{otpCode}</h1>
+            <p>This OTP is valid for 10 minutes. If you did not request this, please ignore this email.</p>
+            <br/>
+            <p>Best regards,</p>
+            <p>The CourtManager Team</p>";
 
-        user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = refreshTokenExpiryTime;
-
-        await _userManager.UpdateAsync(user);
+        try
+        {
+            await _emailService.SendEmailAsync(request.Email, emailSubject, emailBody);
+        }
+        catch (Exception ex)
+        {
+            // Even if email fails, we don't block the API return, but we log the error or mention it.
+            // Ideally in dev, we log it.
+            System.Diagnostics.Debug.WriteLine($"Failed to send verification email: {ex.Message}");
+        }
 
         return new AuthResponseDto
         {
             Success = true,
-            Message = "User registered successfully",
-            AccessToken = accessToken,
-            RefreshToken = refreshToken,
+            Message = "User registered successfully. Please verify your email using the OTP code sent.",
+            AccessToken = null, // Do not log in yet
+            RefreshToken = null,
             User = new UserAuthDto
             {
                 Id = user.Id,
                 FullName = user.FullName,
                 Email = user.Email!,
-                PhoneNumber = user.PhoneNumber ?? string.Empty
+                PhoneNumber = user.PhoneNumber ?? string.Empty,
+                Roles = new[] { roleName }
             }
         };
     }

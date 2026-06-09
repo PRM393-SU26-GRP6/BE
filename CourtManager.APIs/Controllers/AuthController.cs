@@ -116,6 +116,30 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Verify registration OTP code.
+    /// </summary>
+    [HttpPost("verify-otp")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<AuthResponseDto>> VerifyOtp([FromBody] VerifyOtpRequestDto request)
+    {
+        var command = new VerifyOtpCommand
+        {
+            Email = request.Email,
+            Otp = request.Otp
+        };
+
+        var result = await _mediator.Send(command);
+
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Login user and return access and refresh tokens.
     /// </summary>
     [HttpPost("login")]

@@ -15,7 +15,7 @@ public class UpdateProfileCommandValidator : AbstractValidator<UpdateProfileComm
 
         RuleFor(x => x.Phone)
             .NotEmpty().WithMessage("Phone number is required")
-            .Matches(@"^\+?[1-9]\d{1,14}$").WithMessage("Phone number must be valid");
+            .Matches(@"^(\+84|0)\d{9,10}$").WithMessage("Phone number must be a valid Vietnamese number (starts with 0 or +84 and has 9-10 digits)");
 
         RuleFor(x => x.AvatarUrl)
             .MaximumLength(500).WithMessage("Avatar URL must not exceed 500 characters")

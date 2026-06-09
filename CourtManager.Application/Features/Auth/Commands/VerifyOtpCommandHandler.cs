@@ -26,6 +26,7 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, AuthRes
     public async Task<AuthResponseDto> Handle(VerifyOtpCommand request, CancellationToken cancellationToken)
     {
         var cacheKey = $"otp:register:{request.Email}";
+        var attemptsKey = $"otp:attempts:{request.Email}";
 
         // Retrieve OTP code from IMemoryCache
         if (!_memoryCache.TryGetValue(cacheKey, out string? cachedOtp) || string.IsNullOrEmpty(cachedOtp))
@@ -40,12 +41,35 @@ public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, AuthRes
         // Verify OTP
         if (cachedOtp != request.Otp)
         {
+            _memoryCache.TryGetValue(attemptsKey, out int attempts);
+            attempts++;
+
+            if (attempts >= 3)
+            {
+                // Invalidate OTP and attempts counter
+                _memoryCache.Remove(cacheKey);
+                _memoryCache.Remove(attemptsKey);
+
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Too many failed attempts. This OTP code has been invalidated. Please register again to get a new code."
+                };
+            }
+
+            // Save attempts count back to cache for 10 minutes
+            _memoryCache.Set(attemptsKey, attempts, TimeSpan.FromMinutes(10));
+
             return new AuthResponseDto
             {
                 Success = false,
-                Message = "Invalid OTP code."
+                Message = $"Invalid OTP code. You have {3 - attempts} attempt(s) remaining."
             };
         }
+
+        // Clean up cache keys on successful validation
+        _memoryCache.Remove(cacheKey);
+        _memoryCache.Remove(attemptsKey);
 
         // Find user by Email
         var user = await _userManager.FindByEmailAsync(request.Email);

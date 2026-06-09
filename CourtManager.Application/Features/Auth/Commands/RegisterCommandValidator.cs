@@ -19,7 +19,7 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 
         RuleFor(x => x.PhoneNumber)
             .NotEmpty().WithMessage("Phone number is required")
-            .Matches(@"^\+?[1-9]\d{1,14}$").WithMessage("Phone number must be valid");
+            .Matches(@"^(\+84|0)\d{9,10}$").WithMessage("Phone number must be a valid Vietnamese number (starts with 0 or +84 and has 9-10 digits)");
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Password is required")

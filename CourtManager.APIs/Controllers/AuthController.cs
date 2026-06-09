@@ -119,6 +119,7 @@ public class AuthController : ControllerBase
     /// Verify registration OTP code.
     /// </summary>
     [HttpPost("verify-otp")]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("AuthPolicy")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<AuthResponseDto>> VerifyOtp([FromBody] VerifyOtpRequestDto request)

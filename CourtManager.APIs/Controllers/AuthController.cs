@@ -36,13 +36,13 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Register a new user account.
+    /// Register a new customer account.
     /// </summary>
-    [HttpPost("register")]
+    [HttpPost("register/customer")]
     [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("AuthPolicy")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<AuthResponseDto>> Register([FromBody] RegisterRequestDto request)
+    public async Task<ActionResult<AuthResponseDto>> RegisterCustomer([FromBody] RegisterRequestDto request)
     {
         if (request.Password != request.ConfirmPassword)
         {
@@ -55,7 +55,8 @@ public class AuthController : ControllerBase
             Email = request.Email,
             PhoneNumber = request.PhoneNumber,
             Password = request.Password,
-            ConfirmPassword = request.ConfirmPassword
+            ConfirmPassword = request.ConfirmPassword,
+            Role = CourtManager.Domain.Enums.RoleType.User
         };
 
         var result = await _mediator.Send(command);
@@ -66,6 +67,52 @@ public class AuthController : ControllerBase
         }
 
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Register a new owner account.
+    /// </summary>
+    [HttpPost("register/owner")]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("AuthPolicy")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<AuthResponseDto>> RegisterOwner([FromBody] RegisterRequestDto request)
+    {
+        if (request.Password != request.ConfirmPassword)
+        {
+            return BadRequest(new AuthResponseDto { Success = false, Message = "Passwords do not match" });
+        }
+
+        var command = new RegisterCommand
+        {
+            FullName = request.FullName,
+            Email = request.Email,
+            PhoneNumber = request.PhoneNumber,
+            Password = request.Password,
+            ConfirmPassword = request.ConfirmPassword,
+            Role = CourtManager.Domain.Enums.RoleType.Owner
+        };
+
+        var result = await _mediator.Send(command);
+
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Register a new user account (Alias for register/customer).
+    /// </summary>
+    [HttpPost("register")]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("AuthPolicy")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<AuthResponseDto>> Register([FromBody] RegisterRequestDto request)
+    {
+        return await RegisterCustomer(request);
     }
 
     /// <summary>

@@ -8,6 +8,7 @@ namespace CourtManager.Application.Features.Auth.Commands;
 
 public class VerifyOtpCommandHandler : IRequestHandler<VerifyOtpCommand, AuthResponseDto>
 {
+    private readonly UserManager<User> _userManager;
     private readonly IJwtTokenService _jwtTokenService;
 
     public VerifyOtpCommandHandler(

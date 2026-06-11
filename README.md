@@ -23,16 +23,41 @@ erDiagram
     %% USERS - Tai khoan nguoi dung (customer / owner / admin)
     %% =========================================================
     USERS {
-        uuid user_id PK
+        uuid id PK
         string full_name
         string email UK
-        string password
+        string password_hash
         string phone
-        enum role "customer|owner|admin"
+        string phone_number
         string avatar_url
         int loyalty_points
+        string refresh_token
+        datetime refresh_token_expiry_time
+        boolean is_active
+        boolean is_deleted
+        datetime deleted_at
         datetime created_at
         datetime updated_at
+    }
+
+    %% =========================================================
+    %% ROLES - Vai tro trong he thong
+    %% =========================================================
+    ROLES {
+        uuid id PK
+        string name UK "Admin|Owner|User"
+        string normalized_name
+        string description
+        datetime created_at
+    }
+
+    %% =========================================================
+    %% USER_ROLES - Bang noi many-to-many User - Role
+    %% =========================================================
+    USER_ROLES {
+        uuid user_id FK
+        uuid role_id FK
+        datetime assigned_at
     }
 
     %% =========================================================
@@ -72,7 +97,8 @@ erDiagram
         uuid field_id PK
         uuid venue_id FK
         string field_name "San so 1"
-        enum field_type "5|7|11"
+        string description
+        enum field_type "FiveASide=5|SevenASide=7|ElevenASide=11"
         decimal price_per_hour
         boolean is_active
         datetime created_at
@@ -115,9 +141,11 @@ erDiagram
         datetime start_time
         datetime end_time
         decimal price
-        enum slot_status "available|locked|booked"
+        enum slot_status "Available=0|Locked=1|Booked=2"
         datetime locked_until
         uuid locked_by FK "user dang giu slot, nullable"
+        uint row_version "Optimistic concurrency version"
+        datetime created_at
         datetime updated_at
     }
 
@@ -129,7 +157,7 @@ erDiagram
         uuid user_id FK
         decimal total_price
         decimal deposit_amount
-        enum booking_status "pending|accepted|rejected|deposited|completed|cancelled"
+        enum booking_status "Pending=0|Accepted=1|Rejected=2|Deposited=3|Completed=4|Cancelled=5"
         string note
         datetime created_at
         datetime updated_at
@@ -152,12 +180,19 @@ erDiagram
         uuid payment_id PK
         uuid booking_id FK
         decimal amount
-        enum payment_type "deposit|final|refund"
-        string payment_method "momo|vnpay|cash"
-        enum payment_status "pending|success|failed|refunded"
+        enum payment_type "Deposit=0|Final=1|Refund=2"
+        string payment_method "Cash=0|MoMo=1|VNPay=2|SePay=3"
+        enum payment_status "Pending=0|Success=1|Failed=2|Refunded=3"
         string transaction_code
+        string gateway
+        string gateway_transaction_id
+        string gateway_reference_code
+        string gateway_account_number
+        string gateway_raw_content
+        string gateway_description
+        string transaction_date
         datetime paid_at
-        decimal refund_amount "nullable, khi payment_type=refund"
+        decimal refund_amount "nullable"
         string refund_reason "nullable"
     }
 
@@ -191,7 +226,7 @@ erDiagram
         uuid notification_id PK
         string title
         string message
-        enum type "booking|payment|chat|system|broadcast"
+        enum type "Booking=0|Payment=1|Chat=2|System=3|Broadcast=4"
         string ref_id
         uuid sender_id FK
         datetime created_at
@@ -226,11 +261,11 @@ erDiagram
     DISCOUNTS {
         uuid discount_id PK
         uuid owner_id FK
-        uuid venue_id FK "nullable - null = ap dung moi venue cua owner"
+        uuid venue_id FK "nullable"
         string code UK "vd: SUMMER2025"
         string name
-        enum discount_type "percentage|fixed"
-        decimal value "10 = 10% hoặc 50000đ"
+        enum discount_type "Percentage=0|Fixed=1"
+        decimal value
         decimal min_booking_amount
         decimal max_discount_amount
         int usage_limit
@@ -247,14 +282,16 @@ erDiagram
     BOOKING_DISCOUNTS {
         uuid booking_id FK
         uuid discount_id FK
-        decimal discount_amount "tiền đã giảm thực tế"
+        decimal discount_amount
     }
 
     %% =========================================================
     %% QUAN HE (RELATIONSHIPS)
     %% =========================================================
     
-    %% USERS
+    %% USERS & ROLES
+    USERS ||--o{ USER_ROLES : has
+    ROLES ||--o{ USER_ROLES : has
     USERS ||--o{ VENUES : owns
     USERS ||--o{ BOOKINGS : makes
     USERS ||--o{ NOTIFICATION_RECIPIENTS : receives
@@ -292,7 +329,7 @@ erDiagram
 ## 3. Technology Stack
 * **Framework**: .NET 10 (C# 13), ASP.NET Core 10.0
 * **Architecture**: Clean Architecture & CQRS (MediatR)
-* **Database**: Microsoft SQL Server & Entity Framework Core 10.0 (Code-First)
+* **Database**: PostgreSQL & Entity Framework Core 10.0 (Code-First)
 * **Authentication**: ASP.NET Core Identity & JWT Bearer Tokens
 * **Libraries**: AutoMapper, FluentValidation
 
@@ -302,7 +339,7 @@ erDiagram
 
 ### Prerequisites
 * **.NET 10 SDK**
-* **Local MS SQL Server** instance or LocalDB.
+* **Local PostgreSQL** instance.
 
 ### Steps to Run
 1. **Restore Dependencies**:
@@ -340,4 +377,4 @@ The database includes pre-seeded accounts spanning all core system Roles.
 | **Owner** | `duy.pham@sporthub.vn` | Duy Pham | `0902311003` |
 | **User** | `andang.football@gmail.com` | An Dang | `0902311007` |
 
-*(See `SampleDataSeeder.cs` for the full list of 12 seeded users).*
+*(See `SeedData` method in `ApplicationDbContext.cs` for the full list of seeded users).*

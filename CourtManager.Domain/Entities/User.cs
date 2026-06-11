@@ -19,6 +19,11 @@ public class User : IdentityUser<Guid>
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }
 
+    // OTP fields for email verification
+    public string? OtpCode { get; set; }
+    public DateTime? OtpExpiryTime { get; set; }
+    public int OtpAttempts { get; set; } = 0;
+
     // Navigation properties
     public ICollection<Booking> Bookings { get; set; } = [];
     public virtual ICollection<UserRole> UserRoles { get; set; } = [];

@@ -57,6 +57,9 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
             };
         }
 
+        // Generate OTP
+        var otpCode = new Random().Next(100000, 999999).ToString();
+
         // Create new user
         var user = new User
         {
@@ -67,7 +70,10 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
             PhoneNumber = request.PhoneNumber,
             IsActive = true,
             EmailConfirmed = false, // Must verify via OTP
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            OtpCode = otpCode,
+            OtpExpiryTime = DateTime.UtcNow.AddMinutes(10),
+            OtpAttempts = 0
         };
 
         // Save user to database
@@ -86,12 +92,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
         var roleName = request.Role.ToString();
         await _userManager.AddToRoleAsync(user, roleName);
 
-        // Generate OTP
-        var otpCode = new Random().Next(100000, 999999).ToString();
-        var cacheKey = $"otp:register:{request.Email}";
-        
-        // Cache OTP for 10 minutes
-        _memoryCache.Set(cacheKey, otpCode, TimeSpan.FromMinutes(10));
+        // OTP is already saved to the database during user creation
 
         // Send OTP via Gmail
         var emailSubject = "CourtManager - Account Verification OTP";

@@ -377,4 +377,4 @@ The database includes pre-seeded accounts spanning all core system Roles.
 | **Owner** | `duy.pham@sporthub.vn` | Duy Pham | `0902311003` |
 | **User** | `andang.football@gmail.com` | An Dang | `0902311007` |
 
-*(See `SeedData` method in `ApplicationDbContext.cs` for the full list of seeded users).*
+*(See the `SeedData` method in `ApplicationDbContext.cs` for the full list of seeded users).*

@@ -1,5 +1,7 @@
 using CourtManager.Application.DTOs;
+using CourtManager.Application.Features.FieldSchedules;
 using CourtManager.Application.Features.TimeSlots.Commands;
+using CourtManager.Application.Features.TimeSlots.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -83,20 +85,14 @@ public class TimeSlotsController : BaseApiController
     /// <returns>List of available time slots</returns>
     [HttpGet("available")]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(IEnumerable<TimeSlotDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAvailableSlots([FromQuery] Guid fieldId, [FromQuery] DateTime date)
+    [ProducesResponseType(typeof(List<SlotForDateDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<SlotForDateDto>>> GetAvailable(
+        [FromQuery] Guid fieldId,
+        [FromQuery] DateTime date,
+        CancellationToken cancellationToken)
     {
-        var targetDate = DateTime.SpecifyKind(date, DateTimeKind.Utc);
-        var query = new CourtManager.Application.Features.TimeSlots.Queries.GetAvailableSlotsQuery(fieldId, targetDate);
-        var result = await _mediator.Send(query);
-
-        return Ok(new
-        {
-            success = true,
-            message = "OK",
-            data = result,
-            errors = Array.Empty<string>()
-        });
+        var result = await _mediator.Send(new GetSlotsForDateQuery(fieldId, DateTime.SpecifyKind(date.Date, DateTimeKind.Utc)), cancellationToken);
+        return Ok(result);
     }
 
     [HttpPost("{id}/lock")]

@@ -208,6 +208,29 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
         }).ToArray();
         modelBuilder.Entity<FootballField>().HasData(fields);
 
+        var scheduleNow = new DateTime(2026, 6, 5, 0, 0, 0, DateTimeKind.Utc);
+        var fieldSchedules = new List<FieldSchedule>();
+        var scheduleIndex = 1;
+        foreach (var f in fields)
+        {
+            for (var d = 0; d <= 6; d++)
+            {
+                fieldSchedules.Add(new FieldSchedule
+                {
+                    ScheduleId = Id("fsched", scheduleIndex),
+                    FieldId = f.Id,
+                    DayOfWeek = d,
+                    OpenTime = new TimeOnly(6, 0),
+                    CloseTime = new TimeOnly(23, 0),
+                    SlotDurationMinutes = 60,
+                    IsActive = true,
+                    CreatedAt = scheduleNow
+                });
+                scheduleIndex++;
+            }
+        }
+        modelBuilder.Entity<FieldSchedule>().HasData(fieldSchedules);
+
         var slots = new List<TimeSlot>();
         var slotIndex = 1;
         foreach (var field in fields)

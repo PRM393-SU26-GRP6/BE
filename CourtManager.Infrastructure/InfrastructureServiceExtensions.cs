@@ -62,6 +62,7 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<IDiscountRepository, DiscountRepository>();
         services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
+        services.AddScoped<IFieldScheduleRepository, FieldScheduleRepository>();
         services.AddScoped<IVenueImageRepository, VenueImageRepository>();
         services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();

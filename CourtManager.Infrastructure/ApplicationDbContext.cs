@@ -233,7 +233,8 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
 
         var slots = new List<TimeSlot>();
         var slotIndex = 1;
-        var baseSlotDate = new DateTime(2026, 6, 15);
+        // Seed slots for the next 7 days starting from tomorrow
+        var startDate = DateTime.UtcNow.Date.AddDays(1);
         foreach (var field in fields)
         {
             for (var day = 0; day < 7; day++)
@@ -247,7 +248,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
                         FieldId = field.Id,
                         StartTime = new TimeOnly(hour, 0),
                         EndTime = new TimeOnly(hour + 1, 0),
-                        SelectedDate = DateOnly.FromDateTime(baseSlotDate.AddDays(day)),
+                        SelectedDate = DateOnly.FromDateTime(startDate.AddDays(day)),
                         Price = field.PricePerHour,
                         SlotStatus = status,
                         LockedUntil = status == SlotStatus.Locked ? now.AddMinutes(20) : null,

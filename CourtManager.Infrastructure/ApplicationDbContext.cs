@@ -70,10 +70,10 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
         modelBuilder.ApplyConfiguration(new DiscountConfiguration());
         modelBuilder.ApplyConfiguration(new UserDeviceConfiguration());
         modelBuilder.ApplyConfiguration(new FieldScheduleConfiguration());
+        modelBuilder.ApplyConfiguration(new BookingDiscountConfiguration());
+        modelBuilder.ApplyConfiguration(new NotificationRecipientConfiguration());
 
-        modelBuilder.Entity<BookingDiscount>().HasKey(bd => new { bd.BookingId, bd.DiscountId });
         modelBuilder.Entity<VenueAmenity>().HasKey(va => new { va.VenueId, va.AmenityId });
-        modelBuilder.Entity<NotificationRecipient>().HasKey(nr => nr.RecipientId);
 
         SeedData(modelBuilder);
     }

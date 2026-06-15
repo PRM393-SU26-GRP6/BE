@@ -28,6 +28,9 @@ secrets.json
 .idea/
 *.sln.iml
 
+# Cursor Superpowers
+docs/superpowers/
+
 # Logs
 logs/
 *.log

@@ -1,4 +1,4 @@
-namespace CourtManager.Application.Common.Exceptions;
+namespace CourtManager.Application.Exceptions;
 
 /// <summary>
 /// Thrown when a request requires a FieldSchedule row that does not exist

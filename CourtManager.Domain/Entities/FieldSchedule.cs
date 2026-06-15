@@ -28,6 +28,8 @@ public class FieldSchedule
 
     public DateTime? UpdatedAt { get; set; }
 
+    public bool IsDeleted { get; set; }
+
     // Navigation
     public FootballField? Field { get; set; }
 }

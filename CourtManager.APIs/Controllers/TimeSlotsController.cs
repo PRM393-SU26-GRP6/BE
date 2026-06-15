@@ -95,24 +95,34 @@ public class TimeSlotsController : BaseApiController
         return Ok(result);
     }
 
-    [HttpPost("{id}/lock")]
+    /// <summary>
+    /// Locks a time slot for checkout.
+    /// Can lock by SlotId (existing slot) or by field/date/time (creates new slot if needed).
+    /// </summary>
+    [HttpPost("lock")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> LockSlot(Guid id)
+    public async Task<IActionResult> LockSlot([FromBody] LockSlotRequestDto request)
     {
         try
         {
             var userId = CurrentUserId;
-            var command = new CourtManager.Application.Features.TimeSlots.Commands.LockSlotCommand(id, userId);
+            var command = new LockSlotCommand(
+                request.SlotId,
+                request.FieldId,
+                request.SelectedDate,
+                request.StartTime,
+                request.EndTime,
+                userId);
             var result = await _mediator.Send(command);
 
             return Ok(new
             {
                 success = true,
-                message = "Slot locked successfully for 15 minutes.",
-                data = new { },
+                message = "Slot locked successfully.",
+                data = new { slotId = result.SlotId, lockedUntil = result.LockedUntil, isNewSlot = result.IsNewSlot },
                 errors = Array.Empty<string>()
             });
         }
@@ -126,7 +136,7 @@ public class TimeSlotsController : BaseApiController
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error while locking slot {SlotId}: {Error}", id, ex.Message);
+            _logger.LogError(ex, "Unexpected error while locking slot");
             return BadRequest(new
             {
                 success = false,

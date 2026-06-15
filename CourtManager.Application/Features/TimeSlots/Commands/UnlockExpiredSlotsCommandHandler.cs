@@ -18,30 +18,26 @@ public class UnlockExpiredSlotsCommandHandler : IRequestHandler<UnlockExpiredSlo
     public async Task<int> Handle(UnlockExpiredSlotsCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Executing background task to unlock expired slots.");
-        
-        var allSlots = await _timeSlotRepository.GetAllAsync(cancellationToken);
-        
-        var expiredSlots = allSlots.Where(s => 
-            s.SlotStatus == CourtManager.Domain.Enums.SlotStatus.Locked && 
-            s.LockedUntil.HasValue && 
-            s.LockedUntil.Value < DateTime.UtcNow).ToList();
 
-        if (!expiredSlots.Any())
+        var expiredSlots = (await _timeSlotRepository.GetLockedSlotsExpiredAsync(cancellationToken)).ToList();
+
+        if (expiredSlots.Count == 0)
         {
             return 0;
         }
 
         foreach (var slot in expiredSlots)
         {
-            slot.SlotStatus = CourtManager.Domain.Enums.SlotStatus.Available;
-            slot.LockedUntil = null;
-            slot.LockedBy = null;
+            // Soft delete - slot will be regenerated when another user locks it
+            slot.IsDeleted = true;
+            slot.DeletedAt = DateTime.UtcNow;
             await _timeSlotRepository.UpdateAsync(slot, cancellationToken);
         }
 
         await _timeSlotRepository.SaveChangesAsync(cancellationToken);
-        
-        _logger.LogInformation("Unlocked {Count} expired slots.", expiredSlots.Count);
-        return expiredSlots.Count;
+
+        var count = expiredSlots.Count;
+        _logger.LogInformation("Soft-deleted {Count} expired slots.", count);
+        return count;
     }
 }

@@ -67,4 +67,14 @@ public interface ITimeSlotRepository : IRepository<TimeSlot>
         Guid slotId,
         Guid userId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets a time slot by field, date, and time.
+    /// </summary>
+    Task<TimeSlot?> GetByFieldDateTimeAsync(
+        Guid fieldId,
+        DateOnly selectedDate,
+        TimeOnly startTime,
+        TimeOnly endTime,
+        CancellationToken cancellationToken = default);
 }

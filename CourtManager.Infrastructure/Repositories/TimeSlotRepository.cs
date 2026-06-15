@@ -105,4 +105,20 @@ public class TimeSlotRepository : Repository<TimeSlot>, ITimeSlotRepository
 
         return rowsAffected > 0;
     }
+
+    public async Task<TimeSlot?> GetByFieldDateTimeAsync(
+        Guid fieldId,
+        DateOnly selectedDate,
+        TimeOnly startTime,
+        TimeOnly endTime,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .Where(s => s.FieldId == fieldId
+                && s.SelectedDate == selectedDate
+                && s.StartTime == startTime
+                && s.EndTime == endTime
+                && !s.IsDeleted)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
 }

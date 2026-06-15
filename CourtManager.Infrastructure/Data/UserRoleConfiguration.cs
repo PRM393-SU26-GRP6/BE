@@ -11,6 +11,9 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
 {
     public void Configure(EntityTypeBuilder<UserRole> builder)
     {
+        // Soft delete query filter
+        builder.HasQueryFilter(ur => !ur.IsDeleted);
+
         builder.HasOne(ur => ur.User)
             .WithMany(u => u.UserRoles)
             .HasForeignKey(ur => ur.UserId)

@@ -33,6 +33,9 @@ public class FieldScheduleConfiguration : IEntityTypeConfiguration<FieldSchedule
         builder.Property(s => s.CreatedAt)
             .IsRequired();
 
+        // Soft delete query filter
+        builder.HasQueryFilter(s => !s.IsDeleted);
+
         // Unique index: one row per (FieldId, DayOfWeek)
         builder.HasIndex(s => new { s.FieldId, s.DayOfWeek })
             .IsUnique()

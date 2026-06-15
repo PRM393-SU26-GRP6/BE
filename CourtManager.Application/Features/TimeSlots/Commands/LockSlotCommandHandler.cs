@@ -22,7 +22,8 @@ public class LockSlotCommandHandler : IRequestHandler<LockSlotCommand, bool>
             throw new NotFoundException("Slot", request.SlotId);
         }
 
-        if (slot.StartTime <= DateTime.UtcNow)
+        if (slot.SelectedDate < DateOnly.FromDateTime(DateTime.UtcNow) ||
+            (slot.SelectedDate == DateOnly.FromDateTime(DateTime.UtcNow) && slot.StartTime < TimeOnly.FromDateTime(DateTime.UtcNow)))
         {
             throw new InvalidOperationException("Cannot lock a slot that has already started or is in the past.");
         }

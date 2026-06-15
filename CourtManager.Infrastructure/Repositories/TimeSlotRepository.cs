@@ -10,8 +10,9 @@ public class TimeSlotRepository : Repository<TimeSlot>, ITimeSlotRepository
 
     public async Task<IEnumerable<TimeSlot>> GetAvailableSlotsAsync(Guid fieldId, DateTime date, CancellationToken cancellationToken = default)
     {
+        var dateOnly = DateOnly.FromDateTime(date);
         return await _dbSet
-            .Where(x => x.FieldId == fieldId && !x.IsDeleted && x.StartTime.Date == date.Date)
+            .Where(x => x.FieldId == fieldId && !x.IsDeleted && x.SelectedDate == dateOnly)
             .OrderBy(x => x.StartTime)
             .ToListAsync(cancellationToken);
     }
@@ -81,10 +82,10 @@ public class TimeSlotRepository : Repository<TimeSlot>, ITimeSlotRepository
         var slotVersion = await _dbSet
             .AsNoTracking()
             .Where(s => s.SlotId == slotId)
-            .Select(s => s.RowVersion)
+            .Select(s => (uint?)s.RowVersion)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (slotVersion == null)
+        if (!slotVersion.HasValue)
             return false;
 
         // Atomic update: only succeeds if the slot is still available and its row version has not changed.

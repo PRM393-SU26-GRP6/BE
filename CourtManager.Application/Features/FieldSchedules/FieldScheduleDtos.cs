@@ -46,3 +46,28 @@ public class SlotForDateDto
     public string SlotStatus { get; set; } = "Available"; // Available / Locked / Booked
     public Guid? SlotId { get; set; }          // null when no real TimeSlot row exists yet
 }
+
+/// <summary>
+/// Response item for GET /api/v1/fields/{id}/week-schedule.
+/// One entry per day-of-week (Mon-Fri). Customer-facing: shows open/closed and operating hours.
+/// </summary>
+public class FieldWeekScheduleDto
+{
+    /// <summary>ISO day-of-week: 0=Sunday .. 6=Saturday.</summary>
+    public int DayOfWeek { get; set; }
+    public string DayName { get; set; } = "";
+    public bool IsOpen { get; set; }
+    public string? OpenTime { get; set; }
+    public string? CloseTime { get; set; }
+    public int SlotDurationMinutes { get; set; }
+}
+
+/// <summary>
+/// Response for GET /api/v1/fields/{id}/week-schedule.
+/// Returns Mon-Fri rows (days 1-5) suitable for a booking calendar.
+/// </summary>
+public class FieldWeekScheduleResponseDto
+{
+    public Guid FieldId { get; set; }
+    public List<FieldWeekScheduleDto> Days { get; set; } = new();
+}

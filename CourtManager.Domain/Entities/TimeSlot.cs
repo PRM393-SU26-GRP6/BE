@@ -10,8 +10,22 @@ public class TimeSlot
 {
     public Guid SlotId { get; set; }
     public Guid FieldId { get; set; }
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
+
+    /// <summary>
+    /// Start time of the slot (time of day only, e.g., 09:00).
+    /// </summary>
+    public TimeOnly StartTime { get; set; }
+
+    /// <summary>
+    /// End time of the slot (time of day only, e.g., 10:00).
+    /// </summary>
+    public TimeOnly EndTime { get; set; }
+
+    /// <summary>
+    /// The specific date this slot is booked for.
+    /// </summary>
+    public DateOnly SelectedDate { get; set; }
+
     public decimal Price { get; set; }
     public SlotStatus SlotStatus { get; set; } = SlotStatus.Available;
     public DateTime? LockedUntil { get; set; }

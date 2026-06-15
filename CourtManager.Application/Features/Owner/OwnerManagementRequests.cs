@@ -289,8 +289,8 @@ public class BulkCreateSlotsCommandHandler : IRequestHandler<BulkCreateSlotsComm
             throw new ValidationException("Only the venue owner can create slots for this field.");
         }
 
-        if (!TimeSpan.TryParse(request.Request.StartTime, out var startTime) ||
-            !TimeSpan.TryParse(request.Request.EndTime, out var endTime))
+        if (!TimeOnly.TryParse(request.Request.StartTime, out var startTimeOnly) ||
+            !TimeOnly.TryParse(request.Request.EndTime, out var endTimeOnly))
         {
             throw new ValidationException("StartTime and EndTime must be valid time values.");
         }
@@ -303,16 +303,16 @@ public class BulkCreateSlotsCommandHandler : IRequestHandler<BulkCreateSlotsComm
         var created = 0;
         for (var date = request.Request.FromDate.Date; date <= request.Request.ToDate.Date; date = date.AddDays(1))
         {
-            for (var slotStart = startTime; slotStart.Add(TimeSpan.FromMinutes(request.Request.SlotDurationMinutes)) <= endTime; slotStart = slotStart.Add(TimeSpan.FromMinutes(request.Request.SlotDurationMinutes)))
+            for (var slotStart = startTimeOnly; slotStart.AddMinutes(request.Request.SlotDurationMinutes) <= endTimeOnly; slotStart = slotStart.AddMinutes(request.Request.SlotDurationMinutes))
             {
-                var start = DateTime.SpecifyKind(date.Add(slotStart), DateTimeKind.Utc);
-                var end = start.AddMinutes(request.Request.SlotDurationMinutes);
+                var selectedDate = DateOnly.FromDateTime(date);
                 await _timeSlotRepository.AddAsync(new TimeSlot
                 {
                     SlotId = Guid.NewGuid(),
                     FieldId = request.FieldId,
-                    StartTime = start,
-                    EndTime = end,
+                    StartTime = slotStart,
+                    EndTime = slotStart.AddMinutes(request.Request.SlotDurationMinutes),
+                    SelectedDate = selectedDate,
                     Price = request.Request.Price,
                     SlotStatus = SlotStatus.Available,
                     CreatedAt = DateTime.UtcNow

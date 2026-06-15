@@ -233,24 +233,29 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
 
         var slots = new List<TimeSlot>();
         var slotIndex = 1;
+        var baseSlotDate = new DateTime(2026, 6, 15);
         foreach (var field in fields)
         {
-            for (var hour = 18; hour < 22; hour++)
+            for (var day = 0; day < 7; day++)
             {
-                var status = slotIndex % 9 == 0 ? SlotStatus.Booked : slotIndex % 7 == 0 ? SlotStatus.Locked : SlotStatus.Available;
-                slots.Add(new TimeSlot
+                for (var hour = 6; hour < 23; hour++)
                 {
-                    SlotId = Id("slot", slotIndex),
-                    FieldId = field.Id,
-                    StartTime = baseDate.AddHours(hour),
-                    EndTime = baseDate.AddHours(hour + 1),
-                    Price = field.PricePerHour,
-                    SlotStatus = status,
-                    LockedUntil = status == SlotStatus.Locked ? now.AddMinutes(20) : null,
-                    CreatedAt = now.AddDays(-14 + slotIndex % 5),
-                    RowVersion = (uint)slotIndex
-                });
-                slotIndex++;
+                    var status = slotIndex % 9 == 0 ? SlotStatus.Booked : slotIndex % 7 == 0 ? SlotStatus.Locked : SlotStatus.Available;
+                    slots.Add(new TimeSlot
+                    {
+                        SlotId = Id("slot", slotIndex),
+                        FieldId = field.Id,
+                        StartTime = new TimeOnly(hour, 0),
+                        EndTime = new TimeOnly(hour + 1, 0),
+                        SelectedDate = DateOnly.FromDateTime(baseSlotDate.AddDays(day)),
+                        Price = field.PricePerHour,
+                        SlotStatus = status,
+                        LockedUntil = status == SlotStatus.Locked ? now.AddMinutes(20) : null,
+                        CreatedAt = now.AddDays(-14 + slotIndex % 5),
+                        RowVersion = (uint)slotIndex
+                    });
+                    slotIndex++;
+                }
             }
         }
         modelBuilder.Entity<TimeSlot>().HasData(slots);

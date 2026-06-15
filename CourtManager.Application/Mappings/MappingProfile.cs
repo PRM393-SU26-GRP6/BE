@@ -50,12 +50,12 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.FieldName, opt => opt.MapFrom(src => src.Slot != null && src.Slot.Field != null ? src.Slot.Field.FieldName : null))
             .ForMember(dest => dest.VenueId, opt => opt.MapFrom(src => src.Slot != null && src.Slot.Field != null ? src.Slot.Field.VenueId : Guid.Empty))
             .ForMember(dest => dest.VenueName, opt => opt.MapFrom(src => src.Slot != null && src.Slot.Field != null && src.Slot.Field.Venue != null ? src.Slot.Field.Venue.VenueName : null))
-            .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.Slot != null ? src.Slot.StartTime : default))
-            .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.Slot != null ? src.Slot.EndTime : default));
+            .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.Slot != null ? CombineDateTime(src.Slot.SelectedDate, src.Slot.StartTime) : default))
+            .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.Slot != null ? CombineDateTime(src.Slot.SelectedDate, src.Slot.EndTime) : default));
         CreateMap<Booking, BookingDto>()
             .ForMember(dest => dest.FieldId, opt => opt.MapFrom(src => src.BookingItems.Select(i => i.Slot != null ? i.Slot.FieldId : Guid.Empty).FirstOrDefault()))
-            .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.BookingItems.Any() ? src.BookingItems.Min(i => i.Slot != null ? i.Slot.StartTime : DateTime.MinValue) : DateTime.MinValue))
-            .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.BookingItems.Any() ? src.BookingItems.Max(i => i.Slot != null ? i.Slot.EndTime : DateTime.MinValue) : DateTime.MinValue))
+            .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.BookingItems.Any() ? CombineDateTime(src.BookingItems.Min(i => i.Slot != null ? i.Slot.SelectedDate : DateOnly.MinValue), src.BookingItems.Min(i => i.Slot != null ? i.Slot.StartTime : TimeOnly.MinValue)) : DateTime.MinValue))
+            .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.BookingItems.Any() ? CombineDateTime(src.BookingItems.Min(i => i.Slot != null ? i.Slot.SelectedDate : DateOnly.MinValue), src.BookingItems.Max(i => i.Slot != null ? i.Slot.EndTime : TimeOnly.MinValue)) : DateTime.MinValue))
             .ForMember(dest => dest.BookingStatus, opt => opt.MapFrom(src => src.BookingStatus.ToString()))
             .ForMember(dest => dest.DiscountAmount, opt => opt.MapFrom(src => src.BookingDiscounts.Sum(d => d.DiscountAmount)))
             .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.BookingItems))
@@ -108,5 +108,10 @@ public class MappingProfile : Profile
         CreateMap<Discount, DiscountDto>()
             .ForMember(dest => dest.DiscountType, opt => opt.MapFrom(src => src.DiscountType.ToString()))
             .ReverseMap();
+    }
+
+    private static DateTime CombineDateTime(DateOnly date, TimeOnly time)
+    {
+        return date.ToDateTime(time);
     }
 }

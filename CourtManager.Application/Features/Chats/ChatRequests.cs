@@ -203,7 +203,7 @@ public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Mes
             Type = NotificationType.Chat,
             RefId = request.RoomId.ToString(),
             CreatedAt = DateTime.UtcNow,
-            NotificationRecipients =
+            Recipients =
             [
                 new NotificationRecipient
                 {

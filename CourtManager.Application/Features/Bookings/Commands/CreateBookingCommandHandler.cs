@@ -191,7 +191,7 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
                     Type = CourtManager.Domain.Enums.NotificationType.Booking,
                     RefId = booking.Id.ToString(),
                     CreatedAt = now,
-                    NotificationRecipients =
+                    Recipients =
                     [
                         new NotificationRecipient
                         {

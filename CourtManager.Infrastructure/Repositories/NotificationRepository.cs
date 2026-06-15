@@ -11,12 +11,12 @@ public class NotificationRepository : Repository<Notification>, INotificationRep
     public async Task<IEnumerable<Notification>> GetNotificationsByUserIdAsync(Guid userId, bool unreadOnly = false, CancellationToken cancellationToken = default)
     {
         var query = _dbSet
-            .Include(n => n.NotificationRecipients)
-            .Where(n => n.NotificationRecipients.Any(r => r.UserId == userId));
+            .Include(n => n.Recipients)
+            .Where(n => n.Recipients.Any(r => r.UserId == userId));
 
         if (unreadOnly)
         {
-            query = query.Where(n => n.NotificationRecipients.Any(r => r.UserId == userId && r.ReadAt == null));
+            query = query.Where(n => n.Recipients.Any(r => r.UserId == userId && r.ReadAt == null));
         }
 
         return await query
@@ -27,12 +27,12 @@ public class NotificationRepository : Repository<Notification>, INotificationRep
     public async Task<IEnumerable<Notification>> GetNotificationsByUserIdPaginatedAsync(Guid userId, int pageNumber, int pageSize, bool unreadOnly = false, CancellationToken cancellationToken = default)
     {
         var query = _dbSet
-            .Include(n => n.NotificationRecipients)
-            .Where(n => n.NotificationRecipients.Any(r => r.UserId == userId));
+            .Include(n => n.Recipients)
+            .Where(n => n.Recipients.Any(r => r.UserId == userId));
 
         if (unreadOnly)
         {
-            query = query.Where(n => n.NotificationRecipients.Any(r => r.UserId == userId && r.ReadAt == null));
+            query = query.Where(n => n.Recipients.Any(r => r.UserId == userId && r.ReadAt == null));
         }
 
         return await query

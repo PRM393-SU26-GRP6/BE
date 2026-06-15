@@ -162,7 +162,7 @@ public class BroadcastNotificationCommandHandler : IRequestHandler<BroadcastNoti
             Type = NotificationType.Broadcast,
             RefId = request.Request.RefId ?? string.Empty,
             CreatedAt = DateTime.UtcNow,
-            NotificationRecipients = users.Select(userId => new NotificationRecipient
+            Recipients = users.Select(userId => new NotificationRecipient
             {
                 RecipientId = Guid.NewGuid(),
                 UserId = userId

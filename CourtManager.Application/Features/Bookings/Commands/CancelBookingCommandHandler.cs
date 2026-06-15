@@ -77,7 +77,7 @@ public class CancelBookingCommandHandler : IRequestHandler<CancelBookingCommand,
                 Type = NotificationType.Booking,
                 RefId = booking.Id.ToString(),
                 CreatedAt = DateTime.UtcNow,
-                NotificationRecipients =
+                Recipients =
                 [
                     new NotificationRecipient
                     {

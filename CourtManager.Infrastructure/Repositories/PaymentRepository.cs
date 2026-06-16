@@ -18,6 +18,9 @@ public class PaymentRepository : Repository<Payment>, IPaymentRepository
             .Include(p => p.Booking)
                 .ThenInclude(b => b!.BookingItems)
                     .ThenInclude(i => i.Slot)
+                        .ThenInclude(s => s!.Field)
+                            .ThenInclude(f => f!.Venue)
+                                .ThenInclude(v => v!.Owner)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
@@ -34,6 +37,9 @@ public class PaymentRepository : Repository<Payment>, IPaymentRepository
             .Include(p => p.Booking)
                 .ThenInclude(b => b!.BookingItems)
                     .ThenInclude(i => i.Slot)
+                        .ThenInclude(s => s!.Field)
+                            .ThenInclude(f => f!.Venue)
+                                .ThenInclude(v => v!.Owner)
             .FirstOrDefaultAsync(p => p.TransactionCode == transactionCode, cancellationToken);
     }
 

@@ -143,10 +143,10 @@ public static class ApiServiceExtensions
         {
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
-            // Global Policy: 100 requests per minute per IP (or globally if IP not available)
+            // Global Policy: 36 requests per minute per IP (or globally if IP not available)
             options.AddFixedWindowLimiter("GlobalPolicy", policyOptions =>
             {
-                policyOptions.PermitLimit = 100;
+                policyOptions.PermitLimit = 36;
                 policyOptions.Window = TimeSpan.FromMinutes(1);
                 policyOptions.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
                 policyOptions.QueueLimit = 0;

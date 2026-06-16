@@ -37,6 +37,8 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<UserDevice> UserDevices => Set<UserDevice>();
     public DbSet<FieldSchedule> FieldSchedules => Set<FieldSchedule>();
+    public DbSet<WalletTransaction> WalletTransactions => Set<WalletTransaction>();
+    public DbSet<WithdrawalRequest> WithdrawalRequests => Set<WithdrawalRequest>();
 
     /// <summary>
     /// Configures the model and applies all entity configurations.
@@ -72,6 +74,8 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
         modelBuilder.ApplyConfiguration(new FieldScheduleConfiguration());
         modelBuilder.ApplyConfiguration(new BookingDiscountConfiguration());
         modelBuilder.ApplyConfiguration(new NotificationRecipientConfiguration());
+        modelBuilder.ApplyConfiguration(new WalletTransactionConfiguration());
+        modelBuilder.ApplyConfiguration(new WithdrawalRequestConfiguration());
 
         modelBuilder.Entity<VenueAmenity>().HasKey(va => new { va.VenueId, va.AmenityId });
 
@@ -151,6 +155,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
             CreatedAt = now,
             IsActive = true,
             LoyaltyPoints = spec.Role == "User" ? 120 : 0,
+            WalletBalance = 0m,
             SecurityStamp = spec.Id.ToString(),
             ConcurrencyStamp = spec.Id.ToString()
         }));

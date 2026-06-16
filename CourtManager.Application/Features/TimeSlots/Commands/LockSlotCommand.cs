@@ -12,9 +12,9 @@ namespace CourtManager.Application.Features.TimeSlots.Commands;
 public record LockSlotCommand(
     Guid? SlotId,
     Guid FieldId,
-    DateOnly SelectedDate,
     TimeOnly StartTime,
     TimeOnly EndTime,
+    DateOnly SelectedDate,
     Guid UserId
 ) : IRequest<LockSlotResult>;
 

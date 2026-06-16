@@ -18,11 +18,6 @@ public class LockSlotRequestDto
     public Guid FieldId { get; set; }
 
     /// <summary>
-    /// Date for the slot (required if SlotId is null).
-    /// </summary>
-    public DateOnly SelectedDate { get; set; }
-
-    /// <summary>
     /// Start time (required if SlotId is null).
     /// </summary>
     public TimeOnly StartTime { get; set; }
@@ -31,4 +26,9 @@ public class LockSlotRequestDto
     /// End time (required if SlotId is null).
     /// </summary>
     public TimeOnly EndTime { get; set; }
+
+    /// <summary>
+    /// Date for the slot (required if SlotId is null).
+    /// </summary>
+    public DateOnly SelectedDate { get; set; }
 }

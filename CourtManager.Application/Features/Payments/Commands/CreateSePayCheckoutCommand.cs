@@ -62,7 +62,7 @@ public class CreateSePayCheckoutCommandHandler : IRequestHandler<CreateSePayChec
             PayUrl = $"{request.CheckoutBaseUrl.TrimEnd('/')}/v1/checkout/init",
             Merchant = request.MerchantId,
             Operation = "PURCHASE",
-            PaymentMethod = "ALL", // Default to all
+            PaymentMethod = "BANK_TRANSFER", // Default to bank transfer QR payment
             OrderAmount = Math.Round(payment.Amount).ToString(),
             Currency = "VND",
             OrderInvoiceNumber = payment.TransactionCode,

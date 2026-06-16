@@ -56,8 +56,8 @@ public class LockSlotCommandHandler : IRequestHandler<LockSlotCommand, LockSlotR
             throw new InvalidOperationException("This slot is no longer available.");
         }
 
-        // Reload to get updated lock info
-        slot = await _timeSlotRepository.GetByIdAsync(slot.SlotId, cancellationToken);
+        // Reload to get updated lock info (bypass EF cache)
+        slot = await _timeSlotRepository.GetByIdAsNoTrackingAsync(slot.SlotId, cancellationToken);
 
         return new LockSlotResult
         {

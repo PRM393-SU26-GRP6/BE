@@ -112,9 +112,9 @@ public class TimeSlotsController : BaseApiController
             var command = new LockSlotCommand(
                 request.SlotId,
                 request.FieldId,
-                request.SelectedDate,
                 request.StartTime,
                 request.EndTime,
+                request.SelectedDate,
                 userId);
             var result = await _mediator.Send(command);
 

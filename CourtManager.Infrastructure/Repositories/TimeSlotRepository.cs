@@ -17,6 +17,13 @@ public class TimeSlotRepository : Repository<TimeSlot>, ITimeSlotRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<TimeSlot?> GetByIdAsNoTrackingAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.SlotId == id && !x.IsDeleted, cancellationToken);
+    }
+
     public async Task<IEnumerable<TimeSlot>> GetSlotsByFieldIdAsync(Guid fieldId, CancellationToken cancellationToken = default)
     {
         return await _dbSet

@@ -19,8 +19,6 @@ public class SePaySettings
 
     // Bank account details for QR and Checkout Page
     public string BankId { get; set; } = "tpb"; 
-    public string AccountNo { get; set; } = "84519828888";
-    public string AccountName { get; set; } = "PHAM DUC HUNG"; 
     public string AccountNo { get; set; } = string.Empty;
     public string AccountName { get; set; } = string.Empty;
 

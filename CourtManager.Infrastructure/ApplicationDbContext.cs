@@ -36,6 +36,9 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
     public DbSet<NotificationRecipient> NotificationRecipients => Set<NotificationRecipient>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<UserDevice> UserDevices => Set<UserDevice>();
+    public DbSet<FieldSchedule> FieldSchedules => Set<FieldSchedule>();
+    public DbSet<WalletTransaction> WalletTransactions => Set<WalletTransaction>();
+    public DbSet<WithdrawalRequest> WithdrawalRequests => Set<WithdrawalRequest>();
 
     /// <summary>
     /// Configures the model and applies all entity configurations.
@@ -68,10 +71,13 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
         modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
         modelBuilder.ApplyConfiguration(new DiscountConfiguration());
         modelBuilder.ApplyConfiguration(new UserDeviceConfiguration());
+        modelBuilder.ApplyConfiguration(new FieldScheduleConfiguration());
+        modelBuilder.ApplyConfiguration(new BookingDiscountConfiguration());
+        modelBuilder.ApplyConfiguration(new NotificationRecipientConfiguration());
+        modelBuilder.ApplyConfiguration(new WalletTransactionConfiguration());
+        modelBuilder.ApplyConfiguration(new WithdrawalRequestConfiguration());
 
-        modelBuilder.Entity<BookingDiscount>().HasKey(bd => new { bd.BookingId, bd.DiscountId });
         modelBuilder.Entity<VenueAmenity>().HasKey(va => new { va.VenueId, va.AmenityId });
-        modelBuilder.Entity<NotificationRecipient>().HasKey(nr => nr.RecipientId);
 
         SeedData(modelBuilder);
     }
@@ -149,6 +155,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
             CreatedAt = now,
             IsActive = true,
             LoyaltyPoints = spec.Role == "User" ? 120 : 0,
+            WalletBalance = 0m,
             SecurityStamp = spec.Id.ToString(),
             ConcurrencyStamp = spec.Id.ToString()
         }));
@@ -206,26 +213,55 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
         }).ToArray();
         modelBuilder.Entity<FootballField>().HasData(fields);
 
+        var scheduleNow = new DateTime(2026, 6, 5, 0, 0, 0, DateTimeKind.Utc);
+        var fieldSchedules = new List<FieldSchedule>();
+        var scheduleIndex = 1;
+        foreach (var f in fields)
+        {
+            for (var d = 0; d <= 6; d++)
+            {
+                fieldSchedules.Add(new FieldSchedule
+                {
+                    ScheduleId = Id("fsched", scheduleIndex),
+                    FieldId = f.Id,
+                    DayOfWeek = d,
+                    OpenTime = new TimeOnly(6, 0),
+                    CloseTime = new TimeOnly(23, 0),
+                    SlotDurationMinutes = 60,
+                    IsActive = true,
+                    CreatedAt = scheduleNow
+                });
+                scheduleIndex++;
+            }
+        }
+        modelBuilder.Entity<FieldSchedule>().HasData(fieldSchedules);
+
         var slots = new List<TimeSlot>();
         var slotIndex = 1;
+        // Seed slots for the next 7 days starting from tomorrow
+        var startDate = DateTime.UtcNow.Date.AddDays(1);
         foreach (var field in fields)
         {
-            for (var hour = 18; hour < 22; hour++)
+            for (var day = 0; day < 7; day++)
             {
-                var status = slotIndex % 9 == 0 ? SlotStatus.Booked : slotIndex % 7 == 0 ? SlotStatus.Locked : SlotStatus.Available;
-                slots.Add(new TimeSlot
+                for (var hour = 6; hour < 23; hour++)
                 {
-                    SlotId = Id("slot", slotIndex),
-                    FieldId = field.Id,
-                    StartTime = baseDate.AddHours(hour),
-                    EndTime = baseDate.AddHours(hour + 1),
-                    Price = field.PricePerHour,
-                    SlotStatus = status,
-                    LockedUntil = status == SlotStatus.Locked ? now.AddMinutes(20) : null,
-                    CreatedAt = now.AddDays(-14 + slotIndex % 5),
-                    RowVersion = (uint)slotIndex
-                });
-                slotIndex++;
+                    var status = slotIndex % 9 == 0 ? SlotStatus.Booked : slotIndex % 7 == 0 ? SlotStatus.Locked : SlotStatus.Available;
+                    slots.Add(new TimeSlot
+                    {
+                        SlotId = Id("slot", slotIndex),
+                        FieldId = field.Id,
+                        StartTime = new TimeOnly(hour, 0),
+                        EndTime = new TimeOnly(hour + 1, 0),
+                        SelectedDate = DateOnly.FromDateTime(startDate.AddDays(day)),
+                        Price = field.PricePerHour,
+                        SlotStatus = status,
+                        LockedUntil = status == SlotStatus.Locked ? now.AddMinutes(20) : null,
+                        CreatedAt = now.AddDays(-14 + slotIndex % 5),
+                        RowVersion = (uint)slotIndex
+                    });
+                    slotIndex++;
+                }
             }
         }
         modelBuilder.Entity<TimeSlot>().HasData(slots);

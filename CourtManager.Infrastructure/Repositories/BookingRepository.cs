@@ -55,10 +55,17 @@ public class BookingRepository : Repository<Booking>, IBookingRepository
 
     public async Task<bool> IsCourtAvailableAsync(Guid fieldId, DateTime startTime, DateTime endTime, CancellationToken cancellationToken = default)
     {
+        var startDate = DateOnly.FromDateTime(startTime);
+        var endDate = DateOnly.FromDateTime(endTime);
+        var startTimeOnly = TimeOnly.FromDateTime(startTime);
+        var endTimeOnly = TimeOnly.FromDateTime(endTime);
+
         return !await _context.TimeSlots
             .AnyAsync(s => s.FieldId == fieldId
-                && s.StartTime < endTime
-                && s.EndTime > startTime
+                && s.SelectedDate >= startDate
+                && s.SelectedDate <= endDate
+                && s.StartTime < endTimeOnly
+                && s.EndTime > startTimeOnly
                 && s.SlotStatus != CourtManager.Domain.Enums.SlotStatus.Available,
                 cancellationToken);
     }

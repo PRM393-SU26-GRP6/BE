@@ -384,11 +384,22 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
 {
     private readonly IPaymentRepository _paymentRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IWalletTransactionRepository _walletTransactionRepository;
+    private readonly INotificationRepository _notificationRepository;
+    private readonly IWithdrawalRepository _withdrawalRepository;
 
-    public ProcessSePayWebhookCommandHandler(IPaymentRepository paymentRepository, IUserRepository userRepository)
+    public ProcessSePayWebhookCommandHandler(
+        IPaymentRepository paymentRepository,
+        IUserRepository userRepository,
+        IWalletTransactionRepository walletTransactionRepository,
+        INotificationRepository notificationRepository,
+        IWithdrawalRepository withdrawalRepository)
     {
         _paymentRepository = paymentRepository;
         _userRepository = userRepository;
+        _walletTransactionRepository = walletTransactionRepository;
+        _notificationRepository = notificationRepository;
+        _withdrawalRepository = withdrawalRepository;
     }
 
     public async Task<PaymentGatewayCallbackResultDto> Handle(ProcessSePayWebhookCommand request, CancellationToken cancellationToken)
@@ -454,6 +465,51 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
         if (payment.Booking != null)
         {
             payment.Booking.UpdatedAt = DateTime.UtcNow;
+            
+            // Get the owner from booking items
+            var owner = payment.Booking.BookingItems
+                .FirstOrDefault()?.Slot?.Field?.Venue?.Owner;
+
+            if (owner != null)
+            {
+                // Calculate owner's share (90% of payment amount)
+                const decimal commissionRate = 0.10m;
+                decimal ownerShare = payment.Amount * (1 - commissionRate);
+
+                // Credit owner's wallet
+                await _userRepository.UpdateWalletBalanceAsync(owner.Id, ownerShare, cancellationToken);
+
+                // Create wallet transaction record
+                var walletTransaction = new WalletTransaction
+                {
+                    Id = Guid.NewGuid(),
+                    OwnerId = owner.Id,
+                    Type = WalletTransactionType.Deposit,
+                    Amount = ownerShare,
+                    Description = $"{payment.PaymentType} payment from booking {payment.BookingId} (Transaction: {payment.TransactionCode})",
+                    RelatedBookingId = payment.BookingId,
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _walletTransactionRepository.AddAsync(walletTransaction, cancellationToken);
+
+                // Send notification to owner
+                var notification = new Notification
+                {
+                    NotificationId = Guid.NewGuid(),
+                    SenderId = owner.Id,
+                    Title = "Payment Received",
+                    Message = $"You received {ownerShare:N0} VND from booking payment (Transaction: {payment.TransactionCode})",
+                    Type = NotificationType.Payment,
+                    RefId = payment.BookingId.ToString(),
+                    CreatedAt = DateTime.UtcNow,
+                    Recipients = new List<NotificationRecipient>
+                    {
+                        new NotificationRecipient { RecipientId = Guid.NewGuid(), UserId = owner.Id }
+                    }
+                };
+                await _notificationRepository.AddAsync(notification, cancellationToken);
+            }
+
             if (payment.PaymentType == PaymentType.Deposit)
             {
                 payment.Booking.BookingStatus = BookingStatus.Deposited;

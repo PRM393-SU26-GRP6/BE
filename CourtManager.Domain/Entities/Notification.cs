@@ -18,5 +18,5 @@ public class Notification
     public DateTime? DeletedAt { get; set; }
 
     // Navigation properties
-    public ICollection<NotificationRecipient> NotificationRecipients { get; set; } = [];
+    public ICollection<NotificationRecipient> Recipients { get; set; } = [];
 }

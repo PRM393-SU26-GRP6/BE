@@ -67,7 +67,8 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
                     if (slot == null)
                         throw new NotFoundException(nameof(TimeSlot), slotId);
 
-                    if (slot.StartTime <= now)
+                    if (slot.SelectedDate < DateOnly.FromDateTime(now) ||
+                        (slot.SelectedDate == DateOnly.FromDateTime(now) && slot.StartTime < TimeOnly.FromDateTime(now)))
                         throw new ValidationException("Cannot book a time slot in the past.");
 
                     var isExpiredLock = slot.SlotStatus == CourtManager.Domain.Enums.SlotStatus.Locked
@@ -190,7 +191,7 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
                     Type = CourtManager.Domain.Enums.NotificationType.Booking,
                     RefId = booking.Id.ToString(),
                     CreatedAt = now,
-                    NotificationRecipients =
+                    Recipients =
                     [
                         new NotificationRecipient
                         {

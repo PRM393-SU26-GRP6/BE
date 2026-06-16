@@ -35,7 +35,7 @@ public class GetNotificationsQueryHandler : IRequestHandler<GetNotificationsQuer
 
     internal static NotificationDto ToDto(Notification notification, Guid userId)
     {
-        var recipient = notification.NotificationRecipients.FirstOrDefault(r => r.UserId == userId);
+        var recipient = notification.Recipients.FirstOrDefault(r => r.UserId == userId);
         return new NotificationDto
         {
             NotificationId = notification.NotificationId,

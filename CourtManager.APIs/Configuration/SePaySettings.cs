@@ -6,10 +6,6 @@ public class SePaySettings
 {
     public string MerchantId { get; set; } = string.Empty;
     public string SecretKey { get; set; } = string.Empty;
-    public string ProductionApiBaseUrl { get; set; } = "https://pgapi.sepay.vn";
-    public string SandboxApiBaseUrl { get; set; } = "https://pgapi-sandbox.sepay.vn";
-    public string ProductionCheckoutBaseUrl { get; set; } = "https://pay.sepay.vn";
-    public string SandboxCheckoutBaseUrl { get; set; } = "https://pay-sandbox.sepay.vn";
     public string ApiKey { get; set; } = string.Empty;
     public string ApiSecret { get; set; } = string.Empty;
     public string HmacSecret { get; set; } = string.Empty;
@@ -33,13 +29,7 @@ public class SePaySettings
     public string BasicAuthCredentials => 
         Convert.ToBase64String(Encoding.UTF8.GetBytes($"{EffectiveMerchantId}:{EffectiveSecretKey}"));
 
-    public string ApiBaseUrl =>
-        IsProduction ? ProductionApiBaseUrl.TrimEnd('/') : SandboxApiBaseUrl.TrimEnd('/');
-
-    public string CheckoutBaseUrl =>
-        IsProduction ? ProductionCheckoutBaseUrl.TrimEnd('/') : SandboxCheckoutBaseUrl.TrimEnd('/');
-
-    private bool IsProduction =>
-        Environment.Equals("production", StringComparison.OrdinalIgnoreCase) ||
-        Environment.Equals("prod", StringComparison.OrdinalIgnoreCase);
+    // SePay Payment Gateway URLs (Sandbox)
+    public string ApiBaseUrl => "https://pgapi-sandbox.sepay.vn";
+    public string CheckoutBaseUrl => "https://pay-sandbox.sepay.vn";
 }

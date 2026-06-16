@@ -1,5 +1,7 @@
 using CourtManager.Application.DTOs;
+using CourtManager.Application.Features.FieldSchedules;
 using CourtManager.Application.Features.TimeSlots.Commands;
+using CourtManager.Application.Features.TimeSlots.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -83,40 +85,44 @@ public class TimeSlotsController : BaseApiController
     /// <returns>List of available time slots</returns>
     [HttpGet("available")]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(IEnumerable<TimeSlotDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAvailableSlots([FromQuery] Guid fieldId, [FromQuery] DateTime date)
+    [ProducesResponseType(typeof(List<SlotForDateDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<SlotForDateDto>>> GetAvailable(
+        [FromQuery] Guid fieldId,
+        [FromQuery] DateTime date,
+        CancellationToken cancellationToken)
     {
-        var targetDate = DateTime.SpecifyKind(date, DateTimeKind.Utc);
-        var query = new CourtManager.Application.Features.TimeSlots.Queries.GetAvailableSlotsQuery(fieldId, targetDate);
-        var result = await _mediator.Send(query);
-
-        return Ok(new
-        {
-            success = true,
-            message = "OK",
-            data = result,
-            errors = Array.Empty<string>()
-        });
+        var result = await _mediator.Send(new GetSlotsForDateQuery(fieldId, DateTime.SpecifyKind(date.Date, DateTimeKind.Utc)), cancellationToken);
+        return Ok(result);
     }
 
-    [HttpPost("{id}/lock")]
+    /// <summary>
+    /// Locks a time slot for checkout.
+    /// Can lock by SlotId (existing slot) or by field/date/time (creates new slot if needed).
+    /// </summary>
+    [HttpPost("lock")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> LockSlot(Guid id)
+    public async Task<IActionResult> LockSlot([FromBody] LockSlotRequestDto request)
     {
         try
         {
             var userId = CurrentUserId;
-            var command = new CourtManager.Application.Features.TimeSlots.Commands.LockSlotCommand(id, userId);
+            var command = new LockSlotCommand(
+                request.SlotId,
+                request.FieldId,
+                request.StartTime,
+                request.EndTime,
+                request.SelectedDate,
+                userId);
             var result = await _mediator.Send(command);
 
             return Ok(new
             {
                 success = true,
-                message = "Slot locked successfully for 15 minutes.",
-                data = new { },
+                message = "Slot locked successfully.",
+                data = new { slotId = result.SlotId, lockedUntil = result.LockedUntil, isNewSlot = result.IsNewSlot },
                 errors = Array.Empty<string>()
             });
         }
@@ -130,7 +136,7 @@ public class TimeSlotsController : BaseApiController
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error while locking slot {SlotId}: {Error}", id, ex.Message);
+            _logger.LogError(ex, "Unexpected error while locking slot");
             return BadRequest(new
             {
                 success = false,

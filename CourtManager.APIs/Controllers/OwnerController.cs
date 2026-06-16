@@ -2,6 +2,9 @@ using CourtManager.Application.DTOs;
 using CourtManager.Application.Features.Bookings.Commands;
 using CourtManager.Application.Features.Bookings.Queries;
 using CourtManager.Application.Features.Discounts;
+using CourtManager.Application.Features.FieldSchedules;
+using CourtManager.Application.Features.FieldSchedules.Commands;
+using CourtManager.Application.Features.FieldSchedules.Queries;
 using CourtManager.Application.Features.Fields;
 using CourtManager.Application.Features.Owner;
 using CourtManager.Application.Features.TimeSlots;
@@ -74,7 +77,21 @@ public class OwnerController : BaseApiController
         return Created($"/api/v1/fields/{result.Id}", result);
     }
 
+    [HttpGet("fields/{id:guid}/schedule")]
+    [ProducesResponseType(typeof(List<FieldScheduleDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<FieldScheduleDto>>> GetFieldSchedule(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetFieldScheduleQuery(id), cancellationToken);
+        return Ok(result);
+    }
 
+    [HttpPut("fields/{id:guid}/schedule")]
+    [ProducesResponseType(typeof(List<FieldScheduleDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<FieldScheduleDto>>> UpsertFieldSchedule(Guid id, [FromBody] UpsertFieldScheduleDto request, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new UpsertFieldScheduleCommand(CurrentUserId, id, request), cancellationToken);
+        return Ok(result);
+    }
 
     [HttpPost("fields/{id:guid}/slots/bulk")]
     public async Task<IActionResult> BulkCreateSlots(Guid id, [FromBody] BulkCreateSlotsDto request, CancellationToken cancellationToken)

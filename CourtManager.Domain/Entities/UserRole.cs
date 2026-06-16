@@ -8,6 +8,7 @@ namespace CourtManager.Domain.Entities;
 public class UserRole : IdentityUserRole<Guid>
 {
     public DateTime AssignedAt { get; set; }
+    public bool IsDeleted { get; set; }
 
     // Navigation properties
     public virtual User User { get; set; } = null!;

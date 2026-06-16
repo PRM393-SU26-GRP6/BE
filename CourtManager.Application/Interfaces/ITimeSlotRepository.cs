@@ -16,6 +16,14 @@ public interface ITimeSlotRepository : IRepository<TimeSlot>
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Reloads a time slot from the database, bypassing EF Core change tracker cache.
+    /// Use this after raw SQL updates to get the fresh state.
+    /// </summary>
+    Task<TimeSlot?> GetByIdAsNoTrackingAsync(
+        Guid id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Gets all time slots for a specific field.
     /// </summary>
     Task<IEnumerable<TimeSlot>> GetSlotsByFieldIdAsync(
@@ -66,5 +74,15 @@ public interface ITimeSlotRepository : IRepository<TimeSlot>
     Task<bool> TryLockSlotAtomicAsync(
         Guid slotId,
         Guid userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets a time slot by field, date, and time.
+    /// </summary>
+    Task<TimeSlot?> GetByFieldDateTimeAsync(
+        Guid fieldId,
+        DateOnly selectedDate,
+        TimeOnly startTime,
+        TimeOnly endTime,
         CancellationToken cancellationToken = default);
 }

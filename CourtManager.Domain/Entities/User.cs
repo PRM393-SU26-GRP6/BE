@@ -24,6 +24,9 @@ public class User : IdentityUser<Guid>
     public DateTime? OtpExpiryTime { get; set; }
     public int OtpAttempts { get; set; } = 0;
 
+    // Wallet fields
+    public decimal WalletBalance { get; set; } = 0m;
+
     // Navigation properties
     public ICollection<Booking> Bookings { get; set; } = [];
     public virtual ICollection<UserRole> UserRoles { get; set; } = [];
@@ -36,4 +39,8 @@ public class User : IdentityUser<Guid>
     public ICollection<Review> Reviews { get; set; } = [];
     public ICollection<Discount> CreatedDiscounts { get; set; } = [];
     public ICollection<UserDevice> Devices { get; set; } = [];
+    
+    // Wallet navigation properties
+    public ICollection<WalletTransaction> WalletTransactions { get; set; } = [];
+    public ICollection<WithdrawalRequest> WithdrawalRequests { get; set; } = [];
 }

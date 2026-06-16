@@ -88,6 +88,7 @@ public class CreateTimeSlotCommandHandler : IRequestHandler<CreateTimeSlotComman
             FieldId = request.Slot.FieldId,
             StartTime = request.Slot.StartTime,
             EndTime = request.Slot.EndTime,
+            SelectedDate = request.Slot.SelectedDate,
             Price = request.Slot.Price > 0 ? request.Slot.Price : field.PricePerHour,
             SlotStatus = ParseSlotStatus(request.Slot.SlotStatus, SlotStatus.Available),
             CreatedAt = DateTime.UtcNow
@@ -98,7 +99,7 @@ public class CreateTimeSlotCommandHandler : IRequestHandler<CreateTimeSlotComman
         return _mapper.Map<TimeSlotDto>(slot);
     }
 
-    public static void ValidateSlot(DateTime startTime, DateTime endTime)
+    public static void ValidateSlot(TimeOnly startTime, TimeOnly endTime)
     {
         if (endTime <= startTime)
         {

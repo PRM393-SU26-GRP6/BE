@@ -19,12 +19,17 @@ public class TimeSlotDto
     /// <summary>
     /// Start time of the slot.
     /// </summary>
-    public DateTime StartTime { get; set; }
+    public TimeOnly StartTime { get; set; }
 
     /// <summary>
     /// End time of the slot.
     /// </summary>
-    public DateTime EndTime { get; set; }
+    public TimeOnly EndTime { get; set; }
+
+    /// <summary>
+    /// The specific date this slot is booked for.
+    /// </summary>
+    public DateOnly SelectedDate { get; set; }
 
     public decimal Price { get; set; }
 

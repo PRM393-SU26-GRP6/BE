@@ -42,9 +42,11 @@ public class UnlockSlotCommandHandler : IRequestHandler<UnlockSlotCommand, bool>
             throw new ValidationException("You are not allowed to unlock this slot.");
         }
 
-        slot.SlotStatus = SlotStatus.Available;
-        slot.LockedBy = null;
-        slot.LockedUntil = null;
+        // Soft delete the slot - unlock means the slot becomes available again
+        // but we mark it as deleted so it won't show up in queries
+        // The slot will be regenerated when another user locks it
+        slot.IsDeleted = true;
+        slot.DeletedAt = DateTime.UtcNow;
         slot.UpdatedAt = DateTime.UtcNow;
 
         try

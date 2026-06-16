@@ -14,6 +14,9 @@ public class UserDeviceConfiguration : IEntityTypeConfiguration<UserDevice>
         builder.Property(d => d.CreatedAt).ValueGeneratedOnAdd().HasDefaultValueSql("CURRENT_TIMESTAMP");
         builder.HasIndex(d => d.FcmToken).IsUnique();
 
+        // Soft delete query filter
+        builder.HasQueryFilter(d => !d.IsDeleted);
+
         builder.HasOne(d => d.User)
             .WithMany(u => u.Devices)
             .HasForeignKey(d => d.UserId)

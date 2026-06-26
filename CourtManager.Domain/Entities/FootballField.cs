@@ -23,4 +23,5 @@ public class FootballField
     public Venue? Venue { get; set; }
     public ICollection<Booking> Bookings { get; set; } = [];
     public ICollection<TimeSlot> TimeSlots { get; set; } = [];
+    public ICollection<FieldSchedule> FieldSchedules { get; set; } = [];
 }

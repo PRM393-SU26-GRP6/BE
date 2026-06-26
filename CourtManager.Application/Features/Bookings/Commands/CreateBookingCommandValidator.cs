@@ -16,6 +16,8 @@ public class CreateBookingCommandValidator : AbstractValidator<CreateBookingComm
 
         RuleFor(x => x.SlotIds)
             .NotEmpty()
-            .WithMessage("At least one slot must be selected.");
+            .WithMessage("At least one slot must be selected.")
+            .Must(slots => slots.All(id => id != Guid.Empty))
+            .WithMessage("Invalid slot ID detected. Please refresh and try again.");
     }
 }

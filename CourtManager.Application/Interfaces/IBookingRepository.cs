@@ -20,4 +20,9 @@ public interface IBookingRepository : IRepository<Booking>
     Task<bool> HasActiveBookingsForVenueAsync(Guid venueId, CancellationToken cancellationToken = default);
 
     Task<bool> IsBookingValidForReviewAsync(Guid bookingId, Guid venueId, Guid userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets a booking by ID with all navigation properties eagerly loaded (Items, Slots, Field, Venue, Payments, etc.)
+    /// </summary>
+    Task<Booking?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
 }

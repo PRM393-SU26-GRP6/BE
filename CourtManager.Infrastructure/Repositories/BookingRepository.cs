@@ -78,9 +78,9 @@ public class BookingRepository : Repository<Booking>, IBookingRepository
             .Include(b => b.BookingDiscounts)
                 .ThenInclude(bd => bd.Discount)
             .Include(b => b.BookingItems)
-                .ThenInclude(i => i.Slot)
-                    .ThenInclude(s => s!.Field)
-                        .ThenInclude(f => f!.Venue);
+                .ThenInclude(i => i.Slot!)
+                    .ThenInclude(s => s.Field!)
+                        .ThenInclude(f => f.Venue);
     }
 
     public async Task<bool> HasActiveBookingsForVenueAsync(Guid venueId, CancellationToken cancellationToken = default)
@@ -106,5 +106,11 @@ public class BookingRepository : Repository<Booking>, IBookingRepository
                 bi.Slot.Field != null &&
                 bi.Slot.Field.VenueId == venueId),
             cancellationToken);
+    }
+
+    public async Task<Booking?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await IncludeDetails(_db.Bookings)
+            .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
     }
 }

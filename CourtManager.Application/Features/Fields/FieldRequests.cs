@@ -137,10 +137,18 @@ public class UpdateFieldCommandHandler : IRequestHandler<UpdateFieldCommand, Foo
             throw new ValidationException("Only the venue owner can update this field.");
         }
 
-        field.FieldName = request.Field.FieldName?.Trim() ?? string.Empty;
-        field.Description = request.Field.Description?.Trim() ?? string.Empty;
-        field.FieldType = CreateFieldCommandHandler.ParseFieldType(request.Field.FieldType);
-        field.PricePerHour = request.Field.PricePerHour;
+        if (!string.IsNullOrWhiteSpace(request.Field.FieldName))
+            field.FieldName = request.Field.FieldName.Trim();
+        
+        if (request.Field.Description != null)
+            field.Description = request.Field.Description.Trim();
+            
+        if (!string.IsNullOrWhiteSpace(request.Field.FieldType))
+            field.FieldType = CreateFieldCommandHandler.ParseFieldType(request.Field.FieldType);
+            
+        if (request.Field.PricePerHour > 0)
+            field.PricePerHour = request.Field.PricePerHour;
+            
         field.IsActive = request.Field.IsActive;
         field.UpdatedAt = DateTime.UtcNow;
 

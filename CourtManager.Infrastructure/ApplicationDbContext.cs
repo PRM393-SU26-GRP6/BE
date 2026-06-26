@@ -238,8 +238,8 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
 
         var slots = new List<TimeSlot>();
         var slotIndex = 1;
-        // Seed slots for the next 7 days starting from tomorrow
-        var startDate = DateTime.UtcNow.Date.AddDays(1);
+        // Seed slots for the next 7 days starting from a fixed future date
+        var startDate = new DateTime(2026, 6, 20, 0, 0, 0, DateTimeKind.Utc);
         foreach (var field in fields)
         {
             for (var day = 0; day < 7; day++)
@@ -264,49 +264,76 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
                 }
             }
         }
+        
+        // Add additional 8 days (Total 15 days) without altering existing SlotIds
+        foreach (var field in fields)
+        {
+            for (var day = 7; day < 15; day++)
+            {
+                for (var hour = 6; hour < 23; hour++)
+                {
+                    slots.Add(new TimeSlot
+                    {
+                        SlotId = Id("slot", slotIndex),
+                        FieldId = field.Id,
+                        StartTime = new TimeOnly(hour, 0),
+                        EndTime = new TimeOnly(hour + 1, 0),
+                        SelectedDate = DateOnly.FromDateTime(startDate.AddDays(day)),
+                        Price = field.PricePerHour,
+                        SlotStatus = SlotStatus.Available,
+                        LockedUntil = null,
+                        CreatedAt = now,
+                        RowVersion = (uint)slotIndex
+                    });
+                    slotIndex++;
+                }
+            }
+        }
         modelBuilder.Entity<TimeSlot>().HasData(slots);
 
         var discounts = new[]
         {
-            Discount(1, users.Owners[0], venues[0].VenueId, "RIVER20", "Riverside weekday promotion", DiscountType.Percentage, 20, 200000, 60000, 40, 5, true, now),
-            Discount(2, users.Owners[0], null, "COMMUNITY50", "Community club voucher", DiscountType.Fixed, 50000, 300000, 50000, 30, 8, true, now),
-            Discount(3, users.Owners[1], venues[2].VenueId, "GREEN10", "Green Pitch early week", DiscountType.Percentage, 10, 0, 40000, 25, 4, true, now),
-            Discount(4, users.Owners[1], null, "ARENA75", "Arena loyalty discount", DiscountType.Fixed, 75000, 500000, 75000, 20, 6, true, now),
-            Discount(5, users.Owners[2], venues[4].VenueId, "STUDENT15", "Student evening offer", DiscountType.Percentage, 15, 150000, 45000, 60, 12, true, now),
-            Discount(6, users.Owners[2], null, "THUDUC30", "Thu Duc neighborhood voucher", DiscountType.Fixed, 30000, 180000, 30000, 80, 18, true, now),
-            Discount(7, users.Owners[3], venues[6].VenueId, "FLIGHT12", "Airport field promotion", DiscountType.Percentage, 12, 200000, 50000, 35, 7, true, now),
-            Discount(8, users.Owners[3], null, "WEEKEND40", "Weekend booking voucher", DiscountType.Fixed, 40000, 250000, 40000, 45, 9, true, now),
-            Discount(9, users.Owners[0], venues[8].VenueId, "WESTSIDE8", "West side happy hour", DiscountType.Percentage, 8, 0, 30000, 50, 3, true, now),
-            Discount(10, users.Owners[1], venues[9].VenueId, "HANRIVER60", "Han River group voucher", DiscountType.Fixed, 60000, 360000, 60000, 28, 5, true, now),
-            Discount(11, users.Owners[2], venues[10].VenueId, "WESTLAKE18", "West Lake membership discount", DiscountType.Percentage, 18, 300000, 70000, 22, 10, true, now),
-            Discount(12, users.Owners[3], venues[11].VenueId, "NINHKIEU25", "Ninh Kieu off-peak voucher", DiscountType.Fixed, 25000, 120000, 25000, 70, 11, true, now)
+            Discount(1, users.Owners[0], venues[0].VenueId, "SALE10K", "10K Off", DiscountType.Fixed, 10000, 200000, 10000, 100, 15, true, now),
+            Discount(2, users.Owners[1], null, "SUMMER10", "10% Summer", DiscountType.Percentage, 10, 300000, 50000, 50, 5, true, now),
+            Discount(3, users.Owners[2], venues[4].VenueId, "STUDENT", "Student Promo", DiscountType.Fixed, 30000, 150000, 30000, 200, 80, true, now),
+            Discount(4, users.Owners[3], venues[7].VenueId, "WEEKEND20", "20% Weekend", DiscountType.Percentage, 20, 400000, 100000, 20, 2, true, now),
+            Discount(5, users.Owners[0], null, "NEWBIE", "New Player", DiscountType.Fixed, 25000, 250000, 25000, 100, 45, true, now),
+            Discount(6, users.Owners[1], venues[3].VenueId, "VIPMEMBER", "VIP Discount", DiscountType.Percentage, 15, 350000, 75000, 30, 10, true, now),
+            Discount(7, users.Owners[2], null, "FLASH35K", "Flash Sale 35K", DiscountType.Fixed, 35000, 200000, 35000, 50, 50, false, now),
+            Discount(8, users.Owners[3], venues[8].VenueId, "TEAMBUILDING", "Team Building", DiscountType.Percentage, 25, 500000, 150000, 10, 0, true, now)
         };
         modelBuilder.Entity<Discount>().HasData(discounts);
 
+        var seedBaseDate = new DateTime(2026, 6, 17, 0, 0, 0, DateTimeKind.Utc);
         var bookings = new[]
         {
-            Booking(1, users.Customers[0], 350000, 175000, BookingStatus.Pending, "Waiting for owner confirmation.", now.AddDays(-5)),
-            Booking(2, users.Customers[1], 360000, 180000, BookingStatus.Accepted, "Accepted by venue owner.", now.AddDays(-4)),
-            Booking(3, users.Customers[2], 330000, 165000, BookingStatus.Deposited, "Deposit paid through SePay.", now.AddDays(-3)),
-            Booking(4, users.Customers[3], 420000, 210000, BookingStatus.Completed, "Completed after final payment.", now.AddDays(-2)),
-            Booking(5, users.Customers[4], 275000, 137500, BookingStatus.Cancelled, "Customer cancelled before deposit.", now.AddDays(-7)),
-            Booking(6, users.Customers[5], 410000, 205000, BookingStatus.Rejected, "Venue rejected due to maintenance.", now.AddDays(-6)),
-            Booking(7, users.Customers[0], 395000, 197500, BookingStatus.Deposited, "Team league match.", now.AddDays(-1)),
-            Booking(8, users.Customers[1], 450000, 225000, BookingStatus.Completed, "Company friendly match.", now.AddDays(-8)),
-            Booking(9, users.Customers[2], 285000, 142500, BookingStatus.Accepted, "Awaiting deposit payment.", now.AddDays(-2)),
-            Booking(10, users.Customers[3], 310000, 155000, BookingStatus.Pending, "New booking request.", now.AddHours(-20)),
-            Booking(11, users.Customers[4], 375000, 187500, BookingStatus.Completed, "Weekend tournament slot.", now.AddDays(-9)),
-            Booking(12, users.Customers[5], 295000, 147500, BookingStatus.Cancelled, "Schedule changed by customer.", now.AddDays(-10))
+            Booking(1, users.Customers[0], 350000, 175000, BookingStatus.Pending, "Waiting for owner confirmation.", seedBaseDate.AddDays(5)),
+            Booking(2, users.Customers[1], 450000, 225000, BookingStatus.Accepted, "Deposit paid, ready for match.", seedBaseDate.AddDays(6)),
+            Booking(3, users.Customers[2], 280000, 140000, BookingStatus.Completed, "Match played successfully.", seedBaseDate.AddDays(7)),
+            Booking(4, users.Customers[3], 500000, 250000, BookingStatus.Cancelled, "Cancelled due to heavy rain.", seedBaseDate.AddDays(1)),
+            Booking(5, users.Customers[4], 320000, 160000, BookingStatus.Rejected, "Slot no longer available.", seedBaseDate.AddDays(2)),
+            Booking(6, users.Customers[5], 400000, 200000, BookingStatus.Accepted, "Please prepare 2 bibs.", seedBaseDate.AddDays(8)),
+            Booking(7, users.Customers[0], 360000, 180000, BookingStatus.Completed, "Regular weekly booking.", seedBaseDate.AddDays(9)),
+            Booking(8, users.Customers[1], 420000, 210000, BookingStatus.Pending, "Need extra water bottles.", seedBaseDate.AddDays(10)),
+            Booking(9, users.Customers[2], 285000, 142500, BookingStatus.Accepted, "Awaiting deposit payment.", seedBaseDate.AddDays(11)),
+            Booking(10, users.Customers[3], 310000, 155000, BookingStatus.Pending, "New booking request.", seedBaseDate.AddDays(12)),
+            Booking(11, users.Customers[4], 375000, 187500, BookingStatus.Completed, "Weekend tournament slot.", seedBaseDate.AddDays(13)),
+            Booking(12, users.Customers[5], 295000, 147500, BookingStatus.Cancelled, "Schedule changed by customer.", seedBaseDate.AddDays(2))
         };
         modelBuilder.Entity<Booking>().HasData(bookings);
 
-        var bookingItems = bookings.Select((booking, index) => new BookingItem
+        var bookingItems = bookings.Select((booking, index) =>
         {
-            BookingItemId = Id("booking-item", index + 1),
-            BookingId = booking.Id,
-            SlotId = slots[index].SlotId,
-            Price = slots[index].Price,
-            CreatedAt = booking.CreatedAt
+            var targetDate = DateOnly.FromDateTime(booking.CreatedAt);
+            var slot = slots.FirstOrDefault(s => s.SelectedDate == targetDate) ?? slots[index];
+            return new BookingItem
+            {
+                BookingItemId = Id("booking-item", index + 1),
+                BookingId = booking.Id,
+                SlotId = slot.SlotId,
+                Price = slot.Price,
+                CreatedAt = booking.CreatedAt
+            };
         }).ToArray();
         modelBuilder.Entity<BookingItem>().HasData(bookingItems);
 

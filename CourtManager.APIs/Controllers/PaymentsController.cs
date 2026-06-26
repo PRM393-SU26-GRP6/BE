@@ -204,6 +204,11 @@ public class PaymentsController : BaseApiController
             {
                 apiKey = authorizationHeader[prefix.Length..].Trim();
             }
+            else
+            {
+                // Fallback: If user just types the raw key in Swagger's Authorization box
+                apiKey = authorizationHeader.Trim();
+            }
         }
 
         if (string.IsNullOrWhiteSpace(apiKey) || apiKey != _sePaySettings.EffectiveWebhookApiKey)

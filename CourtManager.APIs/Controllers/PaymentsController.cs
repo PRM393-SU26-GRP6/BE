@@ -190,14 +190,12 @@ public class PaymentsController : BaseApiController
     [ProducesResponseType(typeof(PaymentGatewayCallbackResultDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> SePayWebhook(
-        [FromHeader(Name = "Authorization")] string? authorization,
-        [FromHeader(Name = "X-API-Key")] string? xApiKey,
         [FromBody] SePayWebhookDto webhook,
         CancellationToken cancellationToken)
     {
         // Validate API key from Authorization or X-API-Key header
-        var authorizationHeader = authorization;
-        var apiKey = xApiKey;
+        var authorizationHeader = Request.Headers["Authorization"].FirstOrDefault();
+        var apiKey = Request.Headers["X-API-Key"].FirstOrDefault();
 
         if (string.IsNullOrWhiteSpace(apiKey) && !string.IsNullOrWhiteSpace(authorizationHeader))
         {

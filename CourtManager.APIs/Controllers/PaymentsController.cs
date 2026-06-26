@@ -142,8 +142,9 @@ public class PaymentsController : BaseApiController
     public async Task<IActionResult> RefundPayment(Guid id, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Refunding payment {PaymentId}", id);
-        var isOwnerOrAdmin = User.IsInRole("Admin") || User.IsInRole("Owner");
-        var result = await _mediator.Send(new RefundPaymentCommand(id, CurrentUserId, isOwnerOrAdmin), cancellationToken);
+        var isAdmin = User.IsInRole("Admin");
+        var isOwner = User.IsInRole("Owner");
+        var result = await _mediator.Send(new RefundPaymentCommand(id, CurrentUserId, isOwner, isAdmin), cancellationToken);
         _logger.LogInformation("Payment {PaymentId} refunded successfully", id);
         return Ok(result);
     }
@@ -254,6 +255,11 @@ public class PaymentsController : BaseApiController
         var isOwnerOrAdmin = User.IsInRole("Admin") || User.IsInRole("Owner");
         var payment = await _mediator.Send(new GetPaymentByIdPublicQuery(paymentId, CurrentUserId, isOwnerOrAdmin), cancellationToken);
 
+        if (payment.PaymentStatus != CourtManager.Domain.Enums.PaymentStatus.Pending.ToString())
+        {
+            return BadRequest(new { success = false, message = "Cannot generate QR code. This payment is already processed or cancelled." });
+        }
+
         var qrResponse = new SePayQrResponseDto
         {
             PaymentId = payment.Id,
@@ -284,7 +290,12 @@ public class PaymentsController : BaseApiController
     public async Task<IActionResult> GetSePayCheckoutPayload(Guid paymentId, CancellationToken cancellationToken)
     {
         var isOwnerOrAdmin = User.IsInRole("Admin") || User.IsInRole("Owner");
-        await _mediator.Send(new GetPaymentByIdPublicQuery(paymentId, CurrentUserId, isOwnerOrAdmin), cancellationToken);
+        var payment = await _mediator.Send(new GetPaymentByIdPublicQuery(paymentId, CurrentUserId, isOwnerOrAdmin), cancellationToken);
+
+        if (payment.PaymentStatus != CourtManager.Domain.Enums.PaymentStatus.Pending.ToString())
+        {
+            return BadRequest(new { success = false, message = "Cannot generate checkout payload. This payment is already processed or cancelled." });
+        }
 
         var command = new CourtManager.Application.Features.Payments.Commands.CreateSePayCheckoutCommand(
             paymentId,

@@ -35,21 +35,19 @@ public class CreateWithdrawalRequestCommandHandler : IRequestHandler<CreateWithd
         if (user == null)
             throw new NotFoundException(nameof(User), request.OwnerId);
 
-        // 3. Check balance
-        if (user.WalletBalance < request.Amount)
-            throw new ValidationException($"Insufficient balance. Your balance is {user.WalletBalance:N0} VND");
-
-        // 4. Deduct from wallet immediately (hold the money)
-        await _userRepository.UpdateWalletBalanceAsync(request.OwnerId, -request.Amount, cancellationToken);
-
-        // 5. Check no pending request exists
+        // 3. Check no pending request exists first (prevents TOCTOU)
         var hasPending = await _withdrawalRepository.HasPendingRequestAsync(request.OwnerId, cancellationToken);
         if (hasPending)
         {
-            // Refund the held amount since we're rejecting
-            await _userRepository.UpdateWalletBalanceAsync(request.OwnerId, request.Amount, cancellationToken);
             throw new ValidationException("You already have a pending withdrawal request. Please wait for it to be processed.");
         }
+
+        // 4. Check balance
+        if (user.WalletBalance < request.Amount)
+            throw new ValidationException($"Insufficient balance. Your balance is {user.WalletBalance:N0} VND");
+
+        // 5. Deduct from wallet immediately (hold the money)
+        await _userRepository.UpdateWalletBalanceAsync(request.OwnerId, -request.Amount, cancellationToken);
 
         // 6. Create withdrawal request
         var withdrawal = new WithdrawalRequest

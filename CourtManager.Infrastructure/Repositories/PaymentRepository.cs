@@ -67,7 +67,7 @@ public class PaymentRepository : Repository<Payment>, IPaymentRepository
     {
         return await _dbSet
             .Include(p => p.Booking)
-            .Where(p => p.BookingId == bookingId)
+            .Where(p => !p.IsDeleted && p.BookingId == bookingId)
             .OrderByDescending(p => p.PaidAt)
             .ToListAsync(cancellationToken);
     }
@@ -76,7 +76,7 @@ public class PaymentRepository : Repository<Payment>, IPaymentRepository
     {
         return await _dbSet
             .Include(p => p.Booking)
-            .Where(p => p.Booking != null && p.Booking.UserId == userId)
+            .Where(p => !p.IsDeleted && p.Booking != null && p.Booking.UserId == userId)
             .OrderByDescending(p => p.PaidAt)
             .Skip((Math.Max(pageNumber, 1) - 1) * Math.Max(pageSize, 1))
             .Take(Math.Max(pageSize, 1))

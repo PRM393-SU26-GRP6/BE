@@ -35,16 +35,8 @@ public class ApproveWithdrawalCommandHandler : IRequestHandler<ApproveWithdrawal
         if (withdrawal.Status != WithdrawalStatus.Pending)
             throw new ValidationException($"Cannot approve withdrawal. Current status is '{withdrawal.Status}'");
 
-        // Get user with current balance for validation
-        var user = await _userRepository.GetByIdWithWalletAsync(withdrawal.OwnerId, cancellationToken);
-        if (user == null)
-            throw new NotFoundException(nameof(User), withdrawal.OwnerId);
-
-        if (user.WalletBalance < withdrawal.Amount)
-            throw new ValidationException($"Insufficient balance. User has {user.WalletBalance:N0} VND but needs {withdrawal.Amount:N0} VND");
-
-        // Deduct balance atomically
-        await _userRepository.UpdateWalletBalanceAsync(withdrawal.OwnerId, -withdrawal.Amount, cancellationToken);
+        // Note: Wallet balance deduction (hold) was already performed in CreateWithdrawalRequestCommandHandler.
+        // We do not deduct here to avoid double-deduction.
 
         // Create wallet transaction record
         var walletTransaction = new WalletTransaction

@@ -28,7 +28,8 @@ public class TimeSlotRepository : Repository<TimeSlot>, ITimeSlotRepository
     {
         return await _dbSet
             .Where(x => x.FieldId == fieldId && !x.IsDeleted)
-            .OrderBy(x => x.StartTime)
+            .OrderBy(x => x.SelectedDate)
+            .ThenBy(x => x.StartTime)
             .ToListAsync(cancellationToken);
     }
 

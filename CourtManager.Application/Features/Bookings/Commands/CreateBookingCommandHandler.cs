@@ -205,7 +205,8 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
             var createdBooking = await _bookingRepository.AddAsync(booking, cancellationToken);
             await _bookingRepository.SaveChangesAsync(cancellationToken);
 
-            var loaded = await _bookingRepository.GetByIdAsync(createdBooking.Id, cancellationToken) ?? createdBooking;
+            // Detach and reload with all navigation properties
+            var loaded = await _bookingRepository.GetByIdWithDetailsAsync(createdBooking.Id, cancellationToken);
             return _mapper.Map<BookingDto>(loaded);
         }
         catch (DbUpdateConcurrencyException)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -13,6 +13,8 @@ namespace CourtManager.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("DELETE FROM \"Bookings\";");
+
             migrationBuilder.DeleteData(
                 table: "BookingItems",
                 keyColumn: "BookingItemId",

@@ -42,7 +42,6 @@ public class AcceptBookingCommandHandler : IRequestHandler<AcceptBookingCommand,
         booking.UpdatedAt = DateTime.UtcNow;
 
         // Save changes
-        await _bookingRepository.UpdateAsync(booking, cancellationToken);
         await _bookingRepository.SaveChangesAsync(cancellationToken);
 
         return true;

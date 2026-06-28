@@ -146,7 +146,6 @@ public class CancelBookingCommandHandler : IRequestHandler<CancelBookingCommand,
         }
 
         // Save changes
-        await _bookingRepository.UpdateAsync(booking, cancellationToken);
         await _bookingRepository.SaveChangesAsync(cancellationToken);
         await _timeSlotRepository.SaveChangesAsync(cancellationToken);
 

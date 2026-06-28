@@ -170,7 +170,6 @@ public class ProcessDepositPaymentCommandHandler : IRequestHandler<ProcessDeposi
         }
 
         await _paymentRepository.AddAsync(payment, cancellationToken);
-        await _bookingRepository.UpdateAsync(booking, cancellationToken);
         await _paymentRepository.SaveChangesAsync(cancellationToken);
         
         scope.Complete();
@@ -250,7 +249,6 @@ public class ProcessFullPaymentCommandHandler : IRequestHandler<ProcessFullPayme
         }
 
         await _paymentRepository.AddAsync(payment, cancellationToken);
-        await _bookingRepository.UpdateAsync(booking, cancellationToken);
         await _paymentRepository.SaveChangesAsync(cancellationToken);
         return _mapper.Map<PaymentDto>(payment);
     }
@@ -349,7 +347,6 @@ public class RefundPaymentCommandHandler : IRequestHandler<RefundPaymentCommand,
 
         try
         {
-            await _paymentRepository.UpdateAsync(payment, cancellationToken);
             await _paymentRepository.SaveChangesAsync(cancellationToken);
         }
         catch (DbUpdateConcurrencyException)
@@ -411,7 +408,6 @@ public class ProcessPaymentGatewayCallbackCommandHandler : IRequestHandler<Proce
                 cancellationToken);
         }
 
-        await _paymentRepository.UpdateAsync(payment, cancellationToken);
         await _paymentRepository.SaveChangesAsync(cancellationToken);
 
         return Ok("Payment callback processed", payment.Id, payment.PaymentStatus.ToString());
@@ -544,7 +540,6 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
                 cancellationToken);
         }
 
-        await _paymentRepository.UpdateAsync(payment, cancellationToken);
         await _paymentRepository.SaveChangesAsync(cancellationToken);
 
         return ProcessPaymentGatewayCallbackCommandHandler.Ok("Payment confirmed", payment.Id, payment.PaymentStatus.ToString());

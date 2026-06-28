@@ -53,7 +53,6 @@ public class RejectBookingCommandHandler : IRequestHandler<RejectBookingCommand,
         }
 
         // Save changes
-        await _bookingRepository.UpdateAsync(booking, cancellationToken);
         await _bookingRepository.SaveChangesAsync(cancellationToken);
 
         return true;

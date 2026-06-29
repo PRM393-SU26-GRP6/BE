@@ -19,9 +19,7 @@ public class MappingProfile : Profile
         CreateMap<FootballField, FootballFieldDto>()
             .ForMember(dest => dest.OwnerId, opt => opt.MapFrom(src => src.Venue != null ? src.Venue.OwnerId : Guid.Empty))
             .ForMember(dest => dest.FieldType, opt => opt.MapFrom(src => src.FieldType.ToString()))
-            .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Venue != null ? src.Venue.Address : string.Empty))
-            .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.Venue != null ? src.Venue.Latitude : 0))
-            .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Venue != null ? src.Venue.Longitude : 0))
+            .ForMember(dest => dest.VenueAddress, opt => opt.MapFrom(src => src.Venue != null ? src.Venue.Address : string.Empty))
             .ReverseMap();
 
         // Venue mappings

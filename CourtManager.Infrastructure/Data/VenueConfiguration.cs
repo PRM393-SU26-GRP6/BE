@@ -23,12 +23,6 @@ public class VenueConfiguration : IEntityTypeConfiguration<Venue>
             .IsRequired()
             .HasMaxLength(500);
 
-        builder.Property(v => v.Latitude)
-            .HasPrecision(18, 10);
-
-        builder.Property(v => v.Longitude)
-            .HasPrecision(18, 10);
-
         builder.Property(v => v.PhoneContact)
             .HasMaxLength(20);
 

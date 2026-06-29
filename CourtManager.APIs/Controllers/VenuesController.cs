@@ -120,24 +120,4 @@ public class VenuesController : ControllerBase
         });
     }
 
-    [HttpGet("map/nearby")]
-    public async Task<IActionResult> GetNearbyVenues([FromQuery] double lat, [FromQuery] double lng, [FromQuery] double radius = 5.0)
-    {
-        var query = new GetNearbyVenuesQuery
-        {
-            Latitude = lat,
-            Longitude = lng,
-            RadiusInKm = radius
-        };
-
-        var result = await _mediator.Send(query);
-        
-        return Ok(new
-        {
-            success = true,
-            message = "OK",
-            data = result,
-            errors = Array.Empty<string>()
-        });
-    }
 }

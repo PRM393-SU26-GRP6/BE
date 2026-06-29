@@ -78,37 +78,7 @@ public class VenueRepository : Repository<Venue>, IVenueRepository
         return await query.CountAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<(Venue Venue, double Distance)>> GetNearbyVenuesAsync(
-        double latitude,
-        double longitude,
-        double radiusInKm,
-        CancellationToken cancellationToken = default)
-    {
-        // Simple bounding box for SQL performance (1 deg lat ~ 111km, 1 deg lng ~ 111km at equator)
-        decimal latOffset = (decimal)(radiusInKm / 111.0);
-        decimal lngOffset = (decimal)(radiusInKm / (111.0 * Math.Cos(latitude * Math.PI / 180.0)));
 
-        decimal minLat = (decimal)latitude - latOffset;
-        decimal maxLat = (decimal)latitude + latOffset;
-        decimal minLng = (decimal)longitude - lngOffset;
-        decimal maxLng = (decimal)longitude + lngOffset;
-
-        var venues = await _dbContext.Venues
-            .Include(v => v.Owner)
-            .Include(v => v.FootballFields)
-            .Include(v => v.Reviews)
-            .Where(v => v.IsActive && !v.IsDeleted &&
-                        v.Latitude >= minLat && v.Latitude <= maxLat &&
-                        v.Longitude >= minLng && v.Longitude <= maxLng)
-            .ToListAsync(cancellationToken);
-
-        // Precise Haversine distance in memory
-        return venues
-            .Select(v => (Venue: v, Distance: CalculateDistance(latitude, longitude, (double)v.Latitude, (double)v.Longitude)))
-            .Where(x => x.Distance <= radiusInKm)
-            .OrderBy(x => x.Distance)
-            .ToList();
-    }
 
     public async Task<Venue?> GetVenueByIdAsync(Guid venueId, CancellationToken cancellationToken = default)
     {
@@ -170,22 +140,4 @@ public class VenueRepository : Repository<Venue>, IVenueRepository
         return await BuildOwnerQuery(ownerId, isActive).CountAsync(cancellationToken);
     }
 
-    private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
-    {
-        var R = 6371; // Radius of the earth in km
-        var dLat = Deg2Rad(lat2 - lat1);
-        var dLon = Deg2Rad(lon2 - lon1);
-        var a =
-            Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
-            Math.Cos(Deg2Rad(lat1)) * Math.Cos(Deg2Rad(lat2)) *
-            Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
-        var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-        var d = R * c; // Distance in km
-        return d;
-    }
-
-    private double Deg2Rad(double deg)
-    {
-        return deg * (Math.PI / 180);
-    }
 }

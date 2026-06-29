@@ -33,8 +33,6 @@ public class UpdateVenueCommandHandler : IRequestHandler<UpdateVenueCommand, Ven
 
         venue.VenueName = request.VenueName;
         venue.Address = request.Address;
-        venue.Latitude = request.Latitude;
-        venue.Longitude = request.Longitude;
         venue.Description = request.Description;
         venue.OpeningHours = request.OpeningHours;
         venue.PhoneContact = request.PhoneContact;

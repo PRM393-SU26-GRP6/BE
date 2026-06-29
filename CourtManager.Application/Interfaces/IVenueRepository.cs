@@ -21,11 +21,7 @@ public interface IVenueRepository : IRepository<Venue>
         double? minRating, 
         CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<(Venue Venue, double Distance)>> GetNearbyVenuesAsync(
-        double latitude,
-        double longitude,
-        double radiusInKm,
-        CancellationToken cancellationToken = default);
+
 
     Task<Venue?> GetVenueByIdAsync(Guid venueId, CancellationToken cancellationToken = default);
     Task<IEnumerable<Amenity>> GetVenueAmenitiesAsync(Guid venueId, CancellationToken cancellationToken = default);

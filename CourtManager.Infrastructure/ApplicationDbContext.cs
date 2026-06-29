@@ -191,18 +191,18 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
 
         var venues = new[]
         {
-            Venue(1, users.Owners[0], "Saigon Riverside Sports Park", "12 Nguyen Huu Canh, Binh Thanh, Ho Chi Minh City", 10.791054m, 106.719809m, "Riverside venue with four compact football fields.", "06:00-23:00", "02873010001", true),
-            Venue(2, users.Owners[0], "Thanh Da Community Football Hub", "91 Binh Quoi, Binh Thanh, Ho Chi Minh City", 10.815713m, 106.731719m, "Community sports hub near Thanh Da peninsula.", "05:30-22:30", "02873010002", true),
-            Venue(3, users.Owners[1], "District 7 Green Pitch", "45 Nguyen Luong Bang, District 7, Ho Chi Minh City", 10.729210m, 106.721916m, "Well maintained turf fields for evening leagues.", "06:00-23:30", "02873010003", true),
-            Venue(4, users.Owners[1], "Phu My Hung Arena", "19 Ton Dat Tien, District 7, Ho Chi Minh City", 10.732221m, 106.704730m, "Premium arena close to office and residential areas.", "06:00-23:00", "02873010004", true),
-            Venue(5, users.Owners[2], "Thu Duc University Stadium", "1 Vo Van Ngan, Thu Duc City, Ho Chi Minh City", 10.849643m, 106.771566m, "Large venue suitable for student tournaments.", "05:00-22:00", "02873010005", true),
-            Venue(6, users.Owners[2], "Linh Trung Five-A-Side Club", "37 Linh Trung, Thu Duc City, Ho Chi Minh City", 10.871823m, 106.779496m, "Neighborhood five-a-side club with loyal weekly players.", "05:30-22:30", "02873010006", true),
-            Venue(7, users.Owners[3], "Tan Binh Flight Path Fields", "88 Bach Dang, Tan Binh, Ho Chi Minh City", 10.813651m, 106.665408m, "Convenient fields near the airport corridor.", "06:00-23:00", "02873010007", true),
-            Venue(8, users.Owners[3], "Go Vap Weekend Arena", "154 Phan Van Tri, Go Vap, Ho Chi Minh City", 10.833116m, 106.680982m, "Popular weekend venue for amateur clubs.", "06:00-23:30", "02873010008", true),
-            Venue(9, users.Owners[0], "Binh Tan Sports Yard", "22 Ten Lua, Binh Tan, Ho Chi Minh City", 10.753894m, 106.607990m, "Accessible west-side venue with affordable slots.", "05:30-22:00", "02873010009", true),
-            Venue(10, users.Owners[1], "Da Nang Han River Football Center", "75 Tran Hung Dao, Son Tra, Da Nang", 16.070884m, 108.229401m, "Modern riverside venue in central Da Nang.", "06:00-23:00", "02367301010", true),
-            Venue(11, users.Owners[2], "Hanoi West Lake Mini Pitch", "28 Trich Sai, Tay Ho, Hanoi", 21.055408m, 105.813839m, "Compact football complex near West Lake.", "06:00-22:30", "02473010011", true),
-            Venue(12, users.Owners[3], "Can Tho Ninh Kieu Sports Ground", "9 Hai Ba Trung, Ninh Kieu, Can Tho", 10.034103m, 105.788535m, "Central Can Tho venue for evening bookings.", "05:30-22:30", "02927301012", true)
+            Venue(1, users.Owners[0], "Saigon Riverside Sports Park", "12 Nguyen Huu Canh, Binh Thanh, Ho Chi Minh City", "Riverside venue with four compact football fields.", "06:00-23:00", "02873010001", true),
+            Venue(2, users.Owners[0], "Thanh Da Community Football Hub", "91 Binh Quoi, Binh Thanh, Ho Chi Minh City", "Community sports hub near Thanh Da peninsula.", "05:30-22:30", "02873010002", true),
+            Venue(3, users.Owners[1], "District 7 Green Pitch", "45 Nguyen Luong Bang, District 7, Ho Chi Minh City", "Well maintained turf fields for evening leagues.", "06:00-23:30", "02873010003", true),
+            Venue(4, users.Owners[1], "Phu My Hung Arena", "19 Ton Dat Tien, District 7, Ho Chi Minh City", "Premium arena close to office and residential areas.", "06:00-23:00", "02873010004", true),
+            Venue(5, users.Owners[2], "Thu Duc University Stadium", "1 Vo Van Ngan, Thu Duc City, Ho Chi Minh City", "Large venue suitable for student tournaments.", "05:00-22:00", "02873010005", true),
+            Venue(6, users.Owners[2], "Linh Trung Five-A-Side Club", "37 Linh Trung, Thu Duc City, Ho Chi Minh City", "Neighborhood five-a-side club with loyal weekly players.", "05:30-22:30", "02873010006", true),
+            Venue(7, users.Owners[3], "Tan Binh Flight Path Fields", "88 Bach Dang, Tan Binh, Ho Chi Minh City", "Convenient fields near the airport corridor.", "06:00-23:00", "02873010007", true),
+            Venue(8, users.Owners[3], "Go Vap Weekend Arena", "154 Phan Van Tri, Go Vap, Ho Chi Minh City", "Popular weekend venue for amateur clubs.", "06:00-23:30", "02873010008", true),
+            Venue(9, users.Owners[0], "Binh Tan Sports Yard", "22 Ten Lua, Binh Tan, Ho Chi Minh City", "Accessible west-side venue with affordable slots.", "05:30-22:00", "02873010009", true),
+            Venue(10, users.Owners[1], "Da Nang Han River Football Center", "75 Tran Hung Dao, Son Tra, Da Nang", "Modern riverside venue in central Da Nang.", "06:00-23:00", "02367301010", true),
+            Venue(11, users.Owners[2], "Hanoi West Lake Mini Pitch", "28 Trich Sai, Tay Ho, Hanoi", "Compact football complex near West Lake.", "06:00-22:30", "02473010011", true),
+            Venue(12, users.Owners[3], "Can Tho Ninh Kieu Sports Ground", "9 Hai Ba Trung, Ninh Kieu, Can Tho", "Central Can Tho venue for evening bookings.", "05:30-22:30", "02927301012", true)
         };
         modelBuilder.Entity<Venue>().HasData(venues);
 
@@ -469,15 +469,13 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid, Identity
         return new Guid(bytes);
     }
 
-    private static Venue Venue(int id, Guid ownerId, string name, string address, decimal latitude, decimal longitude, string description, string openingHours, string phone, bool isActive)
+    private static Venue Venue(int id, Guid ownerId, string name, string address, string description, string openingHours, string phone, bool isActive)
         => new()
         {
             VenueId = Id("venue", id),
             OwnerId = ownerId,
             VenueName = name,
             Address = address,
-            Latitude = latitude,
-            Longitude = longitude,
             Description = description,
             OpeningHours = openingHours,
             PhoneContact = phone,

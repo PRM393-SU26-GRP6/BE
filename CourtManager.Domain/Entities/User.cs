@@ -40,7 +40,4 @@ public class User : IdentityUser<Guid>
     public ICollection<Discount> CreatedDiscounts { get; set; } = [];
     public ICollection<UserDevice> Devices { get; set; } = [];
     
-    // Wallet navigation properties
-    public ICollection<WalletTransaction> WalletTransactions { get; set; } = [];
-    public ICollection<WithdrawalRequest> WithdrawalRequests { get; set; } = [];
 }

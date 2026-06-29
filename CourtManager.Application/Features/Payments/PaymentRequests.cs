@@ -258,18 +258,15 @@ public class RefundPaymentCommandHandler : IRequestHandler<RefundPaymentCommand,
 {
     private readonly IPaymentRepository _paymentRepository;
     private readonly IUserRepository _userRepository;
-    private readonly IWalletTransactionRepository _walletTransactionRepository;
     private readonly IMapper _mapper;
 
     public RefundPaymentCommandHandler(
         IPaymentRepository paymentRepository,
         IUserRepository userRepository,
-        IWalletTransactionRepository walletTransactionRepository,
         IMapper mapper)
     {
         _paymentRepository = paymentRepository;
         _userRepository = userRepository;
-        _walletTransactionRepository = walletTransactionRepository;
         _mapper = mapper;
     }
 
@@ -300,23 +297,7 @@ public class RefundPaymentCommandHandler : IRequestHandler<RefundPaymentCommand,
             var ownerId = payment.Booking.BookingItems.FirstOrDefault()?.Slot?.Field?.Venue?.OwnerId;
             if (ownerId != null)
             {
-                // Revert the owner's 90% share
-                const decimal commissionRate = 0.10m;
-                decimal ownerShare = payment.Amount * (1 - commissionRate);
-                
-                await _userRepository.UpdateWalletBalanceAsync(ownerId.Value, -ownerShare, cancellationToken);
-
-                var walletTransaction = new WalletTransaction
-                {
-                    Id = Guid.NewGuid(),
-                    OwnerId = ownerId.Value,
-                    Type = WalletTransactionType.Refund,
-                    Amount = -ownerShare,
-                    Description = $"Refund for {payment.PaymentType} payment from booking {payment.BookingId}",
-                    RelatedBookingId = payment.BookingId,
-                    CreatedAt = DateTime.UtcNow
-                };
-                await _walletTransactionRepository.AddAsync(walletTransaction, cancellationToken);
+                // Refund handled manually by Admin offline
             }
         }
 
@@ -362,18 +343,15 @@ public class ProcessPaymentGatewayCallbackCommandHandler : IRequestHandler<Proce
 {
     private readonly IPaymentRepository _paymentRepository;
     private readonly IUserRepository _userRepository;
-    private readonly IWalletTransactionRepository _walletTransactionRepository;
     private readonly INotificationRepository _notificationRepository;
 
     public ProcessPaymentGatewayCallbackCommandHandler(
         IPaymentRepository paymentRepository,
         IUserRepository userRepository,
-        IWalletTransactionRepository walletTransactionRepository,
         INotificationRepository notificationRepository)
     {
         _paymentRepository = paymentRepository;
         _userRepository = userRepository;
-        _walletTransactionRepository = walletTransactionRepository;
         _notificationRepository = notificationRepository;
     }
 
@@ -403,7 +381,6 @@ public class ProcessPaymentGatewayCallbackCommandHandler : IRequestHandler<Proce
             await PaymentSideEffectHelper.ApplyPaymentSuccessSideEffectsAsync(
                 payment,
                 _userRepository,
-                _walletTransactionRepository,
                 _notificationRepository,
                 cancellationToken);
         }
@@ -452,22 +429,16 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
 {
     private readonly IPaymentRepository _paymentRepository;
     private readonly IUserRepository _userRepository;
-    private readonly IWalletTransactionRepository _walletTransactionRepository;
     private readonly INotificationRepository _notificationRepository;
-    private readonly IWithdrawalRepository _withdrawalRepository;
 
     public ProcessSePayWebhookCommandHandler(
         IPaymentRepository paymentRepository,
         IUserRepository userRepository,
-        IWalletTransactionRepository walletTransactionRepository,
-        INotificationRepository notificationRepository,
-        IWithdrawalRepository withdrawalRepository)
+        INotificationRepository notificationRepository)
     {
         _paymentRepository = paymentRepository;
         _userRepository = userRepository;
-        _walletTransactionRepository = walletTransactionRepository;
         _notificationRepository = notificationRepository;
-        _withdrawalRepository = withdrawalRepository;
     }
 
     public async Task<PaymentGatewayCallbackResultDto> Handle(ProcessSePayWebhookCommand request, CancellationToken cancellationToken)
@@ -535,7 +506,6 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
             await PaymentSideEffectHelper.ApplyPaymentSuccessSideEffectsAsync(
                 payment,
                 _userRepository,
-                _walletTransactionRepository,
                 _notificationRepository,
                 cancellationToken);
         }
@@ -586,7 +556,6 @@ internal static class PaymentSideEffectHelper
     public static async Task ApplyPaymentSuccessSideEffectsAsync(
         Payment payment,
         IUserRepository userRepository,
-        IWalletTransactionRepository walletTransactionRepository,
         INotificationRepository notificationRepository,
         CancellationToken cancellationToken)
     {
@@ -598,25 +567,9 @@ internal static class PaymentSideEffectHelper
 
         if (owner != null)
         {
-            // Calculate owner's share (90% of payment amount)
+            // Calculate owner's share for notification purposes
             const decimal commissionRate = 0.10m;
             decimal ownerShare = payment.Amount * (1 - commissionRate);
-
-            // Credit owner's wallet
-            await userRepository.UpdateWalletBalanceAsync(owner.Id, ownerShare, cancellationToken);
-
-            // Create wallet transaction record
-            var walletTransaction = new WalletTransaction
-            {
-                Id = Guid.NewGuid(),
-                OwnerId = owner.Id,
-                Type = WalletTransactionType.Deposit,
-                Amount = ownerShare,
-                Description = $"{payment.PaymentType} payment from booking {payment.BookingId} (Transaction: {payment.TransactionCode})",
-                RelatedBookingId = payment.BookingId,
-                CreatedAt = DateTime.UtcNow
-            };
-            await walletTransactionRepository.AddAsync(walletTransaction, cancellationToken);
 
             // Send notification to owner
             var notification = new Notification

@@ -29,7 +29,12 @@ public class SePaySettings
     public string BasicAuthCredentials => 
         Convert.ToBase64String(Encoding.UTF8.GetBytes($"{EffectiveMerchantId}:{EffectiveSecretKey}"));
 
-    // SePay Payment Gateway URLs (Sandbox)
-    public string ApiBaseUrl => "https://pgapi-sandbox.sepay.vn";
-    public string CheckoutBaseUrl => "https://pay-sandbox.sepay.vn";
+    // SePay Payment Gateway URLs
+    public string ApiBaseUrl => Environment.Equals("production", StringComparison.OrdinalIgnoreCase) 
+        ? "https://pgapi.sepay.vn" 
+        : "https://pgapi-sandbox.sepay.vn";
+        
+    public string CheckoutBaseUrl => Environment.Equals("production", StringComparison.OrdinalIgnoreCase) 
+        ? "https://pay.sepay.vn" 
+        : "https://pay-sandbox.sepay.vn";
 }

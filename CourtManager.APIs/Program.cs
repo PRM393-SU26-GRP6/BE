@@ -58,19 +58,16 @@ app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 // Enable Static Files (Required for Custom Swagger CSS)
 app.UseStaticFiles();
 
-// Swagger UI Configuration
-if (app.Environment.IsDevelopment())
+// Swagger UI Configuration (Enabled for all environments for project demo)
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Court Manager API v1.0.0");
-        options.RoutePrefix = string.Empty;
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Court Manager API v1.0.0");
+    options.RoutePrefix = string.Empty;
 
-        // Inject Custom Cyberpunk Swagger Theme
-        options.InjectStylesheet("/swagger-cyberpunk.css");
-    });
-}
+    // Inject Custom Cyberpunk Swagger Theme
+    options.InjectStylesheet("/swagger-cyberpunk.css");
+});
 
 // app.UseHttpsRedirection();
 app.UseHttpsRedirection();

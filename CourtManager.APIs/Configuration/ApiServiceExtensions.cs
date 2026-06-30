@@ -125,7 +125,7 @@ public static class ApiServiceExtensions
             {
                 if (allowedOrigins.Length == 0)
                 {
-                    policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
+                    policy.AllowAnyOrigin()
                           .AllowAnyMethod()
                           .AllowAnyHeader();
                 }

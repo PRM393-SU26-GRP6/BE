@@ -804,7 +804,7 @@
     "amount": 150000,
     "description": "CMABC123XYZ",
     "status": "Pending",
-    "qrUrl": "https://qr.sepay.vn/img?acc=0000000001&bank=tpb&amount=150000&des=CMABC123XYZ",
+    "vietQrUrl": "https://vietqr.app/img?bank=TPBank&acc=0000000001&template=standee&holder=NGUYEN%20VAN%20A&store=Court%20Manager&amount=150000&des=CMABC123XYZ",
     "bankInfo": {
       "bankId": "tpb",
       "accountNo": "0000000001",

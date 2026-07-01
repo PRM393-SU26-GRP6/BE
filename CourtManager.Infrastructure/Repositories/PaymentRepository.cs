@@ -24,13 +24,6 @@ public class PaymentRepository : Repository<Payment>, IPaymentRepository
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    public async Task<Payment?> GetByBookingIdAsync(Guid bookingId, CancellationToken cancellationToken = default)
-    {
-        return await _dbSet
-            .Include(p => p.Booking)
-            .FirstOrDefaultAsync(p => p.BookingId == bookingId, cancellationToken);
-    }
-
     public async Task<Payment?> GetByTransactionIdAsync(string transactionCode, CancellationToken cancellationToken = default)
     {
         return await _dbSet

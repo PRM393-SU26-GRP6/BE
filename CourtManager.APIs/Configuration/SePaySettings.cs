@@ -22,6 +22,10 @@ public class SePaySettings
     public string AccountNo { get; set; } = string.Empty;
     public string AccountName { get; set; } = string.Empty;
 
+    // VietQR settings
+    public string VietQrBankName { get; set; } = "TPBank";
+    public string VietQrStoreName { get; set; } = string.Empty;
+
     public string EffectiveMerchantId => string.IsNullOrWhiteSpace(MerchantId) ? ApiKey : MerchantId;
     public string EffectiveSecretKey => string.IsNullOrWhiteSpace(SecretKey) ? ApiSecret : SecretKey;
     public string EffectiveWebhookApiKey => string.IsNullOrWhiteSpace(WebhookApiKey) ? ApiKey : WebhookApiKey;

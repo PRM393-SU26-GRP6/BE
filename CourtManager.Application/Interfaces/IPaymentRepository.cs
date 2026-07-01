@@ -7,7 +7,6 @@ namespace CourtManager.Application.Interfaces;
 /// </summary>
 public interface IPaymentRepository : IRepository<Payment>
 {
-    Task<Payment?> GetByBookingIdAsync(Guid bookingId, CancellationToken cancellationToken = default);
     Task<Payment?> GetByTransactionIdAsync(string transactionId, CancellationToken cancellationToken = default);
     Task<Payment?> GetByGatewayReferenceAsync(string gateway, string referenceCode, CancellationToken cancellationToken = default);
     Task<Payment?> GetByGatewayTransactionIdAsync(string gateway, string gatewayTransactionId, CancellationToken cancellationToken = default);

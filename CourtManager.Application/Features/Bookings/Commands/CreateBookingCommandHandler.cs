@@ -3,6 +3,7 @@ using CourtManager.Application.DTOs;
 using CourtManager.Application.Exceptions;
 using CourtManager.Domain.Entities;
 using CourtManager.Application.Interfaces;
+using CourtManager.Application.Features.Notifications;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,7 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
     private readonly ITimeSlotRepository _timeSlotRepository;
     private readonly IDiscountRepository _discountRepository;
     private readonly INotificationRepository _notificationRepository;
+    private readonly IRealtimeEventPublisher _realtimePublisher;
     private readonly IMapper _mapper;
 
     public CreateBookingCommandHandler(
@@ -29,6 +31,7 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
         ITimeSlotRepository timeSlotRepository,
         IDiscountRepository discountRepository,
         INotificationRepository notificationRepository,
+        IRealtimeEventPublisher realtimePublisher,
         IMapper mapper)
     {
         _userRepository = userRepository;
@@ -37,6 +40,7 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
         _timeSlotRepository = timeSlotRepository;
         _discountRepository = discountRepository;
         _notificationRepository = notificationRepository;
+        _realtimePublisher = realtimePublisher;
         _mapper = mapper;
     }
 
@@ -180,9 +184,11 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
                 .Select(s => s.Field!.Venue!.OwnerId)
                 .FirstOrDefault(id => id != Guid.Empty);
 
+            Notification? bookingNotification = null;
+
             if (notificationOwnerId != Guid.Empty)
             {
-                await _notificationRepository.AddAsync(new Notification
+                bookingNotification = new Notification
                 {
                     NotificationId = Guid.NewGuid(),
                     SenderId = request.UserId,
@@ -199,11 +205,20 @@ public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand,
                             UserId = notificationOwnerId
                         }
                     ]
-                }, cancellationToken);
+                };
+                await _notificationRepository.AddAsync(bookingNotification, cancellationToken);
             }
 
             var createdBooking = await _bookingRepository.AddAsync(booking, cancellationToken);
             await _bookingRepository.SaveChangesAsync(cancellationToken);
+
+            if (bookingNotification != null)
+            {
+                var notificationDto = GetNotificationsQueryHandler.ToDto(bookingNotification, notificationOwnerId);
+                var unreadCount = await _notificationRepository.GetUnreadCountAsync(notificationOwnerId, cancellationToken);
+                await _realtimePublisher.PublishNotificationCreatedAsync(notificationOwnerId, notificationDto, cancellationToken);
+                await _realtimePublisher.PublishNotificationUnreadCountChangedAsync(notificationOwnerId, unreadCount, cancellationToken);
+            }
 
             // Detach and reload with all navigation properties
             var loaded = await _bookingRepository.GetByIdWithDetailsAsync(createdBooking.Id, cancellationToken);

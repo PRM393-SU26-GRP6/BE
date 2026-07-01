@@ -157,3 +157,11 @@ VietmapGL(
 
 **Mẹo:** 
 Bạn có thể tích hợp thêm API **Geocoding của Vietmap** (`https://maps.vietmap.vn/api/search/v3?apikey=...&text={địa_chỉ}`) để khi chủ sân gõ địa chỉ vào Textfield, ứng dụng tự động đổi thành Lat/Lng và bay bản đồ tới vị trí đó!
+
+---
+
+## 4. Tóm tắt luồng công việc cho Frontend
+
+1. **Xin API Key của Vietmap (Chỉ làm 1 lần)**: Đăng ký trên trang [maps.vietmap.vn](https://maps.vietmap.vn/) để lấy API Key gắn vào app.
+2. **Luồng "Chủ Sân Tạo/Sửa Sân" (Chuẩn bị Data đầu vào)**: Gắn bản đồ vào form tạo sân. Cho phép chủ sân click vào map để lấy tọa độ `lat`, `lng`. Sau đó nhét vào body JSON gọi API `POST /api/v1/owner/venues` gửi cho Backend.
+3. **Luồng "Khách Hàng Tìm Sân Quanh Đây" (Lấy Data đầu ra)**: Lấy tọa độ GPS của khách (điện thoại khách), gọi API `GET /api/v1/venues?UserLatitude=...&UserLongitude=...&RadiusInKm=5`. Backend sẽ trả về list sân ở gần. Dùng vòng lặp `addSymbol` ghim các sân đó lên bản đồ cho khách.

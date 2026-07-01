@@ -28,9 +28,10 @@ public class UnlockExpiredSlotsCommandHandler : IRequestHandler<UnlockExpiredSlo
 
         foreach (var slot in expiredSlots)
         {
-            // Soft delete - slot will be regenerated when another user locks it
-            slot.IsDeleted = true;
-            slot.DeletedAt = DateTime.UtcNow;
+            slot.SlotStatus = CourtManager.Domain.Enums.SlotStatus.Available;
+            slot.LockedBy = null;
+            slot.LockedUntil = null;
+            slot.UpdatedAt = DateTime.UtcNow;
             await _timeSlotRepository.UpdateAsync(slot, cancellationToken);
         }
 

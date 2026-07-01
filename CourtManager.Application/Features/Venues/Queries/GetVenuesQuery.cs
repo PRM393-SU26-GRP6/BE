@@ -12,6 +12,9 @@ public record GetVenuesQuery : IRequest<PagedResult<VenueDto>>
     public double? MinRating { get; init; }
     public decimal? PriceMin { get; init; }
     public decimal? PriceMax { get; init; }
+    public double? UserLatitude { get; init; }
+    public double? UserLongitude { get; init; }
+    public double? RadiusInKm { get; init; }
     public string? Sort { get; init; }
     
     public int Page { get; init; } = 1;

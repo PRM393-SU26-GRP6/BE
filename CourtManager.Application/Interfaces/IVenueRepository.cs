@@ -10,6 +10,9 @@ public interface IVenueRepository : IRepository<Venue>
         decimal? priceMin, 
         decimal? priceMax, 
         double? minRating, 
+        double? userLatitude,
+        double? userLongitude,
+        double? radiusInKm,
         int skip, 
         int take, 
         CancellationToken cancellationToken = default);
@@ -19,6 +22,9 @@ public interface IVenueRepository : IRepository<Venue>
         decimal? priceMin, 
         decimal? priceMax, 
         double? minRating, 
+        double? userLatitude,
+        double? userLongitude,
+        double? radiusInKm,
         CancellationToken cancellationToken = default);
 
 

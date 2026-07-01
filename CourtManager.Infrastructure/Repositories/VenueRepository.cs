@@ -17,7 +17,10 @@ public class VenueRepository : Repository<Venue>, IVenueRepository
         string? q, 
         decimal? priceMin, 
         decimal? priceMax, 
-        double? minRating)
+        double? minRating,
+        double? userLatitude,
+        double? userLongitude,
+        double? radiusInKm)
     {
         var query = _dbContext.Venues
             .Include(v => v.Owner)
@@ -46,6 +49,24 @@ public class VenueRepository : Repository<Venue>, IVenueRepository
             query = query.Where(v => v.Reviews.Any() && v.Reviews.Average(r => r.Rating) >= minRating.Value);
         }
 
+        if (userLatitude.HasValue && userLongitude.HasValue && radiusInKm.HasValue)
+        {
+            double lat = userLatitude.Value;
+            double lng = userLongitude.Value;
+            double radius = radiusInKm.Value;
+
+            double latDelta = radius / 111.0;
+            double lngDelta = radius / (111.0 * Math.Cos(lat * Math.PI / 180.0));
+
+            double minLat = lat - latDelta;
+            double maxLat = lat + latDelta;
+            double minLng = lng - lngDelta;
+            double maxLng = lng + lngDelta;
+
+            query = query.Where(v => v.Latitude >= minLat && v.Latitude <= maxLat
+                                  && v.Longitude >= minLng && v.Longitude <= maxLng);
+        }
+
         return query;
     }
 
@@ -54,14 +75,28 @@ public class VenueRepository : Repository<Venue>, IVenueRepository
         decimal? priceMin, 
         decimal? priceMax, 
         double? minRating, 
+        double? userLatitude,
+        double? userLongitude,
+        double? radiusInKm,
         int skip, 
         int take, 
         CancellationToken cancellationToken = default)
     {
-        var query = BuildFilterQuery(q, priceMin, priceMax, minRating);
+        var query = BuildFilterQuery(q, priceMin, priceMax, minRating, userLatitude, userLongitude, radiusInKm);
         
+        if (userLatitude.HasValue && userLongitude.HasValue)
+        {
+            query = query.OrderBy(v => 
+                (v.Latitude - userLatitude.Value) * (v.Latitude - userLatitude.Value) + 
+                (v.Longitude - userLongitude.Value) * (v.Longitude - userLongitude.Value)
+            );
+        }
+        else
+        {
+            query = query.OrderByDescending(v => v.CreatedAt);
+        }
+
         return await query
-            .OrderByDescending(v => v.CreatedAt)
             .Skip(skip)
             .Take(take)
             .ToListAsync(cancellationToken);
@@ -72,9 +107,12 @@ public class VenueRepository : Repository<Venue>, IVenueRepository
         decimal? priceMin, 
         decimal? priceMax, 
         double? minRating, 
+        double? userLatitude,
+        double? userLongitude,
+        double? radiusInKm,
         CancellationToken cancellationToken = default)
     {
-        var query = BuildFilterQuery(q, priceMin, priceMax, minRating);
+        var query = BuildFilterQuery(q, priceMin, priceMax, minRating, userLatitude, userLongitude, radiusInKm);
         return await query.CountAsync(cancellationToken);
     }
 

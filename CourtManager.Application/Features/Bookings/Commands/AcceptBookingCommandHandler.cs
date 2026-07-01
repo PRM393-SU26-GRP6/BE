@@ -32,10 +32,10 @@ public class AcceptBookingCommandHandler : IRequestHandler<AcceptBookingCommand,
         if (request.OwnerId != Guid.Empty && !booking.BookingItems.Any(i => i.Slot?.Field?.Venue?.OwnerId == request.OwnerId))
             throw new ValidationException("Only the owner of the booked venue can accept this booking.");
 
-        // Verify booking is in Pending status
-        if (booking.BookingStatus != CourtManager.Domain.Enums.BookingStatus.Pending)
+        // Verify booking is in Pending or Deposited status
+        if (booking.BookingStatus != CourtManager.Domain.Enums.BookingStatus.Pending && booking.BookingStatus != CourtManager.Domain.Enums.BookingStatus.Deposited)
             throw new ValidationException(
-                $"Cannot accept booking. Current status is '{booking.BookingStatus}'. Only 'Pending' bookings can be accepted.");
+                $"Cannot accept booking. Current status is '{booking.BookingStatus}'. Only 'Pending' or 'Deposited' bookings can be accepted.");
 
         // Update booking status to Confirmed
         booking.BookingStatus = CourtManager.Domain.Enums.BookingStatus.Accepted; // Updated from "Confirmed" to match the ER enum

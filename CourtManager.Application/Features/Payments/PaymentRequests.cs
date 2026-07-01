@@ -4,6 +4,7 @@ using CourtManager.Application.Exceptions;
 using CourtManager.Domain.Entities;
 using CourtManager.Domain.Enums;
 using CourtManager.Application.Interfaces;
+using CourtManager.Application.Features.Notifications;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -144,8 +145,8 @@ public class ProcessDepositPaymentCommandHandler : IRequestHandler<ProcessDeposi
             throw new NotFoundException(nameof(Booking), request.Request.BookingId);
         if (booking.UserId != request.UserId)
             throw new ValidationException("Only the booking customer can pay the deposit.");
-        if (booking.BookingStatus != BookingStatus.Accepted)
-            throw new ValidationException("Deposit can only be paid after the owner accepts the booking.");
+        if (booking.BookingStatus != BookingStatus.Accepted && booking.BookingStatus != BookingStatus.Pending)
+            throw new ValidationException("Deposit can only be paid when the booking is Pending or Accepted.");
         if (booking.Payments.Any(p => p.PaymentType == PaymentType.Deposit && p.PaymentStatus != PaymentStatus.Failed))
             throw new ValidationException("Deposit payment is already in progress or has been paid.");
 
@@ -344,15 +345,18 @@ public class ProcessPaymentGatewayCallbackCommandHandler : IRequestHandler<Proce
     private readonly IPaymentRepository _paymentRepository;
     private readonly IUserRepository _userRepository;
     private readonly INotificationRepository _notificationRepository;
+    private readonly IRealtimeEventPublisher _realtimePublisher;
 
     public ProcessPaymentGatewayCallbackCommandHandler(
         IPaymentRepository paymentRepository,
         IUserRepository userRepository,
-        INotificationRepository notificationRepository)
+        INotificationRepository notificationRepository,
+        IRealtimeEventPublisher realtimePublisher)
     {
         _paymentRepository = paymentRepository;
         _userRepository = userRepository;
         _notificationRepository = notificationRepository;
+        _realtimePublisher = realtimePublisher;
     }
 
     public async Task<PaymentGatewayCallbackResultDto> Handle(ProcessPaymentGatewayCallbackCommand request, CancellationToken cancellationToken)
@@ -382,6 +386,7 @@ public class ProcessPaymentGatewayCallbackCommandHandler : IRequestHandler<Proce
                 payment,
                 _userRepository,
                 _notificationRepository,
+                _realtimePublisher,
                 cancellationToken);
         }
 
@@ -430,15 +435,18 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
     private readonly IPaymentRepository _paymentRepository;
     private readonly IUserRepository _userRepository;
     private readonly INotificationRepository _notificationRepository;
+    private readonly IRealtimeEventPublisher _realtimePublisher;
 
     public ProcessSePayWebhookCommandHandler(
         IPaymentRepository paymentRepository,
         IUserRepository userRepository,
-        INotificationRepository notificationRepository)
+        INotificationRepository notificationRepository,
+        IRealtimeEventPublisher realtimePublisher)
     {
         _paymentRepository = paymentRepository;
         _userRepository = userRepository;
         _notificationRepository = notificationRepository;
+        _realtimePublisher = realtimePublisher;
     }
 
     public async Task<PaymentGatewayCallbackResultDto> Handle(ProcessSePayWebhookCommand request, CancellationToken cancellationToken)
@@ -507,6 +515,7 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
                 payment,
                 _userRepository,
                 _notificationRepository,
+                _realtimePublisher,
                 cancellationToken);
         }
 
@@ -557,6 +566,7 @@ internal static class PaymentSideEffectHelper
         Payment payment,
         IUserRepository userRepository,
         INotificationRepository notificationRepository,
+        IRealtimeEventPublisher realtimePublisher,
         CancellationToken cancellationToken)
     {
         payment.Booking!.UpdatedAt = DateTime.UtcNow;
@@ -587,6 +597,12 @@ internal static class PaymentSideEffectHelper
                 }
             };
             await notificationRepository.AddAsync(notification, cancellationToken);
+            await notificationRepository.SaveChangesAsync(cancellationToken);
+            
+            var notificationDto = GetNotificationsQueryHandler.ToDto(notification, owner.Id);
+            var unreadCount = await notificationRepository.GetUnreadCountAsync(owner.Id, cancellationToken);
+            await realtimePublisher.PublishNotificationCreatedAsync(owner.Id, notificationDto, cancellationToken);
+            await realtimePublisher.PublishNotificationUnreadCountChangedAsync(owner.Id, unreadCount, cancellationToken);
         }
 
         if (payment.PaymentType == PaymentType.Deposit)

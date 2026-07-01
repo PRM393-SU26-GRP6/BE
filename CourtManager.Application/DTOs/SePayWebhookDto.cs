@@ -35,9 +35,6 @@ public class SePayWebhookDto
     [JsonPropertyName("accumulated")]
     public decimal Accumulated { get; set; }
 
-    [JsonPropertyName("accumulatedBalance")]
-    public decimal AccumulatedBalance { get; set; }
-
     [JsonPropertyName("content")]
     public string Content { get; set; } = string.Empty;
 

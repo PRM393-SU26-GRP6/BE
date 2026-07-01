@@ -150,26 +150,6 @@ public class PaymentsController : BaseApiController
     }
 
     /// <summary>
-    /// Generic payment gateway callback endpoint.
-    /// </summary>
-    /// <param name="gateway">The gateway name (e.g., "VNPay", "MoMo")</param>
-    /// <param name="callback">The callback payload</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Callback processing result</returns>
-    [HttpPost("callback/{gateway}")]
-    [AllowAnonymous]
-    [ProducesResponseType(typeof(PaymentGatewayCallbackResultDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> PaymentGatewayCallback(
-        string gateway,
-        [FromBody] PaymentGatewayCallbackDto callback,
-        CancellationToken cancellationToken)
-    {
-        _logger.LogInformation("Received {Gateway} payment callback for transaction {TransactionCode}", gateway, callback.TransactionCode);
-        var result = await _mediator.Send(new ProcessPaymentGatewayCallbackCommand(callback, gateway), cancellationToken);
-        return StatusCode(result.StatusCode, result);
-    }
-
-    /// <summary>
     /// SePay webhook endpoint.
     /// Receives automatic bank transfer notifications from SePay.
     /// Secured by API key header validation.
@@ -218,6 +198,13 @@ public class PaymentsController : BaseApiController
             return Unauthorized(new { success = false, message = "Invalid API key" });
         }
 
+        // Validate required fields before processing
+        if (webhook.Id == 0)
+        {
+            _logger.LogWarning("SePay webhook rejected: missing webhook Id");
+            return BadRequest(new { success = false, message = "Invalid webhook payload" });
+        }
+
         _logger.LogInformation("Received SePay webhook: Id={WebhookId}, Amount={Amount}, Content={Content}",
             webhook.Id, webhook.TransferAmount, webhook.Content);
 
@@ -229,15 +216,16 @@ public class PaymentsController : BaseApiController
             webhook.Code,
             webhook.Content,
             webhook.TransferAmount,
-            webhook.ReferenceCode), cancellationToken);
+            webhook.ReferenceCode,
+            webhook.TransactionDate), cancellationToken);
 
-        return StatusCode(result.StatusCode, new
+        // SePay requires EXACTLY {"success": true} - no extra fields
+        if (result.StatusCode is >= 200 and < 300)
         {
-            success = result.StatusCode is >= 200 and < 300,
-            message = result.Message,
-            paymentId = result.PaymentId,
-            status = result.PaymentStatus
-        });
+            return Ok(new { success = true });
+        }
+
+        return StatusCode(result.StatusCode, new { success = false, message = result.Message });
     }
 
     /// <summary>
@@ -260,13 +248,20 @@ public class PaymentsController : BaseApiController
             return BadRequest(new { success = false, message = "Cannot generate QR code. This payment is already processed or cancelled." });
         }
 
+        var description = $"CM{payment.TransactionCode}";
+        var encodedDescription = Uri.EscapeDataString(description);
+        var encodedHolder = Uri.EscapeDataString(_sePaySettings.AccountName);
+        var encodedStore = Uri.EscapeDataString(string.IsNullOrWhiteSpace(_sePaySettings.VietQrStoreName)
+            ? "Court Manager"
+            : _sePaySettings.VietQrStoreName);
+
         var qrResponse = new SePayQrResponseDto
         {
             PaymentId = payment.Id,
             Amount = payment.Amount,
-            Description = $"CM{payment.TransactionCode}",
+            Description = description,
             Status = payment.PaymentStatus,
-            QrUrl = $"https://qr.sepay.vn/img?acc={_sePaySettings.AccountNo}&bank={_sePaySettings.BankId}&amount={payment.Amount}&des=CM{payment.TransactionCode}",
+            VietQrUrl = $"https://vietqr.app/img?bank={_sePaySettings.VietQrBankName}&acc={_sePaySettings.AccountNo}&template=standee&holder={encodedHolder}&store={encodedStore}&amount={payment.Amount}&des={encodedDescription}",
             BankInfo = new BankInfoDto
             {
                 BankId = _sePaySettings.BankId,
@@ -276,38 +271,5 @@ public class PaymentsController : BaseApiController
         };
 
         return Ok(qrResponse);
-    }
-
-    /// <summary>
-    /// Generates SePay Payment Gateway checkout payload (form fields and HMAC-SHA256 signature).
-    /// </summary>
-    /// <param name="paymentId">The payment ID</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Checkout form payload</returns>
-    [HttpGet("{paymentId:guid}/sepay-checkout")]
-    [ProducesResponseType(typeof(SePayCheckoutFormDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetSePayCheckoutPayload(Guid paymentId, CancellationToken cancellationToken)
-    {
-        var isOwnerOrAdmin = User.IsInRole("Admin") || User.IsInRole("Owner");
-        var payment = await _mediator.Send(new GetPaymentByIdPublicQuery(paymentId, CurrentUserId, isOwnerOrAdmin), cancellationToken);
-
-        if (payment.PaymentStatus != CourtManager.Domain.Enums.PaymentStatus.Pending.ToString())
-        {
-            return BadRequest(new { success = false, message = "Cannot generate checkout payload. This payment is already processed or cancelled." });
-        }
-
-        var command = new CourtManager.Application.Features.Payments.Commands.CreateSePayCheckoutCommand(
-            paymentId,
-            _sePaySettings.EffectiveMerchantId,
-            _sePaySettings.EffectiveSecretKey,
-            _sePaySettings.CheckoutBaseUrl,
-            _sePaySettings.SuccessUrl,
-            _sePaySettings.ErrorUrl,
-            _sePaySettings.CancelUrl
-        );
-
-        var payload = await _mediator.Send(command, cancellationToken);
-        return Ok(payload);
     }
 }

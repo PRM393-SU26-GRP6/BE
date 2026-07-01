@@ -17,7 +17,6 @@ public record GetPaymentHistoryQuery(Guid UserId, int PageNumber, int PageSize) 
 public record ProcessDepositPaymentCommand(Guid UserId, ProcessPaymentRequestDto Request) : IRequest<PaymentDto>;
 public record ProcessFullPaymentCommand(Guid UserId, bool IsOwner, bool IsAdmin, ProcessPaymentRequestDto Request) : IRequest<PaymentDto>;
 public record RefundPaymentCommand(Guid PaymentId, Guid UserId, bool IsOwner, bool IsAdmin) : IRequest<PaymentDto>;
-public record ProcessPaymentGatewayCallbackCommand(PaymentGatewayCallbackDto Callback, string Gateway) : IRequest<PaymentGatewayCallbackResultDto>;
 public record ProcessSePayWebhookCommand(
     long WebhookTransactionId,
     string? Gateway,
@@ -26,7 +25,8 @@ public record ProcessSePayWebhookCommand(
     string? Code,
     string Content,
     decimal TransferAmount,
-    string? ReferenceCode) : IRequest<PaymentGatewayCallbackResultDto>;
+    string? ReferenceCode,
+    string? TransactionDate) : IRequest<PaymentGatewayCallbackResultDto>;
 
 public class GetPaymentsByBookingQueryHandler : IRequestHandler<GetPaymentsByBookingQuery, IEnumerable<PaymentDto>>
 {
@@ -172,7 +172,7 @@ public class ProcessDepositPaymentCommandHandler : IRequestHandler<ProcessDeposi
 
         await _paymentRepository.AddAsync(payment, cancellationToken);
         await _paymentRepository.SaveChangesAsync(cancellationToken);
-        
+
         scope.Complete();
         return _mapper.Map<PaymentDto>(payment);
     }
@@ -276,14 +276,14 @@ public class RefundPaymentCommandHandler : IRequestHandler<RefundPaymentCommand,
         var payment = await _paymentRepository.GetByIdAsync(request.PaymentId, cancellationToken);
         if (payment == null)
             throw new NotFoundException(nameof(Payment), request.PaymentId);
-            
+
         var isBookingCustomer = payment.Booking?.UserId == request.UserId;
         var isBookingOwner = request.IsOwner && payment.Booking?.BookingItems.Any(i =>
             i.Slot?.Field?.Venue?.OwnerId == request.UserId) == true;
 
         if (!isBookingCustomer && !isBookingOwner && !request.IsAdmin)
             throw new ValidationException("You are not allowed to refund this payment.");
-            
+
         if (payment.PaymentStatus != PaymentStatus.Success)
             throw new ValidationException("Only successful payments can be refunded.");
 
@@ -340,96 +340,6 @@ public class RefundPaymentCommandHandler : IRequestHandler<RefundPaymentCommand,
     }
 }
 
-public class ProcessPaymentGatewayCallbackCommandHandler : IRequestHandler<ProcessPaymentGatewayCallbackCommand, PaymentGatewayCallbackResultDto>
-{
-    private readonly IPaymentRepository _paymentRepository;
-    private readonly IUserRepository _userRepository;
-    private readonly INotificationRepository _notificationRepository;
-    private readonly IRealtimeEventPublisher _realtimePublisher;
-
-    public ProcessPaymentGatewayCallbackCommandHandler(
-        IPaymentRepository paymentRepository,
-        IUserRepository userRepository,
-        INotificationRepository notificationRepository,
-        IRealtimeEventPublisher realtimePublisher)
-    {
-        _paymentRepository = paymentRepository;
-        _userRepository = userRepository;
-        _notificationRepository = notificationRepository;
-        _realtimePublisher = realtimePublisher;
-    }
-
-    public async Task<PaymentGatewayCallbackResultDto> Handle(ProcessPaymentGatewayCallbackCommand request, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(request.Callback.TransactionCode))
-        {
-            return BadRequest("transactionCode is required");
-        }
-
-        var payment = await _paymentRepository.GetByTransactionIdAsync(request.Callback.TransactionCode, cancellationToken);
-        if (payment == null)
-        {
-            return NotFound("Payment transaction was not found");
-        }
-
-        if (payment.PaymentStatus == PaymentStatus.Success)
-        {
-            return Ok("Payment callback processed", payment.Id, payment.PaymentStatus.ToString());
-        }
-
-        payment.PaymentStatus = request.Callback.Success ? PaymentStatus.Success : PaymentStatus.Failed;
-        payment.PaidAt = request.Callback.Success ? DateTime.UtcNow : payment.PaidAt;
-
-        if (payment.PaymentStatus == PaymentStatus.Success && payment.Booking != null)
-        {
-            await PaymentSideEffectHelper.ApplyPaymentSuccessSideEffectsAsync(
-                payment,
-                _userRepository,
-                _notificationRepository,
-                _realtimePublisher,
-                cancellationToken);
-        }
-
-        await _paymentRepository.SaveChangesAsync(cancellationToken);
-
-        return Ok("Payment callback processed", payment.Id, payment.PaymentStatus.ToString());
-    }
-
-    internal static PaymentGatewayCallbackResultDto Ok(string message, Guid? paymentId = null, string? paymentStatus = null)
-    {
-        return new PaymentGatewayCallbackResultDto
-        {
-            StatusCode = 200,
-            Success = true,
-            Message = message,
-            PaymentId = paymentId,
-            PaymentStatus = paymentStatus
-        };
-    }
-
-    internal static PaymentGatewayCallbackResultDto AcceptedFailure(string message, Guid? paymentId = null, string? paymentStatus = null)
-    {
-        return new PaymentGatewayCallbackResultDto
-        {
-            StatusCode = 200,
-            Success = false,
-            Message = message,
-            PaymentId = paymentId,
-            PaymentStatus = paymentStatus
-        };
-    }
-
-    internal static PaymentGatewayCallbackResultDto BadRequest(string message)
-    {
-        return new PaymentGatewayCallbackResultDto { StatusCode = 400, Success = false, Message = message };
-    }
-
-    internal static PaymentGatewayCallbackResultDto NotFound(string message)
-    {
-        return new PaymentGatewayCallbackResultDto { StatusCode = 404, Success = false, Message = message };
-    }
-}
-
 public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWebhookCommand, PaymentGatewayCallbackResultDto>
 {
     private readonly IPaymentRepository _paymentRepository;
@@ -456,7 +366,7 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
         if (!string.IsNullOrWhiteSpace(request.TransferType) &&
             !request.TransferType.Equals("in", StringComparison.OrdinalIgnoreCase))
         {
-            return ProcessPaymentGatewayCallbackCommandHandler.AcceptedFailure("Ignored non-income SePay transaction.");
+            return PaymentGatewayCallbackResult.AcceptedFailure("Ignored non-income SePay transaction.");
         }
 
         var webhookTransactionId = request.WebhookTransactionId > 0 ? request.WebhookTransactionId.ToString() : null;
@@ -465,7 +375,7 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
             var duplicateByReference = await _paymentRepository.GetByGatewayReferenceAsync(sePayGateway, request.ReferenceCode, cancellationToken);
             if (duplicateByReference != null)
             {
-                return ProcessPaymentGatewayCallbackCommandHandler.Ok("Duplicate SePay webhook ignored", duplicateByReference.Id, duplicateByReference.PaymentStatus.ToString());
+                return PaymentGatewayCallbackResult.Ok("Duplicate SePay webhook ignored", duplicateByReference.Id, duplicateByReference.PaymentStatus.ToString());
             }
         }
 
@@ -474,30 +384,30 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
             var duplicateByTransactionId = await _paymentRepository.GetByGatewayTransactionIdAsync(sePayGateway, webhookTransactionId, cancellationToken);
             if (duplicateByTransactionId != null)
             {
-                return ProcessPaymentGatewayCallbackCommandHandler.Ok("Duplicate SePay webhook ignored", duplicateByTransactionId.Id, duplicateByTransactionId.PaymentStatus.ToString());
+                return PaymentGatewayCallbackResult.Ok("Duplicate SePay webhook ignored", duplicateByTransactionId.Id, duplicateByTransactionId.PaymentStatus.ToString());
             }
         }
 
         var transactionCode = ResolveSePayTransactionCode(request);
         if (string.IsNullOrWhiteSpace(transactionCode))
         {
-            return ProcessPaymentGatewayCallbackCommandHandler.AcceptedFailure("Khong tim thay ma thanh toan trong payload SePay.");
+            return PaymentGatewayCallbackResult.AcceptedFailure("Khong tim thay ma thanh toan trong payload SePay.");
         }
 
         var payment = await _paymentRepository.GetByTransactionIdAsync(transactionCode, cancellationToken);
         if (payment == null)
         {
-            return ProcessPaymentGatewayCallbackCommandHandler.AcceptedFailure($"Khong tim thay don hang tuong ung voi ma thanh toan '{transactionCode}'.");
+            return PaymentGatewayCallbackResult.AcceptedFailure($"Khong tim thay don hang tuong ung voi ma thanh toan '{transactionCode}'.");
         }
 
         if (payment.PaymentStatus == PaymentStatus.Success)
         {
-            return ProcessPaymentGatewayCallbackCommandHandler.Ok("Payment already processed", payment.Id, payment.PaymentStatus.ToString());
+            return PaymentGatewayCallbackResult.Ok("Payment already processed", payment.Id, payment.PaymentStatus.ToString());
         }
 
         if (request.TransferAmount != payment.Amount)
         {
-            return ProcessPaymentGatewayCallbackCommandHandler.AcceptedFailure($"So tien khong khop. Can {payment.Amount}, nhan duoc {request.TransferAmount}", payment.Id, payment.PaymentStatus.ToString());
+            return PaymentGatewayCallbackResult.AcceptedFailure($"So tien khong khop. Can {payment.Amount}, nhan duoc {request.TransferAmount}", payment.Id, payment.PaymentStatus.ToString());
         }
 
         payment.PaymentStatus = PaymentStatus.Success;
@@ -507,7 +417,7 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
         payment.GatewayReferenceCode = request.ReferenceCode;
         payment.GatewayAccountNumber = request.AccountNumber;
         payment.GatewayRawContent = request.Content;
-
+        payment.TransactionDate = request.TransactionDate;
 
         if (payment.Booking != null)
         {
@@ -521,7 +431,7 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
 
         await _paymentRepository.SaveChangesAsync(cancellationToken);
 
-        return ProcessPaymentGatewayCallbackCommandHandler.Ok("Payment confirmed", payment.Id, payment.PaymentStatus.ToString());
+        return PaymentGatewayCallbackResult.Ok("Payment confirmed", payment.Id, payment.PaymentStatus.ToString());
     }
 
     private static string? ResolveSePayTransactionCode(ProcessSePayWebhookCommand request)
@@ -543,20 +453,39 @@ public class ProcessSePayWebhookCommandHandler : IRequestHandler<ProcessSePayWeb
 
         if (cmMatch.Success)
         {
-            return cmMatch.Groups["code"].Value.Trim();
+            return NormalizeTransactionCode(cmMatch.Groups["code"].Value.Trim());
         }
 
+        // Fallback: match DEP/FIN patterns without requiring hyphen after prefix
         var tokenMatch = System.Text.RegularExpressions.Regex.Match(
             request.Content,
-            @"\b(?<code>(?:DEP|FIN)-[A-Za-z0-9-]+)\b",
+            @"\b(?<code>(?:DEP|FIN)[A-Za-z0-9-]+)\b",
             System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
         if (tokenMatch.Success)
         {
-            return tokenMatch.Groups["code"].Value.Trim();
+            return NormalizeTransactionCode(tokenMatch.Groups["code"].Value.Trim());
         }
 
         return null;
+    }
+
+    private static string NormalizeTransactionCode(string code)
+    {
+        if (code.Contains("-"))
+            return code;
+
+        // Restore missing hyphen stripped by banks
+        if (code.StartsWith("DEPOSIT", StringComparison.OrdinalIgnoreCase))
+            return code.Insert("DEPOSIT".Length, "-");
+        
+        if (code.StartsWith("FINAL", StringComparison.OrdinalIgnoreCase))
+            return code.Insert("FINAL".Length, "-");
+            
+        if (code.StartsWith("REFUND", StringComparison.OrdinalIgnoreCase))
+            return code.Insert("REFUND".Length, "-");
+
+        return code;
     }
 }
 
@@ -570,7 +499,7 @@ internal static class PaymentSideEffectHelper
         CancellationToken cancellationToken)
     {
         payment.Booking!.UpdatedAt = DateTime.UtcNow;
-        
+
         // Get the owner from booking items
         var owner = payment.Booking.BookingItems
             .FirstOrDefault()?.Slot?.Field?.Venue?.Owner;
@@ -598,7 +527,7 @@ internal static class PaymentSideEffectHelper
             };
             await notificationRepository.AddAsync(notification, cancellationToken);
             await notificationRepository.SaveChangesAsync(cancellationToken);
-            
+
             var notificationDto = GetNotificationsQueryHandler.ToDto(notification, owner.Id);
             var unreadCount = await notificationRepository.GetUnreadCountAsync(owner.Id, cancellationToken);
             await realtimePublisher.PublishNotificationCreatedAsync(owner.Id, notificationDto, cancellationToken);

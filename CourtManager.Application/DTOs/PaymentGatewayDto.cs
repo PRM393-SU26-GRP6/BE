@@ -1,11 +1,5 @@
 namespace CourtManager.Application.DTOs;
 
-public class PaymentGatewayCallbackDto
-{
-    public string TransactionCode { get; set; } = string.Empty;
-    public bool Success { get; set; }
-}
-
 public class PaymentGatewayCallbackResultDto
 {
     public int StatusCode { get; set; }
@@ -17,7 +11,7 @@ public class PaymentGatewayCallbackResultDto
 
 public class SePayQrResponseDto
 {
-    public string QrUrl { get; set; } = string.Empty;
+    public string VietQrUrl { get; set; } = string.Empty;
     public decimal Amount { get; set; }
     public string Description { get; set; } = string.Empty;
     public Guid PaymentId { get; set; }

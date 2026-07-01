@@ -692,7 +692,7 @@ Step-by-Step Flow:
 1. POST `/api/v1/payments/deposit` với `bookingId`, `paymentMethod`, `transactionCode`.
 2. Nếu `paymentMethod = Cash`, backend set payment `Success`, booking `Deposited`, slot `Booked`.
 3. Nếu SePay/VNPay/MoMo, payment tạo ở `Pending`.
-4. GET `/api/v1/payments/{paymentId}/sepay-qr` hoặc `/sepay-checkout`.
+4. GET `/api/v1/payments/{paymentId}/sepay-qr`.
 5. Payment gateway callback/webhook xac nhan payment.
 6. POST `/api/v1/payments/final` sau khi booking `Deposited`.
 
@@ -1014,10 +1014,8 @@ Không expose qua API: get notification by id, delete notification.
 | POST `/api/v1/payments/deposit` | Bearer | None | `ProcessPaymentRequestDto` | Only booking customer; booking must be `Accepted`; deposit not already successful | 201 `PaymentDto` | 400/401/404 | `{ "bookingId":"...","paymentMethod":"SePay","transactionCode":null }` |
 | POST `/api/v1/payments/final` | Bearer | None | `ProcessPaymentRequestDto` | Customer, booking owner, or admin; booking must be `Deposited`; final not already successful | 201 `PaymentDto` | 400/401/404 | `{ "bookingId":"...","paymentMethod":"Cash" }` |
 | POST `/api/v1/payments/{id}/refund` | Bearer | Route `id` | None | Owner/Admin or payment booking user; payment status must `Success`; sets `Refunded` | `PaymentDto` | 400/401/404 | `POST /api/v1/payments/{id}/refund` |
-| POST `/api/v1/payments/callback/{gateway}` | Public | Route `gateway` | `PaymentGatewayCallbackDto` | `transactionCode` required; sets payment Success/Failed by callback `success` | `PaymentGatewayCallbackResultDto`, status from result | 400/404 result body | `{ "transactionCode":"DEP-2026-0009","success":true }` |
-| POST `/api/v1/payments/webhook/sepay` | Public with `X-API-Key` | Header `X-API-Key` | `SePayWebhookDto` | Invalid/missing API key returns 401; ignores non-income; content must contain `CM{TransactionCode}`; amount must match | `PaymentGatewayCallbackResultDto` | 401 or result success=false | `{ "id":1,"transferType":"in","transferAmount":180000,"content":"CMDEP-2026-0009" }` |
+| POST `/api/v1/payments/webhook/sepay` | Public with `X-API-Key` | Header `X-API-Key` | `SePayWebhookDto` | Invalid/missing API key returns 401; ignores non-income; content must contain `CM{TransactionCode}`; amount must match | `{"success": true}` (SePay requires exact format) | 401, 400 | `{ "id":1,"transferType":"in","transferAmount":180000,"content":"CMDEP-2026-0009" }` |
 | GET `/api/v1/payments/{paymentId}/sepay-qr` | Bearer | Route `paymentId` | None | Uses public payment query internally; builds QR URL from SePay settings | `SePayQrResponseDto` | 401/404 | `GET /api/v1/payments/{paymentId}/sepay-qr` |
-| GET `/api/v1/payments/{paymentId}/sepay-checkout` | Bearer | Route `paymentId` | None | Builds SePay checkout form fields and HMAC SHA256 signature | `SePayCheckoutFormDto` | 401/404 | `GET /api/v1/payments/{paymentId}/sepay-checkout` |
 
 ### Reviews
 
@@ -1221,12 +1219,10 @@ Enums:
 | --- | --- | --- | --- |
 | `ProcessPaymentRequestDto` | `bookingId:Guid`, `paymentMethod:PaymentMethod`, `transactionCode:string?` | `transactionCode` nullable | `{ "bookingId":"...","paymentMethod":"SePay","transactionCode":null }` |
 | `PaymentDto` | `id`, `bookingId`, `amount`, `paymentStatus`, `paymentType`, `paymentMethod`, `transactionCode`, `paidAt?`, `paymentUrl?`, `bookingStatus?` | nullable payment fields in response | `{ "id":"...","amount":175000,"paymentStatus":"Pending","paymentMethod":"SePay" }` |
-| `PaymentGatewayCallbackDto` | `transactionCode:string`, `success:bool` | transactionCode required by handler | `{ "transactionCode":"DEP-2026-0009","success":true }` |
 | `PaymentGatewayCallbackResultDto` | `statusCode:int`, `success:bool`, `message:string`, `paymentId:Guid?`, `paymentStatus:string?` | payment fields nullable | `{ "statusCode":200,"success":true,"message":"Payment confirmed" }` |
-| `SePayWebhookDto` | `id`, `gateway?`, `transactionDate?`, `accountNumber?`, `subAccount?`, `transferType?`, `transferAmount`, `accumulatedBalance`, `content`, `referenceCode?`, `description?` | nullable provider fields | `{ "id":1,"transferType":"in","transferAmount":180000,"content":"CMDEP-2026-0009" }` |
-| `SePayQrResponseDto` | `qrUrl`, `amount`, `description`, `paymentId`, `status`, `bankInfo` | bankInfo object | `{ "qrUrl":"https://qr.sepay.vn/img?...","description":"CMDEP-..." }` |
+| `SePayWebhookDto` | `id`, `gateway?`, `transactionDate?`, `accountNumber?`, `subAccount?`, `transferType?`, `transferAmount`, `accumulated`, `content`, `referenceCode?`, `description?` | nullable provider fields | `{ "id":1,"transferType":"in","transferAmount":180000,"content":"CMDEP-2026-0009" }` |
+| `SePayQrResponseDto` | `vietQrUrl`, `amount`, `description`, `paymentId`, `status`, `bankInfo` | bankInfo object | `{ "vietQrUrl":"https://vietqr.app/img?...","description":"CMDEP-..." }` |
 | `BankInfoDto` | `bankId`, `accountNo`, `accountName` | strings | `{ "bankId":"...","accountNo":"...","accountName":"..." }` |
-| `SePayCheckoutFormDto` | `payUrl`, `merchant`, `operation`, `payment_method`, `order_amount`, `currency`, `order_invoice_number`, `order_description`, `customer_id`, `success_url`, `error_url`, `cancel_url`, `signature` | Tên JSON property dùng snake/camel như đang ghi | `{ "payUrl":"...","operation":"PURCHASE","signature":"..." }` |
 
 Enums:
 
@@ -1498,11 +1494,11 @@ Frontend nên normalize tất cả error shape thành:
 
 ### Payment Page
 
-- APIs: POST `/api/v1/payments/deposit`, POST `/api/v1/payments/final`, GET `/api/v1/payments/{id}`, GET `/api/v1/payments/{id}/sepay-qr`, GET `/api/v1/payments/{id}/sepay-checkout`.
+- APIs: POST `/api/v1/payments/deposit`, POST `/api/v1/payments/final`, GET `/api/v1/payments/{id}`, GET `/api/v1/payments/{id}/sepay-qr`.
 - Permissions: Bearer.
 - Dữ liệu: bookingId, paymentMethod, transactionCode.
 - Hành động: tạo payment, hiển thị QR/checkout, poll payment detail nếu cần.
-- Response mong đợi: `PaymentDto`, `SePayQrResponseDto`, `SePayCheckoutFormDto`.
+- Response mong đợi: `PaymentDto`, `SePayQrResponseDto`.
 
 ### Review Page
 

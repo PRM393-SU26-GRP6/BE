@@ -51,6 +51,7 @@ public class OwnerVenuesController : BaseApiController
         var command = new CreateVenueCommand(
             CurrentUserId,
             request.VenueName, request.Address,
+            request.Latitude, request.Longitude,
             request.Description, request.OpeningHours, request.PhoneContact
         );
 
@@ -86,6 +87,7 @@ public class OwnerVenuesController : BaseApiController
         var command = new UpdateVenueCommand(
             id, CurrentUserId,
             request.VenueName, request.Address,
+            request.Latitude, request.Longitude,
             request.Description, request.OpeningHours, request.PhoneContact
         );
 

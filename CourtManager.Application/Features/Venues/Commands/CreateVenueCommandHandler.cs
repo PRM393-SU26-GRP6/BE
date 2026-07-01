@@ -25,6 +25,8 @@ public class CreateVenueCommandHandler : IRequestHandler<CreateVenueCommand, Ven
             OwnerId = request.OwnerId,
             VenueName = request.VenueName,
             Address = request.Address,
+            Latitude = request.Latitude,
+            Longitude = request.Longitude,
             Description = request.Description,
             OpeningHours = request.OpeningHours,
             PhoneContact = request.PhoneContact,

@@ -1,7 +1,10 @@
 using System.Net;
-using System.Net.Mail;
 using CourtManager.Application.Interfaces;
 using Microsoft.Extensions.Configuration;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
+using MimeKit.Text;
 
 namespace CourtManager.Infrastructure.Services;
 
@@ -24,30 +27,25 @@ public class EmailService : IEmailService
         var senderEmail = _configuration["EmailSettings:SenderEmail"] ?? string.Empty;
         var senderPassword = _configuration["EmailSettings:SenderPassword"] ?? string.Empty;
 
-        using var client = new SmtpClient(host, port)
-        {
-            Credentials = new NetworkCredential(senderEmail, senderPassword),
-            EnableSsl = true
-        };
+        var email = new MimeMessage();
+        email.From.Add(new MailboxAddress("CourtManager", senderEmail));
+        email.To.Add(MailboxAddress.Parse(to));
+        email.Subject = subject;
+        email.Body = new TextPart(TextFormat.Html) { Text = body };
 
-        var mailMessage = new MailMessage
-        {
-            From = new MailAddress(senderEmail, "CourtManager"),
-            Subject = subject,
-            Body = body,
-            IsBodyHtml = true
-        };
-
-        mailMessage.To.Add(to);
-
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        using var smtp = new SmtpClient();
+        smtp.Timeout = 5000; // 5 seconds timeout
+        
         try
         {
-            await client.SendMailAsync(mailMessage, cts.Token);
+            await smtp.ConnectAsync(host, port, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(senderEmail, senderPassword);
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
         }
-        catch (OperationCanceledException)
+        catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine("Email sending timed out after 5 seconds.");
+            System.Diagnostics.Debug.WriteLine($"MailKit failed to send email: {ex.Message}");
         }
     }
 }

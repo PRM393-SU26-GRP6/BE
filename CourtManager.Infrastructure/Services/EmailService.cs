@@ -40,6 +40,14 @@ public class EmailService : IEmailService
 
         mailMessage.To.Add(to);
 
-        await client.SendMailAsync(mailMessage);
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        try
+        {
+            await client.SendMailAsync(mailMessage, cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            System.Diagnostics.Debug.WriteLine("Email sending timed out after 5 seconds.");
+        }
     }
 }

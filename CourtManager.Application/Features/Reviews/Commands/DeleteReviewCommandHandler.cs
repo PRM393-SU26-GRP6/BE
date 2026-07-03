@@ -31,6 +31,12 @@ public class DeleteReviewCommandHandler : IRequestHandler<DeleteReviewCommand, b
             throw new NotFoundException($"Review with ID {request.ReviewId} not found");
         }
 
+        if (review.UserId != request.UserId && !request.IsAdminOrOwner)
+        {
+            _logger.LogWarning("User {UserId} is not authorized to delete review {ReviewId}", request.UserId, request.ReviewId);
+            throw new UnauthorizedAccessException("You are not authorized to delete this review.");
+        }
+
         await _reviewRepository.DeleteAsync(review, cancellationToken);
         await _reviewRepository.SaveChangesAsync(cancellationToken);
 

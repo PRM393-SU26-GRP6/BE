@@ -235,14 +235,16 @@ public class ReviewsController : BaseApiController
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin,Owner")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> DeleteReview(Guid id, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Deleting review {ReviewId}", id);
-        var command = new DeleteReviewCommand(id);
+        bool isAdminOrOwner = User.IsInRole(CourtManager.Domain.Enums.RoleType.Admin.ToString()) || 
+                              User.IsInRole(CourtManager.Domain.Enums.RoleType.Owner.ToString());
+        var command = new DeleteReviewCommand(id, CurrentUserId, isAdminOrOwner);
         var result = await _mediator.Send(command, cancellationToken);
         _logger.LogInformation("Review {ReviewId} deleted successfully (soft delete)", id);
         return Ok(new { success = result, message = "Review deleted successfully" });

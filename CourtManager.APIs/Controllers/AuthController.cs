@@ -141,6 +141,26 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Resends a new OTP to the user's email if the previous one expired.
+    /// </summary>
+    [HttpPost("resend-otp")]
+    [Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("AuthPolicy")]
+    [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<AuthResponseDto>> ResendOtp([FromBody] ResendOtpRequestDto request)
+    {
+        var command = new ResendOtpCommand { Email = request.Email };
+        var result = await _mediator.Send(command);
+
+        if (!result.Success)
+        {
+            return BadRequest(result);
+        }
+
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Login user and return access and refresh tokens.
     /// </summary>
     [HttpPost("login")]

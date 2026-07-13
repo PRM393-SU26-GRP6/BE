@@ -31,11 +31,11 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.MinPrice, opt => opt.MapFrom(src => 
                 src.FootballFields.Any() ? src.FootballFields.Min(f => f.PricePerHour) : 0))
             .ForMember(dest => dest.MaxPrice, opt => opt.MapFrom(src => 
-                src.FootballFields.Any() ? src.FootballFields.Max(f => f.PricePerHour) : 0));
+                src.FootballFields.Any() ? src.FootballFields.Max(f => f.PricePerHour) : 0))
+            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.VenueImages));
 
         CreateMap<Venue, VenueDetailDto>()
             .IncludeBase<Venue, VenueDto>()
-            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.VenueImages))
             .ForMember(dest => dest.Amenities, opt => opt.MapFrom(src => src.VenueAmenities.Select(va => va.Amenity)))
             .ForMember(dest => dest.Fields, opt => opt.MapFrom(src => src.FootballFields));
 

@@ -18,4 +18,5 @@ public class VenueDto
     public int TotalReviews { get; set; }
     public decimal MinPrice { get; set; }
     public decimal MaxPrice { get; set; }
+    public List<VenueImageDto> Images { get; set; } = new();
 }

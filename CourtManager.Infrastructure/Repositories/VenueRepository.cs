@@ -26,6 +26,7 @@ public class VenueRepository : Repository<Venue>, IVenueRepository
             .Include(v => v.Owner)
             .Include(v => v.FootballFields)
             .Include(v => v.Reviews)
+            .Include(v => v.VenueImages)
             .Where(v => v.IsActive && !v.IsDeleted);
 
         if (!string.IsNullOrWhiteSpace(q))
@@ -146,6 +147,7 @@ public class VenueRepository : Repository<Venue>, IVenueRepository
             .Include(v => v.Owner)
             .Include(v => v.FootballFields)
             .Include(v => v.Reviews)
+            .Include(v => v.VenueImages)
             .Where(v => v.OwnerId == ownerId && !v.IsDeleted);
 
         if (isActive.HasValue)

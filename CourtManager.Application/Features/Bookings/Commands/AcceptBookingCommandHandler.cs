@@ -24,26 +24,9 @@ public class AcceptBookingCommandHandler : IRequestHandler<AcceptBookingCommand,
     /// </summary>
     public async Task<bool> Handle(AcceptBookingCommand request, CancellationToken cancellationToken)
     {
-        // Fetch the booking
-        var booking = await _bookingRepository.GetByIdAsync(request.BookingId, cancellationToken);
-        if (booking == null)
-            throw new NotFoundException(nameof(Booking), request.BookingId);
-
-        if (request.OwnerId != Guid.Empty && !booking.BookingItems.Any(i => i.Slot?.Field?.Venue?.OwnerId == request.OwnerId))
-            throw new ValidationException("Only the owner of the booked venue can accept this booking.");
-
-        // Verify booking is in Pending or Deposited status
-        if (booking.BookingStatus != CourtManager.Domain.Enums.BookingStatus.Pending && booking.BookingStatus != CourtManager.Domain.Enums.BookingStatus.Deposited)
-            throw new ValidationException(
-                $"Cannot accept booking. Current status is '{booking.BookingStatus}'. Only 'Pending' or 'Deposited' bookings can be accepted.");
-
-        // Update booking status to Confirmed
-        booking.BookingStatus = CourtManager.Domain.Enums.BookingStatus.Accepted; // Updated from "Confirmed" to match the ER enum
-        booking.UpdatedAt = DateTime.UtcNow;
-
-        // Save changes
-        await _bookingRepository.SaveChangesAsync(cancellationToken);
-
-        return true;
+        // AcceptBookingAtomicAsync handles validation, updating the booking status to Accepted,
+        // marking the TimeSlots as Booked, and rejecting any overlapping Pending/Deposited bookings
+        // all within a single database transaction.
+        return await _bookingRepository.AcceptBookingAtomicAsync(request.BookingId, request.OwnerId, cancellationToken);
     }
 }

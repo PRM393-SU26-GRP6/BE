@@ -12,7 +12,7 @@ public class TimeSlotRepository : Repository<TimeSlot>, ITimeSlotRepository
     {
         var dateOnly = DateOnly.FromDateTime(date);
         return await _dbSet
-            .Where(x => x.FieldId == fieldId && !x.IsDeleted && x.SelectedDate == dateOnly)
+            .Where(x => x.FieldId == fieldId && !x.IsDeleted && x.SelectedDate == dateOnly && x.SlotStatus == CourtManager.Domain.Enums.SlotStatus.Available)
             .OrderBy(x => x.StartTime)
             .ToListAsync(cancellationToken);
     }

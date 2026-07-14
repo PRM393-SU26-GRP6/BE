@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using CourtManager.Domain.Entities;
 using CourtManager.Domain.Enums;
 using CourtManager.Application.Interfaces;
+using CourtManager.Application.Exceptions;
 
 namespace CourtManager.Infrastructure.Repositories;
 
@@ -112,5 +113,70 @@ public class BookingRepository : Repository<Booking>, IBookingRepository
     {
         return await IncludeDetails(_db.Bookings)
             .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
+    }
+
+    public async Task<bool> AcceptBookingAtomicAsync(Guid bookingId, Guid ownerId, CancellationToken cancellationToken = default)
+    {
+        await using var transaction = await _db.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            var booking = await IncludeDetails(_db.Bookings)
+                .FirstOrDefaultAsync(b => b.Id == bookingId, cancellationToken);
+
+            if (booking == null)
+                throw new NotFoundException(nameof(Booking), bookingId);
+
+            if (ownerId != Guid.Empty && !booking.BookingItems.Any(i => i.Slot?.Field?.Venue?.OwnerId == ownerId))
+                throw new ValidationException("Only the owner of the booked venue can accept this booking.");
+
+            if (booking.BookingStatus != BookingStatus.Pending && booking.BookingStatus != BookingStatus.Deposited)
+                throw new ValidationException($"Cannot accept booking. Current status is '{booking.BookingStatus}'. Only 'Pending' or 'Deposited' bookings can be accepted.");
+
+            // 1. Update Booking Status
+            booking.BookingStatus = BookingStatus.Accepted;
+            booking.UpdatedAt = DateTime.UtcNow;
+
+            // 2. Update Slot Statuses to Booked
+            var bookedSlotIds = new List<Guid>();
+            foreach (var item in booking.BookingItems)
+            {
+                if (item.Slot != null)
+                {
+                    item.Slot.SlotStatus = SlotStatus.Booked;
+                    bookedSlotIds.Add(item.SlotId);
+                }
+            }
+
+            // 3. Find overlapping Pending bookings and reject them
+            if (bookedSlotIds.Any())
+            {
+                var overlappingBookings = await _db.Bookings
+                    .Include(b => b.BookingItems)
+                    .Where(b => b.Id != bookingId 
+                             && (b.BookingStatus == BookingStatus.Pending || b.BookingStatus == BookingStatus.Deposited)
+                             && !b.IsDeleted)
+                    .ToListAsync(cancellationToken);
+
+                // Filter in memory to avoid complex query translation issues
+                var conflictingBookings = overlappingBookings
+                    .Where(b => b.BookingItems.Any(i => bookedSlotIds.Contains(i.SlotId)))
+                    .ToList();
+
+                foreach (var ob in conflictingBookings)
+                {
+                    ob.BookingStatus = BookingStatus.Rejected;
+                    ob.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            await _db.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            return true;
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 }

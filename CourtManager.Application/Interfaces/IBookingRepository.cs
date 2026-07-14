@@ -25,4 +25,9 @@ public interface IBookingRepository : IRepository<Booking>
     /// Gets a booking by ID with all navigation properties eagerly loaded (Items, Slots, Field, Venue, Payments, etc.)
     /// </summary>
     Task<Booking?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Atomically accepts a booking, updates slot statuses to Booked, and rejects overlapping pending bookings.
+    /// </summary>
+    Task<bool> AcceptBookingAtomicAsync(Guid bookingId, Guid ownerId, CancellationToken cancellationToken = default);
 }

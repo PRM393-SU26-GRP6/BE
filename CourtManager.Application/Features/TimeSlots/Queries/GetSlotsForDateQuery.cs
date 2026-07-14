@@ -33,6 +33,9 @@ public class GetSlotsForDateQueryHandler
         GetSlotsForDateQuery request,
         CancellationToken cancellationToken)
     {
+        if (request.FieldId == Guid.Empty)
+            throw new ValidationException("FieldId is required.");
+
         var field = await _fieldRepository.GetByIdAsync(request.FieldId, cancellationToken);
         if (field == null)
             throw new NotFoundException(nameof(FootballField), request.FieldId);

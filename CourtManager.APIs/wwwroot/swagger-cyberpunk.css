@@ -16,12 +16,24 @@
    GLOBAL
    ========================================================= */
 
+body {
+    background: var(--bg);
+    margin: 0;
+}
+
 .swagger-ui {
     background: radial-gradient(circle at top left, rgba(255,43,214,0.18), transparent 30%), radial-gradient(circle at bottom right, rgba(0,247,255,0.16), transparent 30%), linear-gradient( 135deg, #07030d, #12091c, #090611 );
     color: var(--text);
     font-family: "Segoe UI", sans-serif;
     min-height: 100vh;
     position: relative;
+}
+
+/* Fix the white authorization bar */
+.swagger-ui .scheme-container {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
     /* cyberpunk grid overlay */

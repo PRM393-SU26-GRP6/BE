@@ -97,7 +97,7 @@ public class TimeSlotsController : BaseApiController
 
     /// <summary>
     /// Locks a time slot for checkout.
-    /// Can lock by SlotId (existing slot) or by field/date/time (creates new slot if needed).
+    /// Requires the ID of an existing persisted slot.
     /// </summary>
     [HttpPost("lock")]
     [Authorize]
@@ -109,13 +109,7 @@ public class TimeSlotsController : BaseApiController
         try
         {
             var userId = CurrentUserId;
-            var command = new LockSlotCommand(
-                request.SlotId,
-                request.FieldId,
-                request.StartTime,
-                request.EndTime,
-                request.SelectedDate,
-                userId);
+            var command = new LockSlotCommand(request.SlotId, userId);
             var result = await _mediator.Send(command);
 
             return Ok(new

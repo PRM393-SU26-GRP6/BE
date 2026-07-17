@@ -30,6 +30,14 @@ public interface ITimeSlotRepository : IRepository<TimeSlot>
         Guid fieldId,
         CancellationToken cancellationToken = default);
 
+    Task<bool> HasOverlappingSlotAsync(
+        Guid fieldId,
+        DateOnly selectedDate,
+        TimeOnly startTime,
+        TimeOnly endTime,
+        Guid? excludedSlotId = null,
+        CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Updates the status of a specific time slot.
     /// </summary>
@@ -76,13 +84,4 @@ public interface ITimeSlotRepository : IRepository<TimeSlot>
         Guid userId,
         CancellationToken cancellationToken = default);
 
-    /// <summary>
-    /// Gets a time slot by field, date, and time.
-    /// </summary>
-    Task<TimeSlot?> GetByFieldDateTimeAsync(
-        Guid fieldId,
-        DateOnly selectedDate,
-        TimeOnly startTime,
-        TimeOnly endTime,
-        CancellationToken cancellationToken = default);
 }

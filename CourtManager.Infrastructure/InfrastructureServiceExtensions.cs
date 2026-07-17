@@ -79,7 +79,6 @@ public static class InfrastructureServiceExtensions
 
         // Register Background Services
         services.AddHostedService<SlotUnlockBackgroundService>();
-        services.AddHostedService<SlotAutoGenerateBackgroundService>();
 
         return services;
     }

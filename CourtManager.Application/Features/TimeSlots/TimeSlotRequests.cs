@@ -82,6 +82,22 @@ public class CreateTimeSlotCommandHandler : IRequestHandler<CreateTimeSlotComman
 
         ValidateSlot(request.Slot.StartTime, request.Slot.EndTime);
 
+        if (request.Slot.Price <= 0)
+        {
+            throw new ValidationException("Price must be greater than zero.");
+        }
+
+        if (await _timeSlotRepository.HasOverlappingSlotAsync(
+                request.Slot.FieldId,
+                request.Slot.SelectedDate,
+                request.Slot.StartTime,
+                request.Slot.EndTime,
+                excludedSlotId: null,
+                cancellationToken))
+        {
+            throw new ValidationException("The time slot overlaps an existing slot for this field.");
+        }
+
         var slot = new TimeSlot
         {
             SlotId = Guid.NewGuid(),
@@ -89,7 +105,7 @@ public class CreateTimeSlotCommandHandler : IRequestHandler<CreateTimeSlotComman
             StartTime = request.Slot.StartTime,
             EndTime = request.Slot.EndTime,
             SelectedDate = request.Slot.SelectedDate,
-            Price = request.Slot.Price > 0 ? request.Slot.Price : field.PricePerHour,
+            Price = request.Slot.Price,
             SlotStatus = ParseSlotStatus(request.Slot.SlotStatus, SlotStatus.Available),
             CreatedAt = DateTime.UtcNow
         };
@@ -130,7 +146,8 @@ public class UpdateTimeSlotCommandHandler : IRequestHandler<UpdateTimeSlotComman
 
     public async Task<TimeSlotDto> Handle(UpdateTimeSlotCommand request, CancellationToken cancellationToken)
     {
-        var slot = await _timeSlotRepository.GetByIdAsync(request.SlotId, cancellationToken);
+        var slot = await _timeSlotRepository.GetByIdWithFieldVenueAsync(
+            request.SlotId, cancellationToken);
         if (slot == null)
         {
             throw new NotFoundException(nameof(TimeSlot), request.SlotId);
@@ -142,6 +159,22 @@ public class UpdateTimeSlotCommandHandler : IRequestHandler<UpdateTimeSlotComman
         }
 
         CreateTimeSlotCommandHandler.ValidateSlot(request.Slot.StartTime, request.Slot.EndTime);
+
+        if (request.Slot.Price <= 0)
+        {
+            throw new ValidationException("Price must be greater than zero.");
+        }
+
+        if (await _timeSlotRepository.HasOverlappingSlotAsync(
+                slot.FieldId,
+                slot.SelectedDate,
+                request.Slot.StartTime,
+                request.Slot.EndTime,
+                excludedSlotId: slot.SlotId,
+                cancellationToken))
+        {
+            throw new ValidationException("The time slot overlaps an existing slot for this field.");
+        }
 
         slot.StartTime = request.Slot.StartTime;
         slot.EndTime = request.Slot.EndTime;

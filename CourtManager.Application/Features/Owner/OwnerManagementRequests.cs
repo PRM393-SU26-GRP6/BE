@@ -295,18 +295,32 @@ public class BulkCreateSlotsCommandHandler : IRequestHandler<BulkCreateSlotsComm
             throw new ValidationException("StartTime and EndTime must be valid time values.");
         }
 
+        CreateTimeSlotCommandHandler.ValidateSlot(startTimeOnly, endTimeOnly);
+
         if (request.Request.SlotDurationMinutes <= 0)
         {
             throw new ValidationException("SlotDurationMinutes must be greater than zero.");
         }
 
-        var created = 0;
+        var windowMinutes = (endTimeOnly - startTimeOnly).TotalMinutes;
+        if (request.Request.SlotDurationMinutes > windowMinutes)
+        {
+            throw new ValidationException(
+                "SlotDurationMinutes cannot be greater than the selected time range.");
+        }
+
+        if (request.Request.Price <= 0)
+        {
+            throw new ValidationException("Price must be greater than zero.");
+        }
+
+        var proposals = new List<TimeSlot>();
         for (var date = request.Request.FromDate.Date; date <= request.Request.ToDate.Date; date = date.AddDays(1))
         {
             for (var slotStart = startTimeOnly; slotStart.AddMinutes(request.Request.SlotDurationMinutes) <= endTimeOnly; slotStart = slotStart.AddMinutes(request.Request.SlotDurationMinutes))
             {
                 var selectedDate = DateOnly.FromDateTime(date);
-                await _timeSlotRepository.AddAsync(new TimeSlot
+                proposals.Add(new TimeSlot
                 {
                     SlotId = Guid.NewGuid(),
                     FieldId = request.FieldId,
@@ -316,13 +330,32 @@ public class BulkCreateSlotsCommandHandler : IRequestHandler<BulkCreateSlotsComm
                     Price = request.Request.Price,
                     SlotStatus = SlotStatus.Available,
                     CreatedAt = DateTime.UtcNow
-                }, cancellationToken);
-                created++;
+                });
             }
         }
 
+        foreach (var proposal in proposals)
+        {
+            if (await _timeSlotRepository.HasOverlappingSlotAsync(
+                    proposal.FieldId,
+                    proposal.SelectedDate,
+                    proposal.StartTime,
+                    proposal.EndTime,
+                    excludedSlotId: null,
+                    cancellationToken))
+            {
+                throw new ValidationException(
+                    $"The time slot {proposal.StartTime:HH\\:mm}-{proposal.EndTime:HH\\:mm} on {proposal.SelectedDate:yyyy-MM-dd} overlaps an existing slot for this field.");
+            }
+        }
+
+        foreach (var proposal in proposals)
+        {
+            await _timeSlotRepository.AddAsync(proposal, cancellationToken);
+        }
+
         await _timeSlotRepository.SaveChangesAsync(cancellationToken);
-        return new BulkCreateSlotsResultDto { CreatedSlots = created };
+        return new BulkCreateSlotsResultDto { CreatedSlots = proposals.Count };
     }
 }
 

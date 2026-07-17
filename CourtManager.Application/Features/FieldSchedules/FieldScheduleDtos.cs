@@ -34,7 +34,7 @@ public class FieldScheduleRowDto
 
 /// <summary>
 /// Response item for GET /api/v1/fields/{id}/slots?date=YYYY-MM-DD.
-/// Combines the schedule (virtual slot definition) with the TimeSlot row (real status) when one exists.
+/// Represents a persisted TimeSlot row available for the requested field and date.
 /// </summary>
 public class SlotForDateDto
 {
@@ -44,7 +44,7 @@ public class SlotForDateDto
     public string EndTimeOfDay { get; set; } = "";   // "HH:mm"
     public decimal Price { get; set; }
     public string SlotStatus { get; set; } = "Available"; // Available / Locked / Booked
-    public Guid? SlotId { get; set; }          // null when no real TimeSlot row exists yet
+    public Guid SlotId { get; set; }           // identity of the persisted TimeSlot row
 }
 
 /// <summary>

@@ -33,6 +33,24 @@ public class TimeSlotRepository : Repository<TimeSlot>, ITimeSlotRepository
             .ToListAsync(cancellationToken);
     }
 
+    public Task<bool> HasOverlappingSlotAsync(
+        Guid fieldId,
+        DateOnly selectedDate,
+        TimeOnly startTime,
+        TimeOnly endTime,
+        Guid? excludedSlotId = null,
+        CancellationToken cancellationToken = default)
+    {
+        return _dbSet.AnyAsync(slot =>
+            slot.FieldId == fieldId &&
+            slot.SelectedDate == selectedDate &&
+            !slot.IsDeleted &&
+            (!excludedSlotId.HasValue || slot.SlotId != excludedSlotId.Value) &&
+            startTime < slot.EndTime &&
+            endTime > slot.StartTime,
+            cancellationToken);
+    }
+
     public async Task UpdateSlotStatusAsync(Guid slotId, string status, CancellationToken cancellationToken = default)
     {
         var slot = await GetByIdAsync(slotId, cancellationToken);
@@ -112,21 +130,5 @@ public class TimeSlotRepository : Repository<TimeSlot>, ITimeSlotRepository
             cancellationToken);
 
         return rowsAffected > 0;
-    }
-
-    public async Task<TimeSlot?> GetByFieldDateTimeAsync(
-        Guid fieldId,
-        DateOnly selectedDate,
-        TimeOnly startTime,
-        TimeOnly endTime,
-        CancellationToken cancellationToken = default)
-    {
-        return await _dbSet
-            .Where(s => s.FieldId == fieldId
-                && s.SelectedDate == selectedDate
-                && s.StartTime == startTime
-                && s.EndTime == endTime
-                && !s.IsDeleted)
-            .FirstOrDefaultAsync(cancellationToken);
     }
 }

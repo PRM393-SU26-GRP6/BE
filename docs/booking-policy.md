@@ -2,4 +2,4 @@
 
 > Bản thảo dùng cho bài thực hành Git; không mô tả cấu hình đang chạy.
 
-Thời gian giữ chỗ: 5 phút.
+Thời gian giữ chỗ: 15 phút.
